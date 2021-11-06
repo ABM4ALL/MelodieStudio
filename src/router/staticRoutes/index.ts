@@ -6,6 +6,7 @@ import Image from '@/views/Image.vue';
 import Button from '@/views/Button.vue';
 import Date from '@/views/Date.vue';
 import Component from '@/views/Component.vue';
+import NetworkShow from "@/views/NetworkShow.vue";
 /**
  * 
  * 路由配置规则：
@@ -25,6 +26,15 @@ export const staticRoutes = [
     path: '/',
     name: '首页',
     component: Home,
+    children: [],
+    meta: {
+      icon: 'el-icon-s-home'
+    }
+  },
+  {
+    path: '/visualize',
+    name: 'Visualize',
+    component: NetworkShow,
     children: [],
     meta: {
       icon: 'el-icon-s-home'

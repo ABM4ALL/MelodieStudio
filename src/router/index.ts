@@ -10,17 +10,6 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  let userInfo = localStorage.getItem('user');
-  if (to.path === "/login") {
-    next();
-  } else {
-    if (userInfo) {
-      next();
-    } else {
-      next({
-        path: '/login'
-      });
-    }
-  }
+  next();
 });
 export default router;
