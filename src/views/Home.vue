@@ -35,7 +35,7 @@ import { useRouter } from "vue-router";
 import { useTheme } from "@/composition/useThemeApi";
 
 
-import request from "@/request/index";
+import request from "@/request/index.js";
 export default {
   setup() {
     const themeApi = useTheme();

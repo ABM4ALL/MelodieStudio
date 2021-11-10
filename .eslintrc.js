@@ -13,9 +13,10 @@ module.exports = {
       parser: "@typescript-eslint/parser"
     },
     rules: {
-      // "@typescript-eslint/no-unused-vars": "off",
-      // "@typescript-eslint/no-explicit-any": "off",
-      // "prefer-const": 'off',
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/camelcase": "off",
+      "prefer-const": 'off',
       "semi": ["error", "always"]
     }
   };
