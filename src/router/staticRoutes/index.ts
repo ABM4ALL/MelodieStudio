@@ -7,6 +7,7 @@ import Button from '@/views/Button.vue';
 import Date from '@/views/Date.vue';
 import Component from '@/views/Component.vue';
 import NetworkShow from "@/views/NetworkShow.vue";
+import GridShow from "@/views/GridShow.vue";
 /**
  * 
  * 路由配置规则：
@@ -24,11 +25,12 @@ import NetworkShow from "@/views/NetworkShow.vue";
 export const staticRoutes = [
   {
     path: '/',
-    name: '首页',
+    name: 'Home',
     component: Home,
     children: [],
     meta: {
-      icon: 'el-icon-s-home'
+      icon: 'el-icon-s-home',
+      title: "Melody Studio"
     }
   },
   {
@@ -39,10 +41,18 @@ export const staticRoutes = [
     meta: {
       icon: 'el-icon-s-home'
     }
+  }, {
+    path: '/grid',
+    name: 'Grid',
+    component: GridShow,
+    children: [],
+    meta: {
+      icon: 'el-icon-s-home'
+    }
   },
   {
-    path: '/doc', 
-    name: '文档',
+    path: '/doc',
+    name: 'Documentations',
     redirect: '/doc/doctxt',
     component: Wrapper,
     meta: {
@@ -50,8 +60,8 @@ export const staticRoutes = [
     },
     children: [
       {
-        path: 'doctxt', 
-        name: '文本',
+        path: 'doctxt',
+        name: 'Text',
         component: Wrapper,
         meta: {
           icon: 'el-icon-s-data'
@@ -98,40 +108,4 @@ export const staticRoutes = [
       }
     ]
   },
-  {
-    path: '/tab',
-    name: '选项',
-    component: Tab,
-    children: [],
-    meta: {
-      icon: 'el-icon-s-release'
-    }
-  },
-  {
-    path: '/button',
-    name: '按钮',
-    component: Button,
-    children: [],
-    meta: {
-      icon: 'el-icon-s-grid'
-    }
-  },
-  {
-    path: '/date',
-    name: '日期',
-    component: Date,
-    children: [],
-    meta: {
-      icon: 'el-icon-date'
-    }
-  },
-  {
-    path: '/component',
-    name: '组件',
-    component: Component,
-    children: [],
-    meta: {
-      icon: 'el-icon-orange'
-    }
-  }
 ];

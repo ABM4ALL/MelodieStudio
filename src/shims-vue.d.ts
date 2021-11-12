@@ -1,4 +1,4 @@
-import { ECharts } from "echarts";
+import { ECharts, EChartsOption } from "echarts";
 import { ComponentCustomProperties } from "vue";
 
 declare module '*.vue' {
@@ -17,5 +17,6 @@ declare module "@vue/runtime-core" {
     $store: Store<State>;
     $ws: WebSocket;
     $chart: ECharts;
+    $echartOptions: EChartsOption;
   }
 }

@@ -5,7 +5,7 @@
       v-for="(item, index) in inputModels"
       :key="index"
     >
-      <span class="demonstration">Customized initial value</span>
+      <span class="demonstration">{{item.name}}</span>
       <el-slider
         v-model="inputValues[item.name].value"
         v-if="item.type === 'number'"
@@ -80,8 +80,8 @@ export default defineComponent({
     //   { name: "d", type: "boolean" },
     // ];
     let inputValues = {
-      reliability: { value: ref(0.9) },
-      recover_rate: { value: ref(0.8) },
+      // reliability: { value: ref(0.9) },
+      // recover_rate: { value: ref(0.8) },
     };
     const formatTooltip = (val) => {
       return val / 100;
