@@ -17,6 +17,7 @@
     "json-server": "^0.16.3",
     "less": "^3.12.2",
     "less-loader": "^7.1.0",
+    "nanoid": "^3.1.30",
     "pug": "^3.0.0",
     "pug-plain-loader": "^1.0.0",
     "vue": "^3.0.0",
