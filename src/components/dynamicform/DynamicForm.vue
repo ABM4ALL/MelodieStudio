@@ -5,7 +5,7 @@
       v-for="(item, index) in inputModels"
       :key="index"
     >
-      <span class="demonstration">{{item.name}}</span>
+      <span class="demonstration">{{ item.name }}</span>
       <el-slider
         v-model="inputValues[item.name].value"
         v-if="item.type === 'number'"
@@ -41,6 +41,13 @@
         <el-switch v-model="inputValues[item.name].value"></el-switch>
       </div>
     </div>
+    <el-alert
+      v-if="paramsModified"
+      type="error"
+      :closable="false"
+      title="Warning: Parameters has changed, please reset the model."
+    >
+    </el-alert>
   </div>
 </template>
 
@@ -63,14 +70,21 @@ export interface SelectionParamType extends ParamType {
   tags: Array<string>;
 }
 
+// Type for complex nested object with dynamic key
+// link: https://stackoverflow.com/questions/39256682/how-to-define-an-interface-for-objects-with-dynamic-keys
+export interface InitialParams {
+  [key: string]: { value: number | string | boolean };
+}
+
 export interface ParamsData {
   paramModels: Array<ParamType | NumberParamType | SelectionParamType>;
-  initialParams: Array<number | string | boolean>;
+  initialParams: InitialParams;
 }
 
 export default defineComponent({
   props: {
     interactiveParams: Object as PropType<ParamsData>,
+    paramsModified: Boolean as PropType<boolean>,
   },
   data() {
     // const inputModels: (ParamType | NumberParamType | SelectionParamType)[] = [
@@ -88,6 +102,7 @@ export default defineComponent({
     };
 
     return {
+      // paramsModified:
       // inputModels,
       inputValues,
       formatTooltip,
@@ -108,6 +123,12 @@ export default defineComponent({
         param.value = ref(param.value);
       }
       this.inputValues = this.interactiveParams.initialParams;
+    },
+    inputValues: {
+      deep: true,
+      handler: function (this: any) {
+        this.$emit("param-changed", this.inputValues);
+      },
     },
   },
   methods: {

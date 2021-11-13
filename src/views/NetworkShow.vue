@@ -1,15 +1,21 @@
 <template>
   <div>
-    <el-row>
+    <el-row type="flex" align="middle">
       <el-button @click="reset">Reset</el-button>
       <!-- <el-button @click="start">Start</el-button> -->
       <el-button @click="step">Step</el-button>
       <el-button @click="loop">Loop</el-button>
       <el-button @click="pause">Pause</el-button>
       <p>Current:{{ currentStep }}</p>
+      <el-tag type="success" v-if="connected">Connected</el-tag>
+      <el-tag type="danger" v-if="!connected">Disconnected</el-tag>
     </el-row>
     <el-row>
-      <dynamic-form :interactiveParams="interactiveParams"></dynamic-form>
+      <dynamic-form
+        :interactiveParams="interactiveParams"
+        @param-changed="paramChanged"
+        :paramsModified="paramsModified"
+      ></dynamic-form>
       <div id="myChart" :style="{ width: '800px', height: '600px' }"></div>
     </el-row>
   </div>
@@ -23,57 +29,17 @@ import DynamicForm, {
   ParamType,
   ParamsData,
 } from "@/components/dynamicform/DynamicForm.vue";
-enum STATES {
-  UNCONFIGURED = 0,
-  READY = 1,
-  RUNNING = 2,
-  FINISHED = 3, // Finished running
-  PAUSED = 4, // Paused
-  LOOP = 5,
-  STEP = 6,
-}
-enum DRAWING_MODES {
-  CANVAS = 0,
-  WEBGL = 1,
-  SVG = 2,
-}
-
-enum COMMANDS {
-  STEP = 0,
-  RESET = 1,
-  CURRENT_DATA = 2,
-  START = 3,
-  GET_PARAMS = 4,
-  SET_PARAMS = 5,
-}
-
-type StatusType = number;
-type ModelStateType = number;
-
-interface VisualizationData {
-  data: echarts.SeriesOption;
-}
-
-interface VisData {
-  type: string;
-  step: number;
-  data: echarts.EChartsOption | ParamsData;
-  modelState: ModelStateType;
-  status: StatusType;
-}
+import BaseVisualizer from "@/views/BaseVisualizer.vue";
+import { DRAWING_MODES } from "@/components/visualizer/visualizerbasics";
 
 export default defineComponent({
+  extends: BaseVisualizer,
   components: {
     DynamicForm,
   },
   name: "hello",
   data() {
     return {
-      interactiveParams: {} as ParamsData,
-      drawingMode: DRAWING_MODES.WEBGL,
-      visualizationState: STATES.STEP,
-      currentStep: 0,
-      STATES: STATES,
       option: {
         title: {
           text: "Basic Graph",
@@ -190,78 +156,11 @@ export default defineComponent({
     };
   },
   mounted() {
-    this.drawLine();
-
-    this.$ws = new WebSocket("ws://127.0.0.1:8765");
-    this.$ws.onopen = () => {
-      console.log("websocket 就绪");
-      this.sendCommand(COMMANDS.CURRENT_DATA, {});
-      this.sendCommand(COMMANDS.GET_PARAMS, {});
-    };
-
-    this.$ws.onmessage = (wsStatus: MessageEvent) => {
-      // if (wsStatus.data!=="") {
-      //   return;
-      // }
-      console.log(wsStatus);
-
-      const data: VisData = JSON.parse(wsStatus.data);
-      if (data.type === "params") {
-        console.log(wsStatus.data);
-        console.log(data);
-        this.updateParams(data.data as ParamsData);
-        return;
-      }
-
-      this.currentStep = data.step;
-      // If status is OK, show data;
-      // else show alert message!
-      if (data.status === 0) {
-        this.setData(data.data as echarts.EChartsOption);
-        // When the running finished, if the visualization mode was loop,
-        //   change it to step!
-        if (data.modelState === this.STATES.FINISHED) {
-          window.alert("Finished, please reset this model!");
-          this.visualizationState = this.STATES.STEP;
-        }
-
-        if (this.visualizationState === this.STATES.LOOP) {
-          this.loop();
-        }
-      } else {
-        window.alert(data.data);
-      }
-    };
+    this.initChart();
+    this.connect();
+    console.log(JSON.stringify(this.option));
   },
   methods: {
-    // start() {
-    //   this.$ws.send("START");
-    //   this.visualizationState = this.STATES.STEP;
-    // },
-    updateParams(params: ParamsData) {
-      console.log(params);
-      this.interactiveParams = params;
-    },
-    step() {
-      this.sendCommand(COMMANDS.STEP, {});
-      this.visualizationState = this.STATES.STEP;
-    },
-
-    reset() {
-      this.sendCommand(COMMANDS.RESET, {});
-      this.visualizationState = this.STATES.STEP;
-      this.sendCommand(COMMANDS.CURRENT_DATA, {});
-    },
-
-    loop() {
-      this.sendCommand(COMMANDS.STEP, {});
-      this.visualizationState = this.STATES.LOOP;
-    },
-
-    pause() {
-      this.visualizationState = this.STATES.STEP;
-    },
-
     async setData(data: echarts.EChartsOption): Promise<void> {
       const series: echarts.GraphSeriesOption =
         data.series as echarts.GraphSeriesOption;
@@ -269,7 +168,6 @@ export default defineComponent({
         console.error("series undefined");
         return;
       }
-      // let series:Array<{data:echarts.number}> = this.option.series! as any;
       if (this.option.series === undefined) {
         return;
       }
@@ -319,15 +217,11 @@ export default defineComponent({
       console.log((t1.valueOf() - t0.valueOf()) / 1000);
     },
 
-    drawLine() {
+    initChart() {
       // 基于准备好的dom，初始化echarts实例
       this.$chart = echarts.init(document.getElementById("myChart") as any);
       // 绘制图表
-      this.$chart.setOption(this.option as any);
-    },
-
-    sendCommand(cmd: number, data: any): void {
-      this.$ws.send(JSON.stringify({ cmd: cmd, data: data }));
+      // this.$chart.setOption(this.option as any);
     },
   },
 });
