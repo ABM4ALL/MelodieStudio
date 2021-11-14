@@ -1,0 +1,67 @@
+{
+    "aaaaa": {
+        "forceUpdate": false,
+        "updatedAt": "2021-11-14T10:02:26.433Z",
+        "title": {
+            "text": "Line Chart",
+            "subtext": "Fake Data"
+        },
+        "xAxis": {
+            "type": "value"
+        },
+        "yAxis": {
+            "type": "value"
+        },
+        "tooltip": {
+            "trigger": "axis",
+            "axisPointer": {
+                "type": "cross"
+            }
+        },
+        "series": [
+            {
+                "data": [],
+                "type": "line",
+                "smooth": true,
+                "showSymbol": false,
+                "name": "series1",
+                "lineStyle": {
+                    "color": "#E3491B",
+                    "width": 2,
+                    "type": "solid"
+                },
+                "symbol": "emptyCircle",
+                "symbolSize": 4
+            },
+            {
+                "data": [],
+                "type": "line",
+                "smooth": true,
+                "showSymbol": false,
+                "name": "series2",
+                "lineStyle": {
+                    "color": "#d48265",
+                    "width": 2,
+                    "type": "solid"
+                },
+                "symbol": "emptyCircle",
+                "symbolSize": 4
+            }
+        ],
+        "legend": {
+            "data": [
+                {
+                    "name": "series1"
+                },
+                {
+                    "name": "series2"
+                }
+            ],
+            "orient": "vertical",
+            "show": true
+        },
+        "textStyle": {
+            "color": "#953535"
+        }
+    }
+}
