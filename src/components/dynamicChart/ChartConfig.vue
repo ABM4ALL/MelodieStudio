@@ -261,16 +261,16 @@ export default defineComponent({
           All options will be reset to default values, and this
           operation is NOT reversible
         </p>
-        <p class="noBreakOut">Are you sure to delete?</p>
+        <p class="noBreakOut">Are you sure to reset?</p>
         <div style="text-align: right; margin: 0">
           <el-button
             size="mini"
             type="text"
             @click="this.deleteConfirmationShow = false"
-            >cancel</el-button
+            >Cancel</el-button
           >
           <el-button type="danger" size="mini" @click="this.deleteSavedOptions"
-            >Delete</el-button
+            >Reset</el-button
           >
         </div>
         <template #reference>

@@ -16,7 +16,7 @@
       :chartName="chartName"
     ></chart-config>
 
-    <el-button @click="onOpenConfigDlg">Tool</el-button>
+    <!-- <el-button @click="onOpenConfigDlg">Tool</el-button> -->
     <div :id="chartDOMID" :style="{ width: '400', height: '300px' }"></div>
   </div>
 </template>

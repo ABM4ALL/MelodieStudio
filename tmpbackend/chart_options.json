@@ -63,5 +63,84 @@
         "textStyle": {
             "color": "#359550"
         }
+    },
+    "mychart1": {
+        "forceUpdate": false,
+        "updatedAt": "2021-11-14T17:09:10.837Z",
+        "title": {
+            "text": "Line Chart",
+            "subtext": "Fake Dataffasdsa"
+        },
+        "xAxis": {
+            "type": "value"
+        },
+        "yAxis": {
+            "type": "value"
+        },
+        "tooltip": {
+            "trigger": "axis",
+            "axisPointer": {
+                "type": "cross"
+            }
+        },
+        "series": [
+            {
+                "name": "series1",
+                "data": [],
+                "type": "line",
+                "smooth": true,
+                "lineStyle": {
+                    "color": "#c23531",
+                    "width": 2,
+                    "type": "solid"
+                },
+                "symbol": "emptyCircle",
+                "showSymbol": false,
+                "symbolSize": 4,
+                "itemStyle": {
+                    "color": "#c23531",
+                    "borderColor": "#000000",
+                    "borderType": "solid",
+                    "borderWidth": 1,
+                    "opacity": 1
+                }
+            },
+            {
+                "name": "series2",
+                "data": [],
+                "type": "line",
+                "smooth": true,
+                "lineStyle": {
+                    "color": "#2f4554",
+                    "width": 2,
+                    "type": "solid"
+                },
+                "symbol": "emptyCircle",
+                "showSymbol": false,
+                "symbolSize": 4,
+                "itemStyle": {
+                    "color": "#2f4554",
+                    "borderColor": "#000000",
+                    "borderType": "solid",
+                    "borderWidth": 1,
+                    "opacity": 1
+                }
+            }
+        ],
+        "legend": {
+            "data": [
+                {
+                    "name": "series1"
+                },
+                {
+                    "name": "series2"
+                }
+            ],
+            "orient": "horizontal",
+            "show": true
+        },
+        "textStyle": {
+            "color": "#000000"
+        }
     }
 }
