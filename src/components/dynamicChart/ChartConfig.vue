@@ -67,8 +67,10 @@ const walker = (obj: object, newObj: ValueTreeType): any => {
 };
 
 export default defineComponent({
-  emits: ["config-modified"],
+  emits: ["config-modified", "delete-saved-option", "drawer-close"],
   props: {
+    showDrawer: { type: Boolean, required: true },
+    chartName: { type: String, required: true },
     initialOptions: { type: Object as PropType<EChartsCoreOption> },
     selectionItems: { type: Object as PropType<any> },
     unchangeableItems: { type: Object as PropType<any> },
@@ -76,6 +78,8 @@ export default defineComponent({
   data() {
     return {
       inEdit: false,
+      configDrawerShow: false,
+      deleteConfirmationShow: false,
       edit: {
         currentEditedObject: Object as any,
         currentEditedID: "",
@@ -105,14 +109,28 @@ export default defineComponent({
       deep: true,
       handler: function (this: any) {
         this.config = this.initialOptions;
-        console.log("config updated!");
+      },
+    },
+    selectionItems: {
+      deep: true,
+      handler: function (this: any) {
+        this.configSelectionItems = this.selectionItems;
+      },
+    },
+    unchangeableItems: {
+      deep: true,
+      handler: function (this: any) {
+        this.configUnchangeableItems = this.unchangeableItems;
+      },
+    },
+    showDrawer: {
+      handler: function (this: any) {
+        this.configDrawerShow = this.showDrawer;
       },
     },
   },
   mounted() {
-    console.log(this.config);
     this.updateTree();
-    console.log(this.configTree);
   },
   methods: {
     updateTree() {
@@ -124,7 +142,6 @@ export default defineComponent({
 
       walker(this.config, obj);
       this.configTree = [obj] as any;
-      console.log(this.configTree);
     },
     formatValue(value: string | number | boolean): string {
       let text = "";
@@ -136,7 +153,6 @@ export default defineComponent({
       return text;
     },
     exitEdit() {
-      console.log("Exit Edit!");
       this.inEdit = false;
       this.updateEditedValue();
       this.$emit("config-modified", this.config);
@@ -151,7 +167,6 @@ export default defineComponent({
         }
         convertedID = convertedID + "-" + idPart;
       }
-      console.log("converted ID:", convertedID);
       return convertedID;
     },
     valueType(id: string) {
@@ -179,10 +194,12 @@ export default defineComponent({
         value = rawValue;
       }
       this.edit.currentEditedObject[this.edit.currentObjectKey] = value;
-
       this.config.updatedAt = new Date();
     },
-
+    deleteSavedOptions() {
+      this.$emit("delete-saved-option");
+      this.deleteConfirmationShow = false;
+    },
     onNodeClick(node) {
       //return if node is not leaf
       if (node.children.length > 0) {
@@ -201,7 +218,6 @@ export default defineComponent({
         p = p[path[i]];
       }
       if (!this.valueChangeable(node.id)) {
-        console.log(`clicked id ${node.id} is unchangeable`);
         return;
       }
       if (this.inEdit) {
@@ -215,80 +231,131 @@ export default defineComponent({
       );
       this.inEdit = true;
     },
+    onDrawerClose() {
+      this.$emit("drawer-close");
+    },
   },
 });
 </script>
 <template>
-  <div>
-    <el-tree
-      :data="configTree"
-      :props="defaultTreeProps"
-      :default-expand-all="true"
-      @node-click="onNodeClick"
-    >
-      <template #default="{ node, data }">
-        <span
-          :class="{
-            unchangeable: !valueChangeable(data.id),
-          }"
-        >
-          <span>{{ node.label }} : </span>
+  <el-drawer
+    v-model="configDrawerShow"
+    title="Chart Options"
+    :modal="false"
+    @close="onDrawerClose"
+  >
+    <template #title>
+      <h3>{{ chartName }}</h3>
 
-          <div v-if="data.children.length === 0" style="display: inline-block">
-            <span
-              v-if="!inEdit || (inEdit && edit.currentEditedID !== data.id)"
+      <el-button @click.stop="exitEdit" size="mini" type="primary"
+        >Save</el-button
+      >
+
+      <el-popover
+        :visible="deleteConfirmationShow"
+        placement="top"
+        :width="160"
+      >
+        <h3>Warning</h3>
+        <p class="noBreakOut">
+          All options will be reset to default values, and this
+          operation is NOT reversible
+        </p>
+        <p class="noBreakOut">Are you sure to delete?</p>
+        <div style="text-align: right; margin: 0">
+          <el-button
+            size="mini"
+            type="text"
+            @click="this.deleteConfirmationShow = false"
+            >cancel</el-button
+          >
+          <el-button type="danger" size="mini" @click="this.deleteSavedOptions"
+            >Delete</el-button
+          >
+        </div>
+        <template #reference>
+          <el-button
+            @click="this.deleteConfirmationShow = true"
+            type="danger"
+            size="mini"
+            >Reset</el-button
+          >
+        </template>
+      </el-popover>
+    </template>
+    <div>
+      <el-tree
+        :data="configTree"
+        :props="defaultTreeProps"
+        :default-expand-all="true"
+        @node-click="onNodeClick"
+      >
+        <template #default="{ node, data }">
+          <span
+            :class="{
+              unchangeable: !valueChangeable(data.id),
+            }"
+          >
+            <span>{{ node.label }} : </span>
+
+            <div
+              v-if="data.children.length === 0"
+              style="display: inline-block"
             >
-              <p v-if="data.type !== 'color'">
-                {{ formatValue(data.value) }}
-              </p>
-              <div
-                v-else
-                :style="{
-                  backgroundColor: data.value,
-                  width: '14px',
-                  height: '14px',
-                }"
-              ></div>
-            </span>
-            <div v-else class="treeEditor">
-              <el-input
-                v-model="edit.currentObjectValue"
-                v-if="
-                  (data.type === 'string' || data.type === 'number') &&
-                  valueType(data.id) === undefined
-                "
-              ></el-input>
-              <el-select
-                v-model="edit.currentObjectValue"
-                v-else-if="
-                  data.type === 'string' && valueType(data.id) !== undefined
-                "
+              <span
+                v-if="!inEdit || (inEdit && edit.currentEditedID !== data.id)"
               >
-                <el-option
-                  v-for="(item, i) in valueType(data.id)"
-                  :key="i"
-                  :label="item"
-                  :value="item"
+                <p v-if="data.type !== 'color'">
+                  {{ formatValue(data.value) }}
+                </p>
+                <div
+                  v-else
+                  :style="{
+                    backgroundColor: data.value,
+                    width: '14px',
+                    height: '14px',
+                  }"
+                ></div>
+              </span>
+              <div v-else class="treeEditor">
+                <el-input
+                  v-model="edit.currentObjectValue"
+                  v-if="
+                    (data.type === 'string' || data.type === 'number') &&
+                    valueType(data.id) === undefined
+                  "
+                ></el-input>
+                <el-select
+                  v-model="edit.currentObjectValue"
+                  v-else-if="
+                    data.type === 'string' && valueType(data.id) !== undefined
+                  "
                 >
-                </el-option>
-              </el-select>
+                  <el-option
+                    v-for="(item, i) in valueType(data.id)"
+                    :key="i"
+                    :label="item"
+                    :value="item"
+                  >
+                  </el-option>
+                </el-select>
 
-              <el-switch
-                v-model="edit.currentObjectValue"
-                v-if="data.type === 'boolean'"
-              />
+                <el-switch
+                  v-model="edit.currentObjectValue"
+                  v-if="data.type === 'boolean'"
+                />
 
-              <el-color-picker
-                v-model="edit.currentObjectValue"
-                v-if="data.type === 'color'"
-              />
+                <el-color-picker
+                  v-model="edit.currentObjectValue"
+                  v-if="data.type === 'color'"
+                />
+              </div>
             </div>
-          </div>
-        </span>
-      </template>
-    </el-tree>
-    <el-button @click.stop="exitEdit" v-show="inEdit">保存</el-button>
-  </div>
+          </span>
+        </template>
+      </el-tree>
+    </div>
+  </el-drawer>
 </template>
 
 <style>
@@ -298,5 +365,22 @@ export default defineComponent({
 
 .unchangeable {
   color: darkgrey;
+}
+.noBreakOut {
+  /* 这两个在技术上是一样的, 为了兼容了浏览器两个都加上 */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* 这个的使用在web-kit中有些危险，他可能会阶段所有东西 */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* 如果浏览器支持的话增加一个连接符(Blink不支持) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 </style>

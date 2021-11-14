@@ -1,7 +1,7 @@
 {
     "aaaaa": {
         "forceUpdate": false,
-        "updatedAt": "2021-11-14T10:02:26.433Z",
+        "updatedAt": "2021-11-14T13:47:48.819Z",
         "title": {
             "text": "Line Chart",
             "subtext": "Fake Data"
@@ -23,14 +23,14 @@
                 "data": [],
                 "type": "line",
                 "smooth": true,
-                "showSymbol": false,
+                "showSymbol": true,
                 "name": "series1",
                 "lineStyle": {
-                    "color": "#E3491B",
+                    "color": "#19EF0E",
                     "width": 2,
                     "type": "solid"
                 },
-                "symbol": "emptyCircle",
+                "symbol": "rect",
                 "symbolSize": 4
             },
             {
@@ -61,7 +61,7 @@
             "show": true
         },
         "textStyle": {
-            "color": "#953535"
+            "color": "#359550"
         }
     }
 }

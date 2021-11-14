@@ -10,7 +10,18 @@ def hello_world():
     return 'Hello Flask!'
 
 
-@app.route('/api/chartOptions')
+@app.route('/api/charts/getChartPolicies')
+def chart_policies():
+    chart_type: str = request.args.get("chartType")
+    with open('chart_policies.json', encoding="utf8") as f:
+        policies = json.load(f)
+    if chart_type not in policies.keys():
+        return json.dumps({"status": 1, "message": f"chart type {chart_type} not found!"})
+    else:
+        return json.dumps({"status": 0, "data": policies[chart_type]})
+
+
+@app.route('/api/charts/chartOptions')
 def chart_option():
     chart_name = request.args.get("chartName")
     if not os.path.exists("chart_options.json"):
@@ -26,7 +37,32 @@ def chart_option():
     # return 'Hello Flask!'
 
 
-@app.route('/api/setChartOptions', methods=["post"])
+@app.route('/api/charts/deleteChartOptions', methods=["post"])
+def delete_chart_options():
+    options: dict = None
+    if os.path.exists("chart_options.json"):
+        try:
+            with open("chart_options.json", "r", encoding="utf8") as f:
+                options = json.load(f)
+                if not isinstance(options, dict):
+                    return json.dumps({"status": 1, "msg": f"Json decode type error: type {options}"})
+        except json.JSONDecodeError:
+            return json.dumps({"status": 1, "msg": "Json decode error"})
+    else:
+        return json.dumps({"status": 1, "msg": "Json file not found"})
+    data = json.loads(request.data)
+    chart_name = data.get("chartName")
+    if options.get(chart_name) is None:
+        return json.dumps({"status": 1, "msg": f"chart {chart_name} options not saved"})
+    else:
+        options.pop(chart_name)
+    with open("chart_options.json", "w", encoding="utf8") as f:
+        json.dump(options, f, indent=4)
+    return json.dumps({"status": 0, "msg": "ok"})
+    # return 'Hello Flask!'
+
+
+@app.route('/api/charts/setChartOptions', methods=["post"])
 def set_chart_option():
     options: dict = None
     if os.path.exists("chart_options.json"):
