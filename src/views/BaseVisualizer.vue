@@ -13,6 +13,7 @@ import {
 } from "@/components/visualizer/visualizerbasics";
 import * as echarts from "echarts";
 import "echarts-gl";
+import { SeriesConfig } from "@/components/dynamicChart/chartutils";
 export default defineComponent({
   data() {
     return {
@@ -26,15 +27,18 @@ export default defineComponent({
       STATES: STATES,
       commandSent: 0,
       lastUpdate: 0 as number,
+
+      seriesConfig: {
+        mychart1: [{ seriesName: "series1" }, { seriesName: "series2" }],
+        mychart2: [
+          { seriesName: "series3" },
+          { seriesName: "series4" },
+          { seriesName: "series5" },
+        ],
+      } as SeriesConfig,
     };
   },
   methods: {
-    // initChart() {
-    //   // 基于准备好的dom，初始化echarts实例
-    //   this.$chart = echarts.init(document.getElementById("myChart") as any);
-    //   // 绘制图表
-    //   this.$chart.setOption(this.option as any);
-    // },
     testMethod() {
       console.log("testMethod");
     },
@@ -86,7 +90,7 @@ export default defineComponent({
           return;
         } else if (data.type === "initOption") {
           console.log(data.data);
-        //   console.log(JSON.stringify(this.optopm));
+          //   console.log(JSON.stringify(this.optopm));
           this.$chart.setOption(data.data as echarts.EChartsOption);
           return;
         }

@@ -16,8 +16,9 @@
         @param-changed="paramChanged"
         :paramsModified="paramsModified"
       ></dynamic-form>
-      <div id="myChart" :style="{ width: '800px', height: '600px' }"></div>
+      <div id="myChart" :style="{ width: '600px', height: '600px' }"></div>
     </el-row>
+    <chart-list :seriesConfig="seriesConfig" ref="chartList"></chart-list>
   </div>
 </template>
 
@@ -30,12 +31,14 @@ import DynamicForm, {
   ParamsData,
 } from "@/components/dynamicform/DynamicForm.vue";
 import BaseVisualizer from "@/views/BaseVisualizer.vue";
+import ChartList from "@/components/dynamicChart/ChartList.vue";
 import { DRAWING_MODES } from "@/components/visualizer/visualizerbasics";
 
 export default defineComponent({
   extends: BaseVisualizer,
   components: {
     DynamicForm,
+    ChartList,
   },
   name: "hello",
   data() {

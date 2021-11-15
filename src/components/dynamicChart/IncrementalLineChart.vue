@@ -16,8 +16,7 @@
       :chartName="chartName"
     ></chart-config>
 
-    <!-- <el-button @click="onOpenConfigDlg">Tool</el-button> -->
-    <div :id="chartDOMID" :style="{ width: '400', height: '300px' }"></div>
+    <div :id="chartDOMID" :style="{ width: '400px', height: '300px' }"></div>
   </div>
 </template>
 
@@ -29,6 +28,8 @@ import {
   ChartPolicies,
   CHART_TYPES,
   generateLineSeriesGeneralOption,
+  SeriesConfig,
+  SingleSeriesConfig,
 } from "./chartutils";
 import { createLinechartDefaultData } from "./defaultoptions";
 import * as echarts from "echarts";
@@ -56,14 +57,14 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    seriesNames: {
-      type: Object as PropType<Array<string>>,
+    seriesConfig: {
+      type: Object as PropType<SingleSeriesConfig[]>,
       required: true,
     },
     externalConfig: Object as PropType<any>,
   },
   data() {
-    const defaultOptions = createLinechartDefaultData(this.seriesNames);
+    const defaultOptions = createLinechartDefaultData(this.seriesConfig);
     return {
       selectionItems: {} as any,
       unchangeableItems: {} as any,
@@ -98,7 +99,8 @@ export default defineComponent({
           const simulationData: { series: echarts.LineSeriesOption[] } = {
             series: [],
           };
-          this.seriesNames?.map((seriesName: string) => {
+          this.seriesConfig?.map((seriesConfig: SingleSeriesConfig) => {
+            const seriesName = seriesConfig.seriesName;
             genericSeriesOptions.push(
               generateLineSeriesGeneralOption(seriesName)
             );
@@ -132,13 +134,14 @@ export default defineComponent({
     async onOptionDelete(): Promise<void> {
       await deleteChartOptions(this.chartName);
 
-      const defaultOptions = createLinechartDefaultData(this.seriesNames);
+      const defaultOptions = createLinechartDefaultData(this.seriesConfig);
       this.chartOption = defaultOptions.genericOption;
       this.$chart.setOption(this.chartOption);
       // console.log(this.simulationData);
       this.$chart.setOption(this.simulationData);
     },
     async addData(step: number, values: Array<number>): Promise<void> {
+      console.log(`chart ${this.chartName} add data ${values}`);
       if (this.simulationData === undefined) {
         console.error("this.simulationData undefined!");
         return;
@@ -154,6 +157,7 @@ export default defineComponent({
       for (let i = 0; i < values.length; i++) {
         this.simulationData.series[i].data!.push([step, values[i]]);
       }
+      console.log(this.simulationData);
       this.needsRender = true;
       this.currentStep += 1;
     },

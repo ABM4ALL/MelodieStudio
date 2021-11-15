@@ -1,4 +1,4 @@
-import { generateLineSeriesGeneralOption } from "./chartutils";
+import { generateLineSeriesGeneralOption, SingleSeriesConfig } from "./chartutils";
 
 const linechartDefaultOptions: echarts.EChartsCoreOption = {
 
@@ -32,7 +32,7 @@ const linechartDefaultOptions: echarts.EChartsCoreOption = {
 
 };
 
-export const createLinechartDefaultData = (seriesNames: string[]): {
+export const createLinechartDefaultData = (seriesNames: SingleSeriesConfig[]): {
     genericOption: echarts.EChartsCoreOption;
     simulationData: { series: echarts.LineSeriesOption[] };
 } => {
@@ -41,7 +41,8 @@ export const createLinechartDefaultData = (seriesNames: string[]): {
     const simulationData: { series: echarts.LineSeriesOption[] } = {
         series: [],
     };
-    seriesNames?.map((seriesName: string) => {
+    seriesNames?.map((singleSeries) => {
+        const seriesName = singleSeries.seriesName;
         genericSeriesOptions.push(generateLineSeriesGeneralOption(seriesName));
         legendData.push({ name: seriesName });
         simulationData.series.push({ data: [], type: "line", name: seriesName });

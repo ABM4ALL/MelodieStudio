@@ -4,6 +4,7 @@ export enum CHART_TYPES {
 }
 const COLORS = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'];
 
+let colorPointer = 0;
 export interface ChartPolicies {
     selectionItems: {
         [key: string]: string[];
@@ -12,7 +13,20 @@ export interface ChartPolicies {
         [key: string]: boolean;
     };
 }
-let colorPointer = 0;
+
+export interface SingleSeriesConfig {
+    seriesName: string;
+}
+// {<chartName>: [{name: series1}, {name: series2}]}
+export interface SeriesConfig {
+    [key: string]: SingleSeriesConfig[];
+}
+
+export interface IncrementalData {
+    chartName: string;
+    series: { name: string; value: number }[];
+}
+
 // generate line series general options
 export const generateLineSeriesGeneralOption = (name: string): echarts.LineSeriesOption => {
     const series: echarts.LineSeriesOption = {
@@ -20,7 +34,7 @@ export const generateLineSeriesGeneralOption = (name: string): echarts.LineSerie
         data: [],
         type: "line",
         smooth: true,
-        
+
         lineStyle: {
             color: COLORS[colorPointer],
             width: 2,
