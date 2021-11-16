@@ -1,6 +1,7 @@
-import os
-from flask import Flask
+from flask import Flask, Blueprint
 from flask import request
+from file_manager import JSONManager
+from messages import Response
 import json
 app = Flask(__name__)
 
@@ -10,79 +11,70 @@ def hello_world():
     return 'Hello Flask!'
 
 
-@app.route('/api/charts/getChartPolicies')
+charts = Blueprint('charts', __name__)
+
+
+@charts.route('getChartPolicies')
 def chart_policies():
     chart_type: str = request.args.get("chartType")
-    with open('chart_policies.json', encoding="utf8") as f:
-        policies = json.load(f)
+    policies, err = JSONManager.from_file('chart_policies.json', dict)
+    if err is not None:
+        return Response.error(err)
     if chart_type not in policies.keys():
-        return json.dumps({"status": 1, "message": f"chart type {chart_type} not found!"})
+        return Response.error(f"chart type {chart_type} not found!")
     else:
-        return json.dumps({"status": 0, "data": policies[chart_type]})
+        return Response.ok(policies[chart_type])
 
 
-@app.route('/api/charts/chartOptions')
+@charts.route('chartOptions')
 def chart_option():
     chart_name = request.args.get("chartName")
-    if not os.path.exists("chart_options.json"):
-        return json.dumps({"status": 1, "message": "json file not found"})
-    with open("chart_options.json", "r", encoding="utf8") as f:
-        options = json.load(f)
-    if not isinstance(options, dict):
-        return json.dumps({"status": 1, "message": "json file format invalid"})
+    options, err = JSONManager.from_file('chart_options.json', dict)
+    if err is not None:
+        return Response.error(err)
     chart_options = options.get(chart_name)
     if chart_options is None:
-        return json.dumps({"status": 1, "message": "chart option not defined"})
-    return json.dumps({"status": 0, "data": chart_options})
-    # return 'Hello Flask!'
-
-
-@app.route('/api/charts/deleteChartOptions', methods=["post"])
-def delete_chart_options():
-    options: dict = None
-    if os.path.exists("chart_options.json"):
-        try:
-            with open("chart_options.json", "r", encoding="utf8") as f:
-                options = json.load(f)
-                if not isinstance(options, dict):
-                    return json.dumps({"status": 1, "msg": f"Json decode type error: type {options}"})
-        except json.JSONDecodeError:
-            return json.dumps({"status": 1, "msg": "Json decode error"})
+        return Response.error("chart option not defined")
     else:
-        return json.dumps({"status": 1, "msg": "Json file not found"})
+        return Response.ok(chart_options)
+
+
+@charts.route('deleteChartOptions', methods=["post"])
+def delete_chart_options():
+    options, err = JSONManager.from_file('chart_options.json', dict)
+    if err is not None:
+        return Response.error(err)
     data = json.loads(request.data)
     chart_name = data.get("chartName")
     if options.get(chart_name) is None:
-        return json.dumps({"status": 1, "msg": f"chart {chart_name} options not saved"})
+        return Response.error(f"chart {chart_name} options not saved")
     else:
         options.pop(chart_name)
-    with open("chart_options.json", "w", encoding="utf8") as f:
-        json.dump(options, f, indent=4)
-    return json.dumps({"status": 0, "msg": "ok"})
-    # return 'Hello Flask!'
+        err = JSONManager.to_file(options, "chart_options.json")
+        if err is not None:
+            return Response.error(err)
+        else:
+            return Response.ok("ok")
 
 
-@app.route('/api/charts/setChartOptions', methods=["post"])
+@charts.route('setChartOptions', methods=["post"])
 def set_chart_option():
-    options: dict = None
-    if os.path.exists("chart_options.json"):
-        try:
-            with open("chart_options.json", "r", encoding="utf8") as f:
-                options = json.load(f)
-        except json.JSONDecodeError:
-            options = {}
-    else:
-        options = {}
+    options, err = JSONManager.from_file('chart_options.json', dict)
+    if err is not None:
+        return Response.error(err)
     data = json.loads(request.data)
     chart_name = data.get("chartName")
     chart_options = data.get("chartOptions")
-    print(data)
+    assert chart_name is not None
     options[chart_name] = chart_options
-    with open("chart_options.json", "w", encoding="utf8") as f:
-        json.dump(options, f, indent=4)
-    return json.dumps({"status": 0, "msg": "ok"})
-    # return 'Hello Flask!'
+    err = JSONManager.to_file(options, "chart_options.json")
+    if err is not None:
+        return Response.error(err)
+    else:
+        return Response.ok("msg")
 
+
+app.register_blueprint(charts, url_prefix="/api/charts")
 
 if __name__ == '__main__':
     app.run(port=8089)

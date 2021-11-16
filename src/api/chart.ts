@@ -6,7 +6,7 @@ export const getChartInitialOptions = async (chartName: string): Promise<echarts
     if (resp.status === 0) {
         return resp.data as EChartsCoreOption;
     } else {
-        console.error(resp.message);
+        console.error(resp.msg);
         return null;
     }
 

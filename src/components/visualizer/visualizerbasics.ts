@@ -3,6 +3,8 @@ import DynamicForm, {
     ParamsData,
     InitialParams
 } from "@/components/dynamicform/DynamicForm.vue";
+import { SeriesModel } from "echarts";
+import { IncrementalData, SeriesConfig } from "../dynamicChart/chartutils";
 export enum STATES {
     UNCONFIGURED = 0,
     READY = 1,
@@ -38,7 +40,7 @@ export interface VisualizationData {
 export interface VisData {
     type: string;
     step: number;
-    data: echarts.EChartsOption | ParamsData;
+    data: { visualizer: echarts.EChartsOption; plots: IncrementalData } | ParamsData | SeriesConfig;
     modelState: ModelStateType;
     status: StatusType;
 }

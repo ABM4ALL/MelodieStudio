@@ -13,7 +13,10 @@ import {
 } from "@/components/visualizer/visualizerbasics";
 import * as echarts from "echarts";
 import "echarts-gl";
-import { SeriesConfig } from "@/components/dynamicChart/chartutils";
+import {
+  IncrementalData,
+  SeriesConfig,
+} from "@/components/dynamicChart/chartutils";
 export default defineComponent({
   data() {
     return {
@@ -28,14 +31,7 @@ export default defineComponent({
       commandSent: 0,
       lastUpdate: 0 as number,
 
-      seriesConfig: {
-        mychart1: [{ seriesName: "series1" }, { seriesName: "series2" }],
-        mychart2: [
-          { seriesName: "series3" },
-          { seriesName: "series4" },
-          { seriesName: "series5" },
-        ],
-      } as SeriesConfig,
+      seriesConfig: {} as SeriesConfig,
     };
   },
   methods: {
@@ -93,25 +89,34 @@ export default defineComponent({
           //   console.log(JSON.stringify(this.optopm));
           this.$chart.setOption(data.data as echarts.EChartsOption);
           return;
-        }
-
-        this.currentStep = data.step;
-        // If status is OK, show data;
-        // else show alert message!
-        if (data.status === 0) {
-          this.setData(data.data as echarts.EChartsOption);
-          // When the running finished, if the visualization mode was loop,
-          //   change it to step!
-          if (data.modelState === this.STATES.FINISHED) {
-            window.alert("Finished, please reset this model!");
-            this.visualizationState = this.STATES.STEP;
-          }
-
-          if (this.visualizationState === this.STATES.LOOP) {
-            this.loop();
-          }
+        } else if (data.type === "initPlotSeries") {
+          console.log("init plot series", data);
+          this.seriesConfig = data.data as SeriesConfig;
         } else {
-          window.alert(data.data);
+          this.currentStep = data.step;
+          // If status is OK, show data;
+          // else show alert message!
+          if (data.status === 0) {
+            this.setData(
+              (data.data as any).visualizer as echarts.EChartsOption
+            );
+            let plots: IncrementalData[] = (data.data as any).plots;
+            console.log("plots", plots);
+
+            (this.$refs["chartList"] as any).addData(this.currentStep, plots);
+            // When the running finished, if the visualization mode was loop,
+            //   change it to step!
+            if (data.modelState === this.STATES.FINISHED) {
+              window.alert("Finished, please reset this model!");
+              this.visualizationState = this.STATES.STEP;
+            }
+
+            if (this.visualizationState === this.STATES.LOOP) {
+              this.loop();
+            }
+          } else {
+            window.alert(data.data);
+          }
         }
       };
     },

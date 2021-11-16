@@ -64,6 +64,22 @@ export default defineComponent({
       timer: null as number | null,
     };
   },
+  watch: {
+    seriesConfig: {
+      deep: true,
+      handler: function (this: any) {
+        const indexCache: { [key: string]: { [key: string]: number } } = {};
+        for (let chartName in this.seriesConfig) {
+          indexCache[chartName] = {};
+          for (let i = 0; i < this.seriesConfig[chartName].length; i++) {
+            const seriesName = this.seriesConfig[chartName][i].seriesName;
+            indexCache[chartName][seriesName] = i;
+          }
+        }
+        this.indexCache = indexCache;
+      },
+    },
+  },
   methods: {
     onChartConfigModified(config: any): void {
       this.config = config;
