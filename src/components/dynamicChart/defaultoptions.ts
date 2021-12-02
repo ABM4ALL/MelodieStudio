@@ -10,6 +10,7 @@ const linechartDefaultOptions: echarts.EChartsCoreOption = {
     },
     xAxis: {
         type: "value",
+        scale: true,
     },
     yAxis: {
         type: "value",

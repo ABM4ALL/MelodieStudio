@@ -9,6 +9,8 @@ import Component from '@/views/Component.vue';
 import NetworkShow from "@/views/NetworkShow.vue";
 import GridShow from "@/views/GridShow.vue";
 import ChartListView from "@/views/ChartListView.vue";
+import Database from "@/views/Database.vue";
+import ThreeVisualizer from "@/views/ThreeVisualizer.vue";
 /**
  * 
  * 路由配置规则：
@@ -61,6 +63,34 @@ export const staticRoutes = [
     }
   },
   {
+    path: '/tools',
+    name: 'Tools',
+    component: Wrapper,
+    children: [
+      {
+        path: 'dbBrowser',
+        name: 'DB Browser',
+        component: Database,
+        children: [],
+        meta: {
+          icon: ''
+        }
+      }
+    ],
+    meta: {
+      icon: 'el-icon-s-home'
+    }
+  },
+  {
+    path: '/threejs-test',
+    name: 'Threejs',
+    component: ThreeVisualizer,
+    children: [],
+    meta: {
+      icon: 'el-icon-s-home'
+    }
+  },
+  {
     path: '/doc',
     name: 'Documentations',
     redirect: '/doc/doctxt',
@@ -68,6 +98,7 @@ export const staticRoutes = [
     meta: {
       icon: 'el-icon-s-order'
     },
+
     children: [
       {
         path: 'doctxt',

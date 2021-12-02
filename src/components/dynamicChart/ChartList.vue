@@ -15,7 +15,6 @@
 <script lang="ts">
 import IncrementalLineChart from "@/components/dynamicChart/IncrementalLineChart.vue";
 import { defineComponent, PropType } from "@vue/runtime-core";
-import { number } from "echarts";
 import { SeriesConfig, IncrementalData } from "./chartutils";
 export default defineComponent({
   components: { IncrementalLineChart },
@@ -112,7 +111,7 @@ export default defineComponent({
           const seriesIndex = this.indexCache[chartName][seriesName];
           seriesData[seriesIndex] = series[j].value;
         }
-        chart.addData(chart.currentStep, seriesData);
+        chart.addData(step, seriesData);
       }
     },
   },
