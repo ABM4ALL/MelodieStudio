@@ -9,7 +9,6 @@ export const getChartInitialOptions = async (chartName: string): Promise<echarts
         console.error(resp.msg);
         return null;
     }
-
 };
 
 export const setChartInitialOptions = async (chartName: string, chartOptions: echarts.EChartsCoreOption): Promise<any> => {

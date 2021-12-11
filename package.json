@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "axios": "^0.21.0",
+    "bootstrap-icons": "^1.7.2",
     "core-js": "^3.6.5",
     "echarts": "^5.2.2",
     "echarts-gl": "^2.0.8",
     "element-plus": "^1.0.2-beta.32",
+    "js-sql-parser": "^1.4.1",
     "json-server": "^0.16.3",
     "less": "^3.12.2",
     "less-loader": "^7.1.0",

@@ -1,261 +1,84 @@
 <template>
-  <el-row>
-    <el-table :data="rowsToShow" style="width: 90%" @scroll="handleScroll">
-      <el-table-column
-        :prop="col.name"
-        :label="col.name"
-        v-for="(col, i) in columns"
-        :key="i"
-      >
-      </el-table-column>
-    </el-table>
-    <el-slider
-      :min="0"
-      :max="sliderMax"
-      v-model="firstRowIndex"
-      vertical
-      height="600px"
-    >
-    </el-slider>
-  </el-row>
+  <div style="height: 100%">
+    <el-row>
+      <el-col :span="16">
+        <el-input
+          v-model="queryForm.sql"
+          placeholder="Please input"
+          @change="onSQLChange"
+        />
+      </el-col>
+      <el-col :span="8">
+        <el-button>
+          Help
+          <!-- <i class="bi-alarm"></i> -->
+          <!-- <i class="el-icon-questionfilled"></i> -->
+        </el-button>
+        <el-popover
+          placement="top-start"
+          title="All Tables:"
+          :width="200"
+          trigger="hover"
+        >
+          <template #reference>
+            <el-button>Desc</el-button>
+          </template>
+          <p v-for="tableName in tableNames" :key="tableName">
+            {{ tableName }}
+          </p>
+        </el-popover>
+
+        <el-popover
+          placement="top-start"
+          title="Settings"
+          :width="200"
+          trigger="hover"
+        >
+          <template #reference>
+            <el-button>Settings</el-button>
+          </template>
+          <el-form>
+            <el-form-item label="Auto Limit">
+              <el-switch v-model="queryForm.autoLimit"></el-switch>
+            </el-form-item>
+          </el-form>
+        </el-popover>
+        <el-button @click="queryTable">Query</el-button>
+      </el-col>
+    </el-row>
+    <el-row style="height: 100%" class="tableContainer">
+      <el-table :data="tableData" @scroll="handleScroll" height="100%">
+        <el-table-column
+          :prop="col.name"
+          :label="col.name"
+          v-for="col in columns"
+          :key="col.name"
+          :min-width="col.name.length * 14"
+        >
+        </el-table-column>
+      </el-table>
+    </el-row>
+  </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
 
+<script lang="ts">
+import { getTableNames, QueriedData, query } from "@/api/db";
+import { defineComponent } from "@vue/runtime-core";
+import { ElMessage } from "element-plus";
+import parser from "js-sql-parser";
 export default defineComponent({
   data() {
     return {
+      queryForm: {
+        sql: "select * from scenarios LIMIT 1000;",
+        autoLimit: true,
+      },
       rowsOnPage: 15,
       firstRowIndex: 0,
-      columns: [{ name: "date" }, { name: "name" }, { name: "address" }],
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄",
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-      ],
+      tableNames: [] as string[],
+      columns: [] as { name: string; type: string }[],
+      tableData: [] as { [key: string]: string | number }[],
     };
   },
   computed: {
@@ -275,7 +98,19 @@ export default defineComponent({
       return this.tableData.slice(firstIndex, lastIndex);
     },
   },
+  watch: {
+    // tableData: {
+    //   handler: function (this: any) {
+    //     if (this.tableData.length > this.rowsOnPage) {
+    //       this.firstRowIndex = this.tableData.length - this.rowsOnPage;
+    //     } else {
+    //       this.firstRowIndex = 0;
+    //     }
+    //   },
+    // },
+  },
   mounted() {
+    // this.getTables();
     // window.addEventListener("mousewheel", this.handleScroll, true); // 监听（绑定）滚轮滚动事件
   },
   methods: {
@@ -283,9 +118,44 @@ export default defineComponent({
       console.log(evt);
       return;
     },
+    onSQLChange() {
+      let ast: any = {};
+      try {
+        ast = parser.parse(this.queryForm.sql);
+      } catch (err) {
+        console.error(err, typeof err);
+        console.log(err);
+        ElMessage.warning((err as any).message as string);
+        return;
+      }
+      const limit = ast.value.limit;
+      if (this.queryForm.autoLimit) {
+        if (limit == null) {
+          ast.value.limit = { type: "Limit", value: ["1000"] };
+        }
+      }
+      console.log(limit, ast, parser.stringify(ast));
+      this.queryForm.sql = parser.stringify(ast);
+    },
+    async queryTable() {
+      // console.log(JSON.stringify(ast, null, 2));
+      // console.log(ast);
+      const data: QueriedData = await query(this.queryForm.sql);
+      console.log(data);
+      this.columns = data.schema.fields;
+      this.tableData = data.data;
+      this.getAllTableNames();
+    },
+    async getAllTableNames() {
+      const tableNames = await getTableNames();
+      this.tableNames = tableNames;
+    },
   },
 });
 </script>
 
 <style>
+.tableContainer .el-table td {
+  padding: 0 0;
+}
 </style>

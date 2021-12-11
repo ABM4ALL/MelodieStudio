@@ -3,7 +3,7 @@ import { staticRoutes } from "@/router/staticRoutes";
 import {useRouter} from 'vue-router';
 
 let dynamic = reactive({
-  dRoutes: [{ path: "/", name: "首页" }]
+  dRoutes: [{ path: "/", name: "Home" }]
 });
 
 export function useDynamicRoutesHook() {

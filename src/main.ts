@@ -5,6 +5,7 @@ import store from './store';
 import ElementPlus from 'element-plus';
 import 'element-plus/lib/theme-chalk/index.css';
 import locale from 'element-plus/lib/locale/lang/zh-cn';
+// import 'bootstrap-icons';
 import request from "@/request/index";
 
 // 这里监听请求的错误统一处理（做弹窗提示提示）

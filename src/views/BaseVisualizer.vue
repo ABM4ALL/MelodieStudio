@@ -101,9 +101,12 @@ export default defineComponent({
               (data.data as any).visualizer as echarts.EChartsOption
             );
             let plots: IncrementalData[] = (data.data as any).plots;
-            console.log("plots", plots);
-
-            (this.$refs["chartList"] as any).addData(this.currentStep, plots);
+            if (plots != null && plots.length > 0) {
+              console.log("plots", data, plots, this.$refs);
+              (this.$refs["chartList"] as any).addData(this.currentStep, plots);
+            } else {
+              console.log("No plot defined.");
+            }
             // When the running finished, if the visualization mode was loop,
             //   change it to step!
             if (data.modelState === this.STATES.FINISHED) {

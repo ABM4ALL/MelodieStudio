@@ -14,6 +14,7 @@
       <dynamic-form :interactiveParams="interactiveParams"></dynamic-form>
       <div id="myChart" :style="{ width: '800px', height: '800px' }"></div>
     </el-row>
+    <chart-list :seriesConfig="seriesConfig" ref="chartList"></chart-list>
   </div>
 </template>
 
@@ -26,11 +27,12 @@ import DynamicForm, {
   ParamsData,
 } from "@/components/dynamicform/DynamicForm.vue";
 import BaseVisualizer from "./BaseVisualizer.vue";
-
+import ChartList from "@/components/dynamicChart/ChartList.vue";
 export default defineComponent({
   extends: BaseVisualizer,
   components: {
     DynamicForm,
+    ChartList,
   },
   name: "hello",
   data() {
@@ -43,16 +45,18 @@ export default defineComponent({
   methods: {
     async setData(data: echarts.EChartsOption): Promise<void> {
       const t0 = new Date();
-      const d: Array<Array<number | string>> = (data.series as any).data;
+      if (data == null || data.series == null) {
+        throw Error;
+      }
+      const d: Array<Array<number | string>> = (data.series[0] as any).data;
       for (let i = 0; i < d.length; i++) {
         if (d[i][3] < 0) {
           d[i][2] = "-";
         }
       }
       const t1 = new Date();
-      this.$chart.setOption({
-        series: [{ data: d }],
-      });
+      // console.log(data);
+      this.$chart.setOption(data);
       const t2 = new Date();
       console.log(
         `Render time consumption: ${

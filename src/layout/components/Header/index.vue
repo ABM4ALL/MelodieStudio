@@ -4,7 +4,7 @@
       <i @click="toggleMenuCollpase()" :class="state.controls.isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i>
       <el-breadcrumb separator="/">
         <transition-group name="breadcrumb">
-          <el-breadcrumb-item key="/" :to="{ path: '/' }">首页</el-breadcrumb-item>
+          <el-breadcrumb-item key="/" :to="{ path: '/' }">Home</el-breadcrumb-item>
           <el-breadcrumb-item
             v-for="(item, index) in routeListConfig.currentRouteList"
             :key="index"

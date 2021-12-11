@@ -5,17 +5,50 @@
 <script lang="ts">
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as THREE from "three";
-import ThreejsTestVue from "./ThreejsTest.vue";
+import { defineComponent } from "@vue/runtime-core";
 const green = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const red = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-export default {
+
+interface Mesh {
+  coorX: number;
+  coorY: number;
+  material: any;
+  geometry: any;
+}
+interface Obj {
+  add: (m: Mesh | Scene | Group) => void;
+  remove: (m: Mesh | Scene | Group) => void;
+}
+
+interface Scene extends Obj {
+  children: Mesh[];
+}
+
+interface Group extends Obj {
+  children: Mesh[];
+}
+
+interface Agent {
+  id: number;
+  x: number;
+  y: number;
+  category: string; // The category of agent. Stands for the class
+  style: string;
+  deleted: boolean;
+}
+
+export default defineComponent({
   setup() {
     console.log("setup!");
-    const scene: THREE.Scene | undefined = undefined;
-    const patchGroup: THREE.Group | undefined = undefined;
+    const scene: Scene = {} as any;
+    const patchGroup: Group = {} as any;
+    const agentGroup: Group = {} as any;
+    const agentsMap: { [key: string]: Map<number, Agent> } = {}; // store agent id=>agent property.
     return {
       scene,
       patchGroup,
+      agentsMap,
+      agentGroup,
     };
   },
   data() {
@@ -33,64 +66,73 @@ export default {
       throw Error(`Container ${this.containerID} is not found!`);
     }
     let scene = new THREE.Scene();
-    this.scene = scene;
+    this.scene = scene as any;
+    if (
+      this.scene == null ||
+      this.patchGroup == null ||
+      this.agentGroup == null
+    ) {
+      throw Error;
+    }
 
     let camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
+      90, // 直角三角形
+      800 / 600,
       0.1,
       1000
     );
-    // camera.position.x = 0;
-    // camera.position.y = 0;
-    // camera.position.z = 10;
-    // camera.lookAt({
-    //   x: 0,
-    //   y: 0,
-    //   z: 0,
-    // });
 
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(800, 600);
 
     container.appendChild(renderer.domElement);
 
-    camera.position.z = 5;
-    this.patchGroup = new THREE.Group();
+    this.patchGroup = new THREE.Group() as any;
+    this.agentGroup = new THREE.Group() as any;
     this.scene.add(this.patchGroup);
-    // for (let i = 0; i < 100; i++) {
-    //   const cube = this.createGeometry(0);
-    //   this.group.add(cube);
-    // }
-
-    // this.scene.add(this.group);
-    // console.log(cube1.name);
-    this.initObject();
-    // this.draw2d();
+    this.scene.add(this.agentGroup);
 
     function render() {
       renderer.render(scene, camera); //执行渲染操作
     }
 
     const controls = new OrbitControls(camera, renderer.domElement); //创建控件对象
+    controls.enablePan = true;
     controls.addEventListener("change", render); //监听鼠标、键盘事件
-    for (let i = 0; i < 100; i++) {
-      for (let j = 0; j < 100; j++) {
-        // if (Math.random() > 0.5) {
-        this.draw2d(i, j);
-        // }
-      }
+    controls.target = new THREE.Vector3(50, 50, 0);
+    camera.position.set(50, 50, 50);
+    camera.lookAt(new THREE.Vector3(50, 50, 0));
+
+    this.drawGrid();
+
+    // for (let i = 0; i < 100; i++) {
+    //   for (let j = 0; j < 100; j++) {
+    //     this.addCellPatch(i, j);
+    //   }
+    // }
+
+    for (let i = 0; i < 5; i++) {
+      this.addAgent({
+        id: i,
+        x: 10,
+        y: 5 + i,
+        category: "wolf",
+        style: "",
+        deleted: false,
+      });
     }
 
-    // this.clearPatchGroup();
     const update = () => {
-      this.updatePatches();
+      const t0 = Date.now();
+      // this.updatePatches();
+      this.updateAgents();
       renderer.render(scene, camera);
+      console.log(Date.now() - t0);
     };
-    // animate();
+
     window.setInterval(() => {
       update();
-    }, 100);
+    }, 1000);
   },
 
   methods: {
@@ -108,23 +150,57 @@ export default {
       //   this.scene.add(cube);
       return cube;
     },
-    draw2d(x: number, y: number) {
-      //   qwe;
+
+    addAgent(agent: Agent) {
+      if (this.agentGroup == null) {
+        throw Error;
+      }
+      if (this.agentsMap[agent.category] === undefined) {
+        this.agentsMap[agent.category] = new Map();
+      }
+      this.agentsMap[agent.category].set(agent.id, agent);
+      const fcn = (shape) => {
+        const { x, y } = agent;
+        shape.moveTo(x, y);
+        shape.lineTo(x + 0.1, y + 0.9, 1);
+        shape.lineTo(x + 0.9, y + 0.9, 1);
+        shape.lineTo(x + 0.9, y + 0.1, 1);
+        shape.lineTo(x + 0.1, y + 0.1, 1);
+      };
+      this.drawInCell(agent.x, agent.y, fcn, this.agentGroup);
+    },
+    addCellPatch(x: number, y: number) {
+      if (this.patchGroup == null) {
+        throw Error;
+      }
+      const fcn = (shape) => {
+        shape.moveTo(x, y);
+        shape.lineTo(x + 0, y + 1, 0);
+        shape.lineTo(x + 1, y + 1, 0);
+        shape.lineTo(x + 1, y + 0, 0);
+        shape.lineTo(x + 0, y + 0, 0);
+      };
+      this.drawInCell(x, y, fcn, this.patchGroup);
+    },
+    drawInCell(
+      x: number,
+      y: number,
+      drawFunc: (shape: THREE.Shape) => void,
+      group: Group
+    ) {
       const heartShape = new THREE.Shape();
-      heartShape.moveTo(x, y);
-      heartShape.lineTo(x + 0, y + 1, 0);
-      heartShape.lineTo(x + 1, y + 1, 0);
-      heartShape.lineTo(x + 1, y + 0, 0);
-      heartShape.lineTo(x + 0, y + 0, 0);
+      drawFunc(heartShape);
 
       const geometry = new THREE.ShapeGeometry(heartShape);
-
-      const mesh = new THREE.Mesh(geometry, green);
-      mesh.x = x;
-      mesh.y = y;
-      this.patchGroup.add(mesh);
+      const mesh: Mesh = new THREE.Mesh(geometry, green) as any;
+      mesh.coorX = x;
+      mesh.coorY = y;
+      group.add(mesh);
     },
     clearPatchGroup() {
+      if (this.patchGroup == null) {
+        throw Error;
+      }
       while (this.patchGroup.children.length > 0) {
         const child = this.patchGroup.children[0];
         child.geometry.dispose();
@@ -135,15 +211,23 @@ export default {
     updatePatches() {
       for (let i = 0; i < this.patchGroup.children.length; i++) {
         // this.patchGroup.children[i].visible = Math.random() > 0.8;
-        if (Math.random() > 0.8) {
+        if (Math.random() > 0.8 && this.patchGroup.children[i].coorX > 50) {
           this.patchGroup.children[i].material = red;
         } else {
           this.patchGroup.children[i].material = green;
         }
       }
     },
-    initObject() {
-      //   a;
+    updateAgents() {
+      const agents = (this.agentGroup as Group).children;
+      for (let i = 0; i < agents.length; i++) {
+        agents[i].material = red;
+      }
+    },
+    drawGrid() {
+      if (this.scene == null) {
+        throw Error;
+      }
       const xCells = 100;
       const yCells = 100;
       const xMin = 0;
@@ -157,7 +241,7 @@ export default {
         const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const line = new THREE.Line(geometry, material);
-        this.scene.add(line);
+        this.scene.add(line as any);
       }
       for (let j = 0; j <= xCells; j++) {
         const points: THREE.Vector3[] = [];
@@ -166,11 +250,11 @@ export default {
         const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const line = new THREE.Line(geometry, material);
-        this.scene.add(line);
+        this.scene.add(line as any);
       }
     },
   },
-};
+});
 </script>
 
 <style>

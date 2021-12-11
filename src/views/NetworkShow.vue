@@ -165,23 +165,22 @@ export default defineComponent({
   },
   methods: {
     async setData(data: echarts.EChartsOption): Promise<void> {
-      const series: echarts.GraphSeriesOption =
-        data.series as echarts.GraphSeriesOption;
-      if (series === undefined) {
-        console.error("series undefined");
-        return;
-      }
-      if (this.option.series === undefined) {
-        return;
-      }
-      (this.option.series as echarts.GraphSeriesOption[])[0].data = series.data;
-      (this.option.series as echarts.GraphSeriesOption[])[0].links =
-        series.links;
+      console.log("data", data);
+
+      // (this.option.series as echarts.GraphSeriesOption[])[0].data = series.data;
+      // (this.option.series as echarts.GraphSeriesOption[])[0].links =
+      //   series.links;
 
       if (this.drawingMode === DRAWING_MODES.WEBGL) {
+        const series: echarts.GraphSeriesOption[] =
+          data.series as echarts.GraphSeriesOption[];
+        if (series === undefined) {
+          console.error("series undefined");
+          return;
+        }
         const xRange = [0, 0];
         const yRange = [0, 0];
-        const nodeData: Array<{ x: number; y: number }> = series.data! as any;
+        const nodeData: Array<{ x: number; y: number }> = series[0].data! as any;
         for (let i = 0; i < nodeData.length; i++) {
           const x = nodeData[i].x;
           const y = nodeData[i].y;
@@ -208,14 +207,15 @@ export default defineComponent({
       }
 
       const t0 = new Date();
-      this.$chart.setOption({
-        series: [
-          {
-            data: series.data,
-            links: series.links,
-          },
-        ],
-      });
+      this.$chart.setOption(data);
+      // this.$chart.setOption({
+      //   series: [
+      //     {
+      //       data: series.data,
+      //       links: series.links,
+      //     },
+      //   ],
+      // });
       const t1 = new Date();
       console.log((t1.valueOf() - t0.valueOf()) / 1000);
     },
