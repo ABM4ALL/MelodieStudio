@@ -81,15 +81,15 @@ export const staticRoutes = [
       icon: 'el-icon-s-home'
     }
   },
-  {
-    path: '/threejs-test',
-    name: 'Threejs',
-    component: ThreeVisualizer,
-    children: [],
-    meta: {
-      icon: 'el-icon-s-home'
-    }
-  },
+  // {
+  //   path: '/threejs-test',
+  //   name: 'Threejs',
+  //   component: ThreeVisualizer,
+  //   children: [],
+  //   meta: {
+  //     icon: 'el-icon-s-home'
+  //   }
+  // },
   {
     path: '/doc',
     name: 'Documentations',

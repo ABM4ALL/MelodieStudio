@@ -22,12 +22,14 @@
     "nanoid": "^3.1.30",
     "pug": "^3.0.0",
     "pug-plain-loader": "^1.0.0",
+    "save-dev": "0.0.1-security",
     "three": "^0.135.0",
     "three-orbitcontrols": "^2.110.3",
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "vuex": "^4.0.0-0",
+    "webpack-bundle-analyzer": "^4.5.0"
   },
   "devDependencies": {
     "@types/three": "^0.134.0",
