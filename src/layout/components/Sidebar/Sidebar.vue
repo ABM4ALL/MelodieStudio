@@ -9,7 +9,7 @@
         <i :class="routeItem.meta.icon || ''"></i>
         <template #title>{{ routeItem.name }}</template>
       </el-menu-item>
-      <el-submenu
+      <el-sub-menu
         class="submenu-title"
         :key="routeIndex"
         v-if="routeItem.children.length > 0"
@@ -25,7 +25,7 @@
             :basePath="basePath.length > 0 ? basePath + '/' + routeItem.path : routeItem.path"
           ></sidebar>
         </el-menu-item-group>
-      </el-submenu>
+      </el-sub-menu>
     </template>
   </div>
 </template>
@@ -58,18 +58,18 @@ export default {
     display: flex;
     align-items: center;
   }
-  .is-active > .el-submenu__title {
+  .is-active > .el-sub-menu__title {
     color: @subMenuActiveText !important;
   }
   .submenu-title-noDropdown,
-  .el-submenu__title,
+  .el-sub-menu__title,
   .el-menu-item {
     font-weight: bold;
     &:hover {
       background-color: @menuHover !important;
     }
   }
-  .el-submenu__title i{
+  .el-sub-menu__title i{
     height: 18px;
     color: @menuText !important;
   }
@@ -80,12 +80,12 @@ export default {
   .el-menu-item.is-active i{
     color: @menuActiveText !important;
   }
-  .is-active > .el-submenu__title {
+  .is-active > .el-sub-menu__title {
     color: @subMenuActiveText !important;
   }
 
-  & .nest-menu .el-submenu > .el-submenu__title,
-  & .el-submenu .el-menu-item {
+  & .nest-menu .el-sub-menu > .el-sub-menu__title,
+  & .el-sub-menu .el-menu-item {
     min-width: @sideBarWidth !important;
     background-color: @subMenuBg !important;
     &:hover {

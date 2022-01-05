@@ -14,7 +14,7 @@ module.exports = {
                 target: 'http://localhost:8089/',
                 changeOrigin: true
             }
-        }
+        },
     },
     configureWebpack: {
         devtool: "inline-source-map",

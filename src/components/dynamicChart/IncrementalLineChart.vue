@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import ChartConfig from "./ChartConfig.vue";
-import { defineComponent, PropType } from "@vue/runtime-core";
+import { defineComponent, PropType } from "vue";
 import { nanoid, random } from "nanoid";
 import {
   ChartPolicies,

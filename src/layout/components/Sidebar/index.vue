@@ -34,7 +34,7 @@ export default {
 
     watch(route, (newVal, oldVal) => {
       if(newVal.meta.activePath) {
-        currentActiveRoute.value = newVal.meta.activePath;
+        currentActiveRoute.value = newVal.meta.activePath as string;
       } else {
         currentActiveRoute.value = newVal.path;
       }

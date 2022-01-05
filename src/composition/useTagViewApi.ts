@@ -37,7 +37,7 @@ export function useDynamicRoutesHook() {
    * @param current Objct 当前激活路由对象
    */
   function deleteDynamicTag(value: any, current: any) {
-    new Promise((resolve, reject) => {
+    new Promise<void>((resolve, reject) => {
       let valueIndex = dynamic.dRoutes.findIndex((item, index) => {
         return item.path === value.path;
       });

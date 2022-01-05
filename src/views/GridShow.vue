@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/runtime-core";
+import { defineComponent } from "vue";
 import * as echarts from "echarts";
 import "echarts-gl";
 import DynamicForm, {
@@ -70,6 +70,7 @@ export default defineComponent({
     },
 
     initChart() {
+      
       // 基于准备好的dom，初始化echarts实例
       this.$chart = echarts.init(document.getElementById("myChart") as any);
       // 绘制图表

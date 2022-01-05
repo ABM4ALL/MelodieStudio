@@ -8,7 +8,7 @@ import {
   IncrementalData,
   SeriesConfig,
 } from "@/components/dynamicChart/chartutils";
-import { defineComponent } from "@vue/runtime-core";
+import { defineComponent } from "vue";
 export default defineComponent({
   components: { ChartList },
   data() {
