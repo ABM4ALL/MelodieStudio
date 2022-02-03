@@ -22,14 +22,7 @@
         </div>
       </div>
     </el-dialog>
-    <!-- <el-row>
-      <el-col :span="22">
-        <el-input :readonly="true" v-model="currentDirectory"></el-input>
-      </el-col> -->
-    <!-- <el-col :span="2"> -->
     <el-button @click="dialogVisible = true">...</el-button>
-    <!-- </el-col>
-    </el-row> -->
   </div>
 </template>
 <script setup lang="ts">
@@ -50,8 +43,7 @@ export default defineComponent({
   data() {
     return {
       dialogVisible: false,
-      currentDirectory:
-        "",
+      currentDirectory: "",
       fsItemsList: [],
     };
   },
