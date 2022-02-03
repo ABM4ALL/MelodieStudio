@@ -49,7 +49,7 @@ export default defineComponent({
   emits: ["select-directory"],
   data() {
     return {
-      dialogVisible: true,
+      dialogVisible: false,
       currentDirectory:
         "",
       fsItemsList: [],

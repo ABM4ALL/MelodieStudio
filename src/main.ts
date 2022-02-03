@@ -11,7 +11,7 @@ import request from "@/request/index";
 // 这里监听请求的错误统一处理（做弹窗提示提示）
 request.on("HttpStatusFaild", () => {
    // console.log("Capture status");
-   alert("请求失败，请检查接口问题");
+   alert("Request failed, please check the interface.");
 });
 
 createApp(App).use(store).use(router).use(ElementPlus, { locale }).mount('#app');

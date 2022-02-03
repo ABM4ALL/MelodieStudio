@@ -26,6 +26,7 @@
       </el-form-item>
     </el-form>
     <el-divider></el-divider>
+    <h3>New Project Descriptions</h3>
     <p>All project files will be placed at</p>
     <p>{{ config.directory }}/{{ config.projectName }}</p>
     <p>
@@ -37,7 +38,7 @@
       }}Environment\{{ config.projectNameAlias }}Model
     </p>
     <el-divider />
-    <el-button @click="create">Create</el-button>
+    <el-button @click="create" type="primary">Create Project!</el-button>
   </div>
 </template>
 <script setup lang="ts">
