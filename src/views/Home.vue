@@ -1,28 +1,22 @@
 <template>
   <div class="home">
-    <h2>欢迎使用VUE3.0 + ElementPlus 后台管理模板</h2>
-    <div>1. 环境变量：{{ envName.title }}</div>
-    <div>2. {{ "当前主题色值：" + themeApi.theme.customTheme }}</div>
+    <h2>Welcome to Melody Studio!</h2>
     <div>
-      <div>
-        3. <el-button @click="themeApi.setTheme('red')">切换theme</el-button>
-        <p>theme切换采用 将less变量存储在响应式变量中，动态切换该变量达到切换theme（右侧抽屉中可体验）核心逻辑在compisition/useThemeApi</p>
-      </div>
-      <div>
-        4. <el-button @click="jumpToInner()">跳转内部页面</el-button>
-        <p>跳转页面是非menu页面</p>
-      </div>
-    </div>
-    <div>5. 自动menu生成：根据路由生成menu 在router->staticRoutes文件中按照路由规则配置，该menu采用递归组件，可以放心嵌套children自动生成submenu</div>
-    <div>6. 非参与menu路由生成：在router->defaultRoutes文件中配置，包括404路由等</div>
-    <div>7. 头部标签根据menu自动生成核心逻辑在compisition/useTagViewApi</div>
-    <div>8. 当前激活菜单和头部标签激活项颜色在less变量中可设置 style/variable.less/@menuActiveText</div>
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
-    <div>9. mock数据：采用json-server基于RESTfulapi风格模拟数据 参考：src/mock/ 启动mock服务 npm run mock</div>
-    <el-button @click="loadData()">点击加载数据</el-button>
-    <div>
-        {{JSON.stringify(mockData.data, null, "  ")}}
+      <p>
+        Melody Studio is a web-based toolbox for agent-based modelling together with Melodie. Now
+        MelodyStudio has integrated the following functions:
+      </p>
+      <li>
+        <el-button @click="jumpToInner('tools/dbBrowser')"
+          >Database Browser</el-button
+        > to browse your database.
+      </li>
+      <li>
+        <el-button @click="jumpToInner('tools/projectCreator')"
+          >Project Creator</el-button
+        > to create a new project from a template.
+      </li>
+      <p>Happy Modelling!</p>
     </div>
   </div>
 </template>
@@ -30,10 +24,9 @@
 <script lang="ts">
 import { ref, reactive, provide } from "vue";
 import variable from "@/style/variable.less";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+// import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import { useRouter } from "vue-router";
 import { useTheme } from "@/composition/useThemeApi";
-
 
 import request from "@/request/index.js";
 export default {
@@ -41,16 +34,16 @@ export default {
     const themeApi = useTheme();
     const router = useRouter();
     let variables = reactive(variable);
-    const envName = reactive({ title: process.env.VUE_APP_TITLE});
-    const mockData = reactive({data:{}});
-    function jumpToInner() {
+    const envName = reactive({ title: process.env.VUE_APP_TITLE });
+    const mockData = reactive({ data: {} });
+    function jumpToInner(path: string) {
       router.push({
-        path: "/inner"
+        path: `/${path}`,
       });
     }
     function loadData() {
-      request.get('http://localhost:3001/api/wans').then((data: any) => {
-        console.log(data, 'ddasd');
+      request.get("http://localhost:3001/api/wans").then((data: any) => {
+        console.log(data, "ddasd");
         mockData.data = data.result;
       });
     }
@@ -62,12 +55,12 @@ export default {
       themeApi,
       jumpToInner,
       loadData,
-      mockData
+      mockData,
     };
   },
-  components: {
-    HelloWorld
-  }
+  // components: {
+  //   HelloWorld
+  // }
 };
 </script>
 <style lang="less">
