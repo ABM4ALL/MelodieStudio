@@ -10,6 +10,7 @@ import NetworkShow from "@/views/NetworkShow.vue";
 import GridShow from "@/views/GridShow.vue";
 import ChartListView from "@/views/ChartListView.vue";
 import Database from "@/views/Database.vue";
+import ProjectCreator from "@/components/projectcreator/ProjectCreator.vue";
 import ThreeVisualizer from "@/views/ThreeVisualizer.vue";
 /**
  * 
@@ -71,6 +72,15 @@ export const staticRoutes = [
         path: 'dbBrowser',
         name: 'DB Browser',
         component: Database,
+        children: [],
+        meta: {
+          icon: ''
+        }
+      },
+      {
+        path: 'projectCreator',
+        name: 'New Project ...',
+        component: ProjectCreator,
         children: [],
         meta: {
           icon: ''

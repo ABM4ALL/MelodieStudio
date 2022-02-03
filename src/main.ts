@@ -14,4 +14,4 @@ request.on("HttpStatusFaild", () => {
    alert("请求失败，请检查接口问题");
 });
 
-createApp(App).use(store).use(router).use(ElementPlus, {locale}).mount('#app');
+createApp(App).use(store).use(router).use(ElementPlus, { locale }).mount('#app');

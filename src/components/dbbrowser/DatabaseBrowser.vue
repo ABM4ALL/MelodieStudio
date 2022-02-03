@@ -15,7 +15,7 @@
           <!-- <i class="el-icon-questionfilled"></i> -->
         </el-button>
         <el-popover
-          placement="top-start"
+          placement="bottom-start"
           title="All Tables:"
           :width="200"
           trigger="hover"
@@ -29,7 +29,7 @@
         </el-popover>
 
         <el-popover
-          placement="top-start"
+          placement="bottom-start"
           title="Settings"
           :width="200"
           trigger="hover"

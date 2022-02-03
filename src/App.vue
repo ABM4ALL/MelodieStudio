@@ -21,7 +21,7 @@ body{
   margin: 0;
 }
 #app {
-  min-width: 1280px;
+  min-width: 800px;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

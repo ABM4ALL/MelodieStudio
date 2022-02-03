@@ -6,9 +6,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "mock": "node ./src/mock/server.js",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "start": "node index.js",
+    "server": "nodemon index.js --ignore client"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^0.2.6",
     "axios": "^0.21.0",
     "bootstrap-icons": "^1.7.2",
     "core-js": "^3.6.5",

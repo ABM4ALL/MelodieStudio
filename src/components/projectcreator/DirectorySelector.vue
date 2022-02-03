@@ -1,0 +1,100 @@
+
+
+<template>
+  <div>
+    <el-dialog v-model="dialogVisible">
+      <!-- <el-button @click="onSelectDirectory">Select Directory</el-button> -->
+      <el-button @click="gotoParent_">ToParentDir</el-button>
+      <el-button @click="select">Select</el-button>
+      <p>{{ currentDirectory }}</p>
+      <div>
+        <div v-for="(value, index) in fsItemsList" :key="index">
+          <el-icon>
+            <Folder v-if="value.type == 'directory'" />
+            <Document v-else />
+          </el-icon>
+          <a
+            v-if="value.type == 'directory'"
+            @click="gotoSubDir_(value.name)"
+            >{{ value.name }}</a
+          >
+          <a v-else>{{ value.name }}</a>
+        </div>
+      </div>
+    </el-dialog>
+    <!-- <el-row>
+      <el-col :span="22">
+        <el-input :readonly="true" v-model="currentDirectory"></el-input>
+      </el-col> -->
+    <!-- <el-col :span="2"> -->
+    <el-button @click="dialogVisible = true">...</el-button>
+    <!-- </el-col>
+    </el-row> -->
+  </div>
+</template>
+<script setup lang="ts">
+import { Folder, Document } from "@element-plus/icons-vue";
+</script>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import { getFSItems, gotoSubDir, gotoParentDir } from "@/api/fs";
+
+interface FSItem {
+  name: string;
+  type: string;
+}
+
+export default defineComponent({
+  emits: ["select-directory"],
+  data() {
+    return {
+      dialogVisible: true,
+      currentDirectory:
+        "",
+      fsItemsList: [],
+    };
+  },
+  mounted() {
+    this.getFSItems_();
+  },
+  methods: {
+    async onSelectDirectory() {
+      let directory = await (window as any).showDirectoryPicker({
+        startIn: "desktop",
+      }); // 从桌面开始选择文件。
+      for await (const entry of directory.values()) {
+        console.log(entry);
+      }
+    },
+    async getFSItems_() {
+      const resp = await getFSItems(this.currentDirectory);
+      const fsItems = resp.data;
+      this.currentDirectory = fsItems.currentDirectory;
+      this.fsItemsList = fsItems.fsItemsList;
+    },
+
+    async gotoSubDir_(subdirName: string) {
+      const resp = await gotoSubDir(this.currentDirectory, subdirName);
+      const fsItems = resp.data;
+      this.currentDirectory = fsItems.currentDirectory;
+      this.fsItemsList = fsItems.fsItemsList;
+    },
+
+    async gotoParent_() {
+      const resp = await gotoParentDir(this.currentDirectory);
+      const fsItems = resp.data;
+      this.currentDirectory = fsItems.currentDirectory;
+      this.fsItemsList = fsItems.fsItemsList;
+    },
+
+    select() {
+      this.$emit("select-directory", this.currentDirectory);
+      this.dialogVisible = false;
+    },
+  },
+});
+</script>
+
+<style>
+</style>

@@ -86,7 +86,6 @@ export default defineComponent({
           return;
         } else if (data.type === "initOption") {
           console.log(data.data);
-          //   console.log(JSON.stringify(this.optopm));
           this.$chart.setOption(data.data as echarts.EChartsOption);
           return;
         } else if (data.type === "initPlotSeries") {
@@ -97,6 +96,7 @@ export default defineComponent({
           // If status is OK, show data;
           // else show alert message!
           if (data.status === 0) {
+            console.log(data);
             this.setData(
               (data.data as any).visualizer as echarts.EChartsOption
             );
