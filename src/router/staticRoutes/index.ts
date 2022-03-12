@@ -8,7 +8,6 @@ import Date from '@/views/Date.vue';
 import Component from '@/views/Component.vue';
 import NetworkShow from "@/views/NetworkShow.vue";
 import GridShow from "@/views/GridShow.vue";
-import ChartListView from "@/views/ChartListView.vue";
 import Database from "@/views/Database.vue";
 import ProjectCreator from "@/components/projectcreator/ProjectCreator.vue";
 import ThreeVisualizer from "@/views/ThreeVisualizer.vue";
@@ -54,15 +53,15 @@ export const staticRoutes = [
       icon: 'el-icon-s-home'
     }
   },
-  {
-    path: '/chartList',
-    name: 'ChartListView',
-    component: ChartListView,
-    children: [],
-    meta: {
-      icon: 'el-icon-s-home'
-    }
-  },
+  // {
+  //   path: '/chartList',
+  //   name: 'ChartListView',
+  //   component: ChartListView,
+  //   children: [],
+  //   meta: {
+  //     icon: 'el-icon-s-home'
+  //   }
+  // },
   {
     path: '/tools',
     name: 'Tools',

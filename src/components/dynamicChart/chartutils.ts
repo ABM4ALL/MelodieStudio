@@ -16,6 +16,8 @@ export interface ChartPolicies {
 
 export interface SingleSeriesConfig {
     seriesName: string;
+    data: number[];
+    latest_data: number;
 }
 // {<chartName>: [{name: series1}, {name: series2}]}
 export interface SeriesConfig {

@@ -10,6 +10,7 @@ import {
   DRAWING_MODES,
   STATES,
   VisData,
+  VisualizerData,
 } from "@/components/visualizer/visualizerbasics";
 import * as echarts from "echarts";
 import "echarts-gl";
@@ -35,9 +36,6 @@ export default defineComponent({
     };
   },
   methods: {
-    testMethod() {
-      console.log("testMethod");
-    },
     updateParams(params: ParamsData) {
       this.interactiveParams = params;
 
@@ -65,7 +63,7 @@ export default defineComponent({
     connect() {
       this.$ws = new WebSocket("ws://127.0.0.1:8765");
       this.$ws.onopen = () => {
-        console.log("websocket 就绪");
+        console.log("websocket ready!");
 
         this.sendCommand(COMMANDS.GET_PARAMS, {});
         this.sendCommand(COMMANDS.INIT_OPTIONS, {});
@@ -77,35 +75,29 @@ export default defineComponent({
         this.reconnect();
       };
       this.$ws.onmessage = (wsStatus: MessageEvent) => {
-        console.log(
-          `time taken Since command sent:${Date.now() - this.commandSent}`
-        );
         const data: VisData = JSON.parse(wsStatus.data);
         if (data.type === "params") {
           this.updateParams(data.data as ParamsData);
           return;
         } else if (data.type === "initOption") {
-          console.log(data.data);
-          this.$chart.setOption(data.data as echarts.EChartsOption);
+          (this.$refs["grid-visualizer"] as any).setOption(
+            data.data as echarts.EChartsOption
+          );
           return;
         } else if (data.type === "initPlotSeries") {
-          console.log("init plot series", data);
-          this.seriesConfig = data.data as SeriesConfig;
+          this.seriesConfig = (data.data as any).charts as SeriesConfig;
+          console.log("seriesConfig", this.seriesConfig);
         } else {
           this.currentStep = data.step;
           // If status is OK, show data;
           // else show alert message!
           if (data.status === 0) {
-            console.log(data);
-            this.setData(
-              (data.data as any).visualizer as echarts.EChartsOption
-            );
+            this.setData((data.data as VisualizerData).visualizers[0].data);
             let plots: IncrementalData[] = (data.data as any).plots;
             if (plots != null && plots.length > 0) {
-              console.log("plots", data, plots, this.$refs);
               (this.$refs["chartList"] as any).addData(this.currentStep, plots);
             } else {
-              console.log("No plot defined.");
+              console.error("No plot defined.");
             }
             // When the running finished, if the visualization mode was loop,
             //   change it to step!
@@ -139,6 +131,8 @@ export default defineComponent({
       this.paramsModified = false;
       this.visualizationState = this.STATES.STEP;
       this.sendCommand(COMMANDS.CURRENT_DATA, {});
+      const chartList = this.$refs["chartList"] as any;
+      chartList.reset();
     },
 
     loop() {

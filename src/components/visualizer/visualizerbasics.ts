@@ -37,10 +37,20 @@ export interface VisualizationData {
     data: echarts.SeriesOption;
 }
 
+export interface VisualizerData {
+    visualizers: {
+        name: string;
+        type: string;
+        data: echarts.EChartsOption;
+    }[];
+    plots: IncrementalData;
+
+}
+
 export interface VisData {
     type: string;
     step: number;
-    data: { visualizer: echarts.EChartsOption; plots: IncrementalData } | ParamsData | SeriesConfig;
+    data: VisualizerData | ParamsData | SeriesConfig;
     modelState: ModelStateType;
     status: StatusType;
 }

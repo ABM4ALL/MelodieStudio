@@ -42,8 +42,9 @@ export const createLinechartDefaultData = (seriesNames: SingleSeriesConfig[]): {
     const simulationData: { series: echarts.LineSeriesOption[] } = {
         series: [],
     };
-    seriesNames?.map((singleSeries) => {
-        const seriesName = singleSeries.seriesName;
+
+    seriesNames.map((series: SingleSeriesConfig) => {
+        const seriesName = series.seriesName;
         genericSeriesOptions.push(generateLineSeriesGeneralOption(seriesName));
         legendData.push({ name: seriesName });
         simulationData.series.push({ data: [], type: "line", name: seriesName });

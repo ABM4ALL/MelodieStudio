@@ -11,8 +11,13 @@
       <el-tag type="danger" v-if="!connected">Disconnected</el-tag>
     </el-row>
     <el-row>
-      <dynamic-form :interactiveParams="interactiveParams"></dynamic-form>
-      <div id="myChart" :style="{ width: '800px', height: '800px' }"></div>
+      <dynamic-form
+        :interactiveParams="interactiveParams"
+        @param-changed="paramChanged"
+        :paramsModified="paramsModified"
+      ></dynamic-form>
+      <grid-visualizer ref="grid-visualizer" />
+      <!-- <div id="myChart" :style="{ width: '800px', height: '800px' }"></div> -->
     </el-row>
     <chart-list :seriesConfig="seriesConfig" ref="chartList"></chart-list>
   </div>
@@ -28,9 +33,11 @@ import DynamicForm, {
 } from "@/components/dynamicform/DynamicForm.vue";
 import BaseVisualizer from "./BaseVisualizer.vue";
 import ChartList from "@/components/dynamicChart/ChartList.vue";
+import GridVisualizer from "@/components/visualizer/GridVisualizer.vue";
 export default defineComponent({
   extends: BaseVisualizer,
   components: {
+    GridVisualizer,
     DynamicForm,
     ChartList,
   },
@@ -39,40 +46,18 @@ export default defineComponent({
     return {};
   },
   mounted() {
-    this.initChart();
+    // this.initChart();
     this.connect();
   },
   methods: {
     async setData(data: echarts.EChartsOption): Promise<void> {
-      const t0 = new Date();
-      if (data == null || data.series == null) {
-        throw Error;
-      }
-      const d: Array<Array<number | string>> = (data.series[0] as any).data;
-      for (let i = 0; i < d.length; i++) {
-        if (d[i][3] < 0) {
-          d[i][2] = "-";
-        }
-      }
-      const t1 = new Date();
-      // console.log(data);
-      this.$chart.setOption(data);
-      const t2 = new Date();
-      console.log(
-        `Render time consumption: ${
-          (t2.valueOf() - t0.valueOf()) / 1000
-        }, preprocessing takes: ${(t1.valueOf() - t0.valueOf()) / 1000}`
-      );
-
-      console.log(`fps:${1000 / (Date.now() - this.lastUpdate)}`);
-
-      this.lastUpdate = Date.now();
+      const visualizer = this.$refs["grid-visualizer"] as typeof GridVisualizer;
+      visualizer.setData(data);
     },
 
     initChart() {
-      
       // 基于准备好的dom，初始化echarts实例
-      this.$chart = echarts.init(document.getElementById("myChart") as any);
+      // this.$chart = echarts.init(document.getElementById("myChart") as any);
       // 绘制图表
       // const t0 = new Date();
       // this.$chart.setOption(this.$echartOptions as any);

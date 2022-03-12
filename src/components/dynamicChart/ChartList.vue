@@ -2,12 +2,11 @@
   <el-row>
     <incremental-line-chart
       :externalConfig="config"
-      @initialized="onChartInitialized"
       v-for="(seriesConf, key) in seriesConfig"
       :key="key"
       :chartName="key"
       :ref="key"
-      :seriesConfig="seriesConf"
+      :seriesConfig="seriesConf.series"
     ></incremental-line-chart>
   </el-row>
 </template>
@@ -25,17 +24,7 @@ export default defineComponent({
     },
   },
   data() {
-    const indexCache: { [key: string]: { [key: string]: number } } = {};
-    for (let chartName in this.seriesConfig) {
-      indexCache[chartName] = {};
-      for (let i = 0; i < this.seriesConfig[chartName].length; i++) {
-        const seriesName = this.seriesConfig[chartName][i].seriesName;
-        indexCache[chartName][seriesName] = i;
-      }
-    }
-    console.log(indexCache);
     return {
-      indexCache: indexCache,
       config: undefined as any | undefined,
       configSelectionItems: {
         "root-tooltip-trigger": ["axis", "item", "none"],
@@ -63,38 +52,21 @@ export default defineComponent({
       timer: null as number | null,
     };
   },
-  watch: {
-    seriesConfig: {
-      deep: true,
-      handler: function (this: any) {
-        const indexCache: { [key: string]: { [key: string]: number } } = {};
-        for (let chartName in this.seriesConfig) {
-          indexCache[chartName] = {};
-          for (let i = 0; i < this.seriesConfig[chartName].length; i++) {
-            const seriesName = this.seriesConfig[chartName][i].seriesName;
-            indexCache[chartName][seriesName] = i;
-          }
-        }
-        this.indexCache = indexCache;
-      },
-    },
-  },
   methods: {
     onChartConfigModified(config: any): void {
       this.config = config;
     },
-    onChartInitialized(chartName: string): void {
-      console.log("chart", chartName, "initialized!");
-    },
+
     addData(step: number, data: IncrementalData[]): void {
-      console.log(step, data);
       for (let i = 0; i < data.length; i++) {
         const chartName = data[i].chartName;
         const chart = this.$refs[chartName] as typeof IncrementalLineChart;
         const series = data[i].series;
-        console.log(i, chartName, this.$refs);
         if (chart === undefined) {
-          console.error("chart undefined!");
+          console.error(
+            `chart "${chartName}" undefined! the series config was:`,
+            this.seriesConfig
+          );
           return;
         }
         if (series === undefined) {
@@ -102,16 +74,12 @@ export default defineComponent({
           return;
         }
 
-        const seriesData: number[] = [];
-        for (let i = 0; i < series.length; i++) {
-          seriesData.push(0);
-        }
-        for (let j in series) {
-          const seriesName = series[j].name;
-          const seriesIndex = this.indexCache[chartName][seriesName];
-          seriesData[seriesIndex] = series[j].value;
-        }
-        chart.addData(step, seriesData);
+        chart.addData(step, series);
+      }
+    },
+    reset() {
+      for (let chartName in this.seriesConfig) {
+        (this.$refs[chartName] as any).clear();
       }
     },
   },
