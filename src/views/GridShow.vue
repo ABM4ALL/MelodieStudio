@@ -1,25 +1,32 @@
 <template>
-  <div>
-    <el-row type="flex" align="middle">
-      <el-button @click="reset">Reset</el-button>
-      <!-- <el-button @click="start">Start</el-button> -->
-      <el-button @click="step">Step</el-button>
-      <el-button @click="loop">Loop</el-button>
-      <el-button @click="pause">Pause</el-button>
-      <p>Current:{{ currentStep }}</p>
-      <el-tag type="success" v-if="connected">Connected</el-tag>
-      <el-tag type="danger" v-if="!connected">Disconnected</el-tag>
-    </el-row>
+  <div style="position: relative">
+    <toolbar
+      @reset="reset"
+      @step="step"
+      @loop="loop"
+      @pause="pause"
+      @fps-limit-change="fpsLimit = $event"
+      :currentStep="currentStep"
+      :connected="connected"
+    ></toolbar>
+    <dynamic-form
+      :interactiveParams="interactiveParams"
+      @param-changed="paramChanged"
+      :paramsModified="paramsModified"
+    ></dynamic-form>
     <el-row>
-      <dynamic-form
-        :interactiveParams="interactiveParams"
-        @param-changed="paramChanged"
-        :paramsModified="paramsModified"
-      ></dynamic-form>
-      <grid-visualizer ref="grid-visualizer" />
-      <!-- <div id="myChart" :style="{ width: '800px', height: '800px' }"></div> -->
+      <grid-visualizer
+        :ref="`grid-visualizer-${i}`"
+        v-for="(_item, i) in visualizers"
+        :key="i"
+        :visualizerIndex="i"
+      />
     </el-row>
-    <chart-list :seriesConfig="seriesConfig" ref="chartList"></chart-list>
+    <chart-list
+      :seriesConfig="seriesConfig"
+      ref="chartList"
+      :style="{ position: 'absolute' }"
+    ></chart-list>
   </div>
 </template>
 
@@ -31,39 +38,41 @@ import DynamicForm, {
   ParamType,
   ParamsData,
 } from "@/components/dynamicform/DynamicForm.vue";
+import { getContainersLayout } from "@/components/basic/dragcontainers";
 import BaseVisualizer from "./BaseVisualizer.vue";
 import ChartList from "@/components/dynamicChart/ChartList.vue";
 import GridVisualizer from "@/components/visualizer/GridVisualizer.vue";
+import Toolbar from "@/components/visualizer/Toolbar.vue";
 export default defineComponent({
   extends: BaseVisualizer,
   components: {
     GridVisualizer,
     DynamicForm,
     ChartList,
+    Toolbar,
   },
   name: "hello",
   data() {
     return {};
   },
+  beforeCreate() {
+    getContainersLayout();
+  },
   mounted() {
-    // this.initChart();
     this.connect();
   },
   methods: {
-    async setData(data: echarts.EChartsOption): Promise<void> {
-      const visualizer = this.$refs["grid-visualizer"] as typeof GridVisualizer;
-      visualizer.setData(data);
+    getVisualizer(index: number): typeof GridVisualizer {
+      return this.$refs[`grid-visualizer-${index}`] as typeof GridVisualizer;
     },
 
-    initChart() {
-      // 基于准备好的dom，初始化echarts实例
-      // this.$chart = echarts.init(document.getElementById("myChart") as any);
-      // 绘制图表
-      // const t0 = new Date();
-      // this.$chart.setOption(this.$echartOptions as any);
-      // const t1 = new Date();
-      // console.log(t1.getTime() - t0.getTime());
+    async setData(
+      visualizerIndex: number,
+      data: echarts.EChartsOption
+    ): Promise<void> {
+      this.getVisualizer(visualizerIndex).setData(data);
     },
+
     sendCommand(cmd: number, data: any): void {
       this.$ws.send(JSON.stringify({ cmd: cmd, data: data }));
     },

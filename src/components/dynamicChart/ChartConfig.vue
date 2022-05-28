@@ -133,6 +133,9 @@ export default defineComponent({
     this.updateTree();
   },
   methods: {
+    voidFcn() {
+      return;
+    },
     updateTree() {
       const obj: ValueTreeType = {
         label: "parameters",
@@ -238,124 +241,133 @@ export default defineComponent({
 });
 </script>
 <template>
-  <el-drawer
-    v-model="configDrawerShow"
-    title="Chart Options"
-    :modal="false"
-    @close="onDrawerClose"
+  <div
+    @mousemove.stop="voidFcn"
+    @mousedown.stop="voidFcn"
+    @mouseup.stop="voidFcn"
   >
-    <template #title>
-      <h3>{{ chartName }}</h3>
+    <el-drawer
+      v-model="configDrawerShow"
+      title="Chart Options"
+      :modal="false"
+      @close="onDrawerClose"
+    >
+      <template #title>
+        <h3>{{ chartName }}</h3>
 
-      <el-button @click.stop="exitEdit" size="mini" type="primary"
-        >Save</el-button
-      >
+        <el-button @click.stop="exitEdit" size="mini" type="primary"
+          >Save</el-button
+        >
 
-      <el-popover
-        :visible="deleteConfirmationShow"
-        placement="top"
-        :width="160"
-      >
-        <h3>Warning</h3>
-        <p class="noBreakOut">
-          All options will be reset to default values, and this
-          operation is NOT reversible
-        </p>
-        <p class="noBreakOut">Are you sure to reset?</p>
-        <div style="text-align: right; margin: 0">
-          <el-button
-            size="mini"
-            type="text"
-            @click="this.deleteConfirmationShow = false"
-            >Cancel</el-button
-          >
-          <el-button type="danger" size="mini" @click="this.deleteSavedOptions"
-            >Reset</el-button
-          >
-        </div>
-        <template #reference>
-          <el-button
-            @click="this.deleteConfirmationShow = true"
-            type="danger"
-            size="mini"
-            >Reset</el-button
-          >
-        </template>
-      </el-popover>
-    </template>
-    <div>
-      <el-tree
-        :data="configTree"
-        :props="defaultTreeProps"
-        :default-expand-all="true"
-        @node-click="onNodeClick"
-      >
-        <template #default="{ node, data }">
-          <span
-            :class="{
-              unchangeable: !valueChangeable(data.id),
-            }"
-          >
-            <span>{{ node.label }} : </span>
-
-            <div
-              v-if="data.children.length === 0"
-              style="display: inline-block"
+        <el-popover
+          :visible="deleteConfirmationShow"
+          placement="top"
+          :width="160"
+        >
+          <h3>Warning</h3>
+          <p class="noBreakOut">
+            All options will be reset to default values, and this operation is
+            NOT reversible
+          </p>
+          <p class="noBreakOut">Are you sure to reset?</p>
+          <div style="text-align: right; margin: 0">
+            <el-button
+              size="mini"
+              type="text"
+              @click="this.deleteConfirmationShow = false"
+              >Cancel</el-button
             >
-              <span
-                v-if="!inEdit || (inEdit && edit.currentEditedID !== data.id)"
+            <el-button
+              type="danger"
+              size="mini"
+              @click="this.deleteSavedOptions"
+              >Reset</el-button
+            >
+          </div>
+          <template #reference>
+            <el-button
+              @click="this.deleteConfirmationShow = true"
+              type="danger"
+              size="mini"
+              >Reset</el-button
+            >
+          </template>
+        </el-popover>
+      </template>
+      <div>
+        <el-tree
+          :data="configTree"
+          :props="defaultTreeProps"
+          :default-expand-all="true"
+          @node-click="onNodeClick"
+        >
+          <template #default="{ node, data }">
+            <span
+              :class="{
+                unchangeable: !valueChangeable(data.id),
+              }"
+            >
+              <span>{{ node.label }} : </span>
+
+              <div
+                v-if="data.children.length === 0"
+                style="display: inline-block"
               >
-                <p v-if="data.type !== 'color'">
-                  {{ formatValue(data.value) }}
-                </p>
-                <div
-                  v-else
-                  :style="{
-                    backgroundColor: data.value,
-                    width: '14px',
-                    height: '14px',
-                  }"
-                ></div>
-              </span>
-              <div v-else class="treeEditor">
-                <el-input
-                  v-model="edit.currentObjectValue"
-                  v-if="
-                    (data.type === 'string' || data.type === 'number') &&
-                    valueType(data.id) === undefined
-                  "
-                ></el-input>
-                <el-select
-                  v-model="edit.currentObjectValue"
-                  v-else-if="
-                    data.type === 'string' && valueType(data.id) !== undefined
-                  "
+                <span
+                  v-if="!inEdit || (inEdit && edit.currentEditedID !== data.id)"
                 >
-                  <el-option
-                    v-for="(item, i) in valueType(data.id)"
-                    :key="i"
-                    :label="item"
-                    :value="item"
+                  <p v-if="data.type !== 'color'">
+                    {{ formatValue(data.value) }}
+                  </p>
+                  <div
+                    v-else
+                    :style="{
+                      backgroundColor: data.value,
+                      width: '14px',
+                      height: '14px',
+                    }"
+                  ></div>
+                </span>
+                <div v-else class="treeEditor">
+                  <el-input
+                    v-model="edit.currentObjectValue"
+                    v-if="
+                      (data.type === 'string' || data.type === 'number') &&
+                      valueType(data.id) === undefined
+                    "
+                  ></el-input>
+                  <el-select
+                    v-model="edit.currentObjectValue"
+                    v-else-if="
+                      data.type === 'string' && valueType(data.id) !== undefined
+                    "
                   >
-                  </el-option>
-                </el-select>
+                    <el-option
+                      v-for="(item, i) in valueType(data.id)"
+                      :key="i"
+                      :label="item"
+                      :value="item"
+                    >
+                    </el-option>
+                  </el-select>
 
-                <el-switch
-                  v-model="edit.currentObjectValue"
-                  v-if="data.type === 'boolean'"
-                />
+                  <el-switch
+                    v-model="edit.currentObjectValue"
+                    v-if="data.type === 'boolean'"
+                  />
 
-                <el-color-picker
-                  v-model="edit.currentObjectValue"
-                  v-if="data.type === 'color'"
-                />
+                  <el-color-picker
+                    v-model="edit.currentObjectValue"
+                    v-if="data.type === 'color'"
+                  />
+                </div>
               </div>
-            </div>
-          </span>
-        </template>
-      </el-tree>
-    </div>
-  </el-drawer>
+            </span>
+          </template>
+        </el-tree>
+      </div>
+    </el-drawer>
+  </div>
 </template>
 
 <style>

@@ -6,7 +6,9 @@
         v-if="routeItem.children.length <= 0"
         :index="resolvePath(routeItem.path)"
       >
-        <i :class="routeItem.meta.icon || ''"></i>
+        <el-icon>
+          <component :is="routeItem.meta.icon"> </component>
+        </el-icon>
         <template #title>{{ routeItem.name }}</template>
       </el-menu-item>
       <el-sub-menu
@@ -16,13 +18,19 @@
         :index="routeItem.path"
       >
         <template #title>
-        <i :class="routeItem.meta.icon || ''"></i>
+          <el-icon>
+            <component :is="routeItem.meta.icon"> </component>
+          </el-icon>
           <span>{{ routeItem.name }}</span>
         </template>
         <el-menu-item-group>
           <sidebar
             :item="routeItem.children"
-            :basePath="basePath.length > 0 ? basePath + '/' + routeItem.path : routeItem.path"
+            :basePath="
+              basePath.length > 0
+                ? basePath + '/' + routeItem.path
+                : routeItem.path
+            "
           ></sidebar>
         </el-menu-item-group>
       </el-sub-menu>
@@ -32,12 +40,13 @@
 <script>
 import path from "path";
 import { useStore } from "vuex";
-import variables from '@/style/variable.less';
+import variables from "@/style/variable.less";
+import Component from "@/views/Component.vue";
 export default {
   name: "sidebar",
   props: {
     item: Object,
-    basePath: String
+    basePath: String,
   },
   setup(props, context) {
     function resolvePath(routePath) {
@@ -46,15 +55,15 @@ export default {
     }
     return {
       resolvePath: resolvePath,
-      variables
+      variables,
     };
-  }
+  },
 };
 </script>
 <style lang="less">
 @import "@/style/variable.less";
 #app {
-  .el-menu-item{
+  .el-menu-item {
     display: flex;
     align-items: center;
   }
@@ -69,15 +78,15 @@ export default {
       background-color: @menuHover !important;
     }
   }
-  .el-sub-menu__title i{
+  .el-sub-menu__title i {
     height: 18px;
     color: @menuText !important;
   }
-  .el-menu-item i{
+  .el-menu-item i {
     height: 18px;
     color: @menuText !important;
   }
-  .el-menu-item.is-active i{
+  .el-menu-item.is-active i {
     color: @menuActiveText !important;
   }
   .is-active > .el-sub-menu__title {

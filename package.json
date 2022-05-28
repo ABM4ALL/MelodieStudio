@@ -11,6 +11,7 @@
     "server": "nodemon index.js --ignore client"
   },
   "dependencies": {
+    "@element-plus/icons": "^0.0.11",
     "@element-plus/icons-vue": "^0.2.6",
     "axios": "^0.21.0",
     "bootstrap-icons": "^1.7.2",

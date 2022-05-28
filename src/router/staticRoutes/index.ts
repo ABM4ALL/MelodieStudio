@@ -11,6 +11,7 @@ import GridShow from "@/views/GridShow.vue";
 import Database from "@/views/Database.vue";
 import ProjectCreator from "@/components/projectcreator/ProjectCreator.vue";
 import ThreeVisualizer from "@/views/ThreeVisualizer.vue";
+import { Grid } from '@element-plus/icons';
 /**
  * 
  * 路由配置规则：
@@ -32,27 +33,28 @@ export const staticRoutes = [
     component: Home,
     children: [],
     meta: {
-      icon: 'el-icon-s-home',
+      icon: 'home-filled',
       title: "Melody Studio"
     }
   },
   {
-    path: '/visualize',
-    name: 'Visualize',
-    component: NetworkShow,
-    children: [],
-    meta: {
-      icon: 'el-icon-s-home'
-    }
-  }, {
-    path: '/grid',
-    name: 'Grid',
+    path: '/visualizer',
+    name: 'Visualizer',
     component: GridShow,
     children: [],
     meta: {
-      icon: 'el-icon-s-home'
+      icon: 'view'
     }
   },
+  //  {
+  //   path: '/grid',
+  //   name: 'Grid',
+  //   component: GridShow,
+  //   children: [],
+  //   meta: {
+  //     icon: 'el-icon-s-home'
+  //   }
+  // },
   // {
   //   path: '/chartList',
   //   name: 'ChartListView',
@@ -66,6 +68,9 @@ export const staticRoutes = [
     path: '/tools',
     name: 'Tools',
     component: Wrapper,
+    meta: {
+      icon: "tools"
+    },
     children: [
       {
         path: 'dbBrowser',
@@ -73,7 +78,7 @@ export const staticRoutes = [
         component: Database,
         children: [],
         meta: {
-          icon: ''
+          icon: 'coin'
         }
       },
       {
@@ -82,13 +87,10 @@ export const staticRoutes = [
         component: ProjectCreator,
         children: [],
         meta: {
-          icon: ''
+          icon: 'magic-stick'
         }
       }
     ],
-    meta: {
-      icon: 'el-icon-s-home'
-    }
   },
   // {
   //   path: '/threejs-test',
@@ -102,60 +104,61 @@ export const staticRoutes = [
   {
     path: '/doc',
     name: 'Documentations',
-    redirect: '/doc/doctxt',
+    redirect: '/doc/doctext',
     component: Wrapper,
     meta: {
-      icon: 'el-icon-s-order'
+      icon: 'document'
     },
 
     children: [
       {
-        path: 'doctxt',
+        path: 'doctext',
         name: 'Text',
         component: Wrapper,
         meta: {
           icon: 'el-icon-s-data'
         },
-        children: [
-          {
-            path: 'doctxtooo',
-            name: '文本1',
-            component: Wrapper,
-            meta: {
-              icon: ''
-            },
-            children: [
-              {
-                path: 'docimg1',
-                name: '文本内容',
-                component: Image,
-                children: [],
-                meta: {
-                  icon: ''
-                }
-              }
-            ]
-          },
-          {
-            path: 'doctxtiii',
-            name: '文本2',
-            component: Document,
-            children: [],
-            meta: {
-              icon: ''
-            }
-          }
-        ]
+        children: []
+        // children: [
+        //   {
+        //     path: 'doctxtooo',
+        //     name: '文本1',
+        //     component: Wrapper,
+        //     meta: {
+        //       icon: ''
+        //     },
+        //     children: [
+        //       {
+        //         path: 'docimg1',
+        //         name: '文本内容',
+        //         component: Image,
+        //         children: [],
+        //         meta: {
+        //           icon: ''
+        //         }
+        //       }
+        //     ]
+        //   },
+        //   {
+        //     path: 'doctxtiii',
+        //     name: '文本2',
+        //     component: Document,
+        //     children: [],
+        //     meta: {
+        //       icon: ''
+        //     }
+        //   }
+        // ]
       },
-      {
-        path: 'docimg',
-        name: '图像',
-        component: Image,
-        children: [],
-        meta: {
-          icon: 'el-icon-camera'
-        }
-      }
+      // {
+      //   path: 'docimg',
+      //   name: '图像',
+      //   component: Image,
+      //   children: [],
+      //   meta: {
+      //     icon: 'el-icon-camera'
+      //   }
+      // }
     ]
   },
 ];

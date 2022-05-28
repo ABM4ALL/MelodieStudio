@@ -6,7 +6,7 @@ const linechartDefaultOptions: echarts.EChartsCoreOption = {
     updatedAt: new Date(),
     title: {
         text: "Line Chart",
-        subtext: "Fake Data",
+        subtext: "",
     },
     xAxis: {
         type: "value",

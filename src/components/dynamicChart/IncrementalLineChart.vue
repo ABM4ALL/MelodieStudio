@@ -1,10 +1,20 @@
 <style >
+.linechartIncremental {
+  position: absolute;
+  width: 500px;
+  height: 300px;
+}
 .linechartIncremental .el-drawer__body {
   overflow: auto;
 }
 </style>
 <template>
-  <div class="linechartIncremental">
+  <!-- <div class="linechartIncremental" ref="chart-container"> -->
+  <drag-container
+    class="linechartIncremental"
+    @container-changed="onLayoutChanged"
+    :slotComponentID="'chart-' + chartName"
+  >
     <chart-config
       @config-modified="onChartConfigModified"
       @delete-saved-option="onOptionDelete"
@@ -16,8 +26,9 @@
       :chartName="chartName"
     ></chart-config>
 
-    <div :id="chartDOMID" :style="{ width: '400px', height: '300px' }"></div>
-  </div>
+    <div :id="chartDOMID" :style="{ width: '100%', height: '100%' }"></div>
+    <!-- </div> -->
+  </drag-container>
 </template>
 
 <script lang="ts">
@@ -30,6 +41,7 @@ import {
   generateLineSeriesGeneralOption,
   SeriesConfig,
   SingleSeriesConfig,
+  getChartPosTop,
 } from "./chartutils";
 import { createLinechartDefaultData } from "./defaultoptions";
 import * as echarts from "echarts";
@@ -41,6 +53,8 @@ import {
   getChartPolicies,
   setChartInitialOptions,
 } from "@/api/chart";
+import { RefElement } from "element-plus/es/utils/types";
+import DragContainer from "@/components/basic/DragContainer.vue";
 interface LineChartSeriesOption extends echarts.LineSeriesOption {
   data: Array<Array<number>>;
 }
@@ -48,7 +62,7 @@ interface LineChartSeriesOption extends echarts.LineSeriesOption {
 export default defineComponent({
   name: "IncrementalLineChart",
   emits: ["initialized"],
-  components: { ChartConfig },
+  components: { ChartConfig, DragContainer },
   props: {
     immediateRender: {
       default: false,
@@ -125,6 +139,16 @@ export default defineComponent({
     );
   },
   methods: {
+    onLayoutChanged(evt: {
+      left: number;
+      top: number;
+      width: number;
+      height: number;
+    }) {
+      console.log("pos-changed");
+      this.needsRender = true;
+      this.$chart.resize({ width: evt.width, height: evt.height });
+    },
     async onOptionDelete(): Promise<void> {
       await deleteChartOptions(this.chartName);
 
@@ -158,6 +182,7 @@ export default defineComponent({
       }
       this.needsRender = true;
       this.currentStep += 1;
+      console.log(this.currentStep, this.simulationData);
     },
     clear() {
       for (let i in this.simulationData.series) {
@@ -190,6 +215,15 @@ export default defineComponent({
       this.$chart = echarts.init(
         document.getElementById(this.chartDOMID) as any
       );
+
+      // let container = this.$refs["chart-container"] as RefElement;
+      // if (container == null) {
+      //   console.error("container undefined");
+      //   return;
+      // }
+      // container.style.left = `${0}px`;
+      // container.style.top = `${getChartPosTop()}px`;
+      // container.style.position = "absolute";
     },
     getChartOption(): any {
       return this.chartOption;

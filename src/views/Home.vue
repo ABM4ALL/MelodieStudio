@@ -3,20 +3,25 @@
     <h2>Welcome to Melody Studio!</h2>
     <div>
       <p>
-        Melody Studio is a web-based toolbox for agent-based modelling together with Melodie. Now
-        MelodyStudio has integrated the following functions:
+        Melody Studio is a web-based toolbox for agent-based modelling together
+        with Melodie. Now MelodyStudio has integrated the following functions:
       </p>
       <li>
         <el-button @click="jumpToInner('tools/dbBrowser')"
           >Database Browser</el-button
-        > to browse your database.
+        >
+        to browse your database.
       </li>
       <li>
         <el-button @click="jumpToInner('tools/projectCreator')"
           >Project Creator</el-button
-        > to create a new project from a template.
+        >
+        to create a new project from a template.
       </li>
       <p>Happy Modelling!</p>
+    </div>
+    <div style="position:absolute; bottom:0px; font-size:12px">
+      <p>Powered by: Vue-Onepiece-Admin by Mstian </p>
     </div>
   </div>
 </template>
@@ -67,6 +72,7 @@ export default {
 .home {
   // text-align: center;
   line-height: 24px;
+  height: 100%;
 }
 .height {
   height: 999px;

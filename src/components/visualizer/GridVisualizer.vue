@@ -1,23 +1,52 @@
 <template>
-  <div id="myChart" :style="{ width: '800px', height: '800px' }"></div>
+  <drag-container
+    @container-changed="onContainrerLayoutChanged"
+    :slotComponentID="'visualizer-' + visualizerIndex"
+  >
+    <div
+      :id="canvasElementID"
+      :style="{
+        width: `100%`,
+        height: '100%',
+      }"
+    ></div>
+  </drag-container>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import * as echarts from "echarts";
 import "echarts-gl";
-
+import DragContainer from "@/components/basic/DragContainer.vue";
 export default defineComponent({
   name: "hello",
+  components: {
+    DragContainer,
+  },
+  props: {
+    visualizerIndex: {
+      type: Number,
+      required: true,
+    },
+  },
   data() {
     return {
       lastUpdate: 0 as number,
+      canvasElementID: `chart-${Math.random() + Math.random()}`,
     };
   },
   mounted() {
     this.initChart();
   },
   methods: {
+    onContainrerLayoutChanged(newLayout: {
+      left: number;
+      top: number;
+      width: number;
+      height: number;
+    }) {
+      this.$chart.resize({ width: newLayout.width, height: newLayout.height });
+    },
     async setOption(data: echarts.EChartsOption) {
       this.$chart.setOption(data);
     },
@@ -42,11 +71,14 @@ export default defineComponent({
       );
 
       console.log(`fps:${1000 / (Date.now() - this.lastUpdate)}`);
+      this.lastUpdate = Date.now();
     },
 
     initChart() {
       // 基于准备好的dom，初始化echarts实例
-      this.$chart = echarts.init(document.getElementById("myChart") as any);
+      this.$chart = echarts.init(
+        document.getElementById(this.canvasElementID) as any
+      );
     },
   },
 });

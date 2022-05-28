@@ -31,6 +31,9 @@ export default defineComponent({
       STATES: STATES,
       commandSent: 0,
       lastUpdate: 0 as number,
+      lastLoopRequest: 0 as number,
+      fpsLimit: 10 as number,
+      visualizers: [] as number[],
 
       seriesConfig: {} as SeriesConfig,
     };
@@ -80,9 +83,19 @@ export default defineComponent({
           this.updateParams(data.data as ParamsData);
           return;
         } else if (data.type === "initOption") {
-          (this.$refs["grid-visualizer"] as any).setOption(
-            data.data as echarts.EChartsOption
-          );
+          const visualizerIDs: number[] = [];
+          for (let i in data.data) {
+            visualizerIDs.push(data.data[i]);
+          }
+          this.visualizers = visualizerIDs;
+          this.$nextTick(() => {
+            for (let i in data.data) {
+              (this.$refs[`grid-visualizer-${i}`] as any).setOption(
+                data.data[i] as echarts.EChartsOption
+              );
+            }
+          });
+
           return;
         } else if (data.type === "initPlotSeries") {
           this.seriesConfig = (data.data as any).charts as SeriesConfig;
@@ -92,7 +105,13 @@ export default defineComponent({
           // If status is OK, show data;
           // else show alert message!
           if (data.status === 0) {
-            this.setData((data.data as VisualizerData).visualizers[0].data);
+            const visualizerData = data.data as VisualizerData;
+            console.log(visualizerData.visualizers);
+            for (let i = 0; i < visualizerData.visualizers.length; i++) {
+              // this.setData((data.data as VisualizerData).visualizers[0].data);
+              this.setData(i, visualizerData.visualizers[i].data);
+            }
+
             let plots: IncrementalData[] = (data.data as any).plots;
             if (plots != null && plots.length > 0) {
               (this.$refs["chartList"] as any).addData(this.currentStep, plots);
@@ -107,15 +126,31 @@ export default defineComponent({
             }
 
             if (this.visualizationState === this.STATES.LOOP) {
-              this.loop();
+              const gap = Date.now() - this.lastLoopRequest;
+
+              let interval = 0;
+              let minTimeGap = 1000 / this.fpsLimit;
+              console.log(gap, minTimeGap);
+              if (gap < minTimeGap) {
+                interval = minTimeGap - gap;
+              } else {
+                interval = 0;
+              }
+              window.setTimeout(() => {
+                if (this.visualizationState === this.STATES.LOOP) {
+                  this.loop();
+                  this.lastLoopRequest = Date.now();
+                }
+              }, interval);
             }
           } else {
+            console.error(data.data);
             window.alert(data.data);
           }
         }
       };
     },
-    async setData(data: echarts.EChartsOption): Promise<void> {
+    async setData(i, data: echarts.EChartsOption): Promise<void> {
       return;
     },
 
