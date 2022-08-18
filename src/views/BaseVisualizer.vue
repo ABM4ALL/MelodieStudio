@@ -11,7 +11,7 @@ import {
   STATES,
   VisData,
   VisualizerData,
-} from "@/components/visualizer/visualizerbasics";
+} from "@/models/visualizerbasics";
 import * as echarts from "echarts";
 import "echarts-gl";
 import {
@@ -101,7 +101,7 @@ export default defineComponent({
           this.seriesConfig = (data.data as any).charts as SeriesConfig;
           console.log("seriesConfig", this.seriesConfig);
         } else {
-          this.currentStep = data.step;
+          this.currentStep = data.period;
           // If status is OK, show data;
           // else show alert message!
           if (data.status === 0) {
@@ -114,6 +114,7 @@ export default defineComponent({
 
             let plots: IncrementalData[] = (data.data as any).plots;
             if (plots != null && plots.length > 0) {
+              console.log("logged", data, this.currentStep, plots);
               (this.$refs["chartList"] as any).addData(this.currentStep, plots);
             } else {
               console.error("No plot defined.");
@@ -150,7 +151,7 @@ export default defineComponent({
         }
       };
     },
-    async setData(i, data: echarts.EChartsOption): Promise<void> {
+    async setData(i: number, data: echarts.EChartsOption): Promise<void> {
       return;
     },
 

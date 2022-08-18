@@ -1,6 +1,5 @@
 import Inner from "@/views/Inner.vue";
 import NotFound from '@/views/NotFound.vue';
-import Login from "@/views/Login.vue";
 const defaultRoutes: any = [
   {
     path: "/inner",
@@ -14,11 +13,6 @@ const defaultRoutes: any = [
     path: '/:pathMatch(.*)*',
     name: '404',
     component: NotFound
-  },
-  {
-    path: '/login',
-    name: '登录',
-    component: Login
   }
 ];
 

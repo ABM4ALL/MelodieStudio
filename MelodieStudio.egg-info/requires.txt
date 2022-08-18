@@ -1,0 +1,8 @@
+chardet
+websockets
+sqlalchemy
+flask
+flask_cors
+astunparse
+pprintast
+watchdog

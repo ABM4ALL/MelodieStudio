@@ -30,8 +30,9 @@ import {
   updateContainerLayout,
   getContainerLayout,
 } from "@/components/basic/dragcontainers";
-import { RefElement } from "element-plus/es/utils/types";
 import { defineComponent, PropType } from "vue";
+import * as echarts from "echarts"
+
 interface LineChartSeriesOption extends echarts.LineSeriesOption {
   data: Array<Array<number>>;
 }
@@ -145,7 +146,7 @@ export default defineComponent({
       this.dragMode = "move";
     },
     getDirection(ev: MouseEvent): string {
-      const container = this.$refs["chart-container"] as RefElement;
+      const container = this.$refs["chart-container"] as any;
       if (container == null) {
         return "";
       }
@@ -165,14 +166,14 @@ export default defineComponent({
     },
     onMouseMove(evt: MouseEvent) {
       const direc = this.getDirection(evt);
-      let container = this.$refs["chart-container"] as RefElement;
+      let container = this.$refs["chart-container"] as any;
       if (direc != "") {
         container!.style.cursor = direc + "-resize";
       } else {
         container!.style.cursor = "default";
       }
       if (evt.buttons === 1) {
-        let container = this.$refs["chart-container"] as RefElement;
+        let container = this.$refs["chart-container"] as any;
         if (container == null) {
           console.error("container undefined");
           return;

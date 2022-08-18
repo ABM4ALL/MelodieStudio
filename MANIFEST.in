@@ -1,0 +1,3 @@
+recursive-include MelodieStudio/static *.html *.js *.png *.jpg *.ico *.css *.json *.woff *.ttf
+include requirements.txt
+include pyproject.toml

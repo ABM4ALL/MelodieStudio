@@ -1,0 +1,15 @@
+matplotlib
+seaborn
+numpy >= 1.17.3
+pandas
+flask
+flask-cors
+openpyxl
+xlrd==1.2.0
+networkx
+chardet
+sqlalchemy
+astunparse
+pprintast
+websockets
+watchdog

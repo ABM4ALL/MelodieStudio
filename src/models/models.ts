@@ -1,0 +1,12 @@
+// Generated using py-ts-interfaces.
+// See https://github.com/cs-cordero/py-ts-interfaces
+
+export interface WSMessage {
+    type: string;
+    payload: any | Array<any>;
+}
+
+export interface WSToServerMessage {
+    type: string;
+    payload: any;
+}

@@ -1,0 +1,1 @@
+python -m twine upload dist/MelodieStudio-0.2.0.tar.gz

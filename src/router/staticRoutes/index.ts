@@ -1,17 +1,9 @@
 import Wrapper from '@/layout/components/Wrapper/index.vue';
 import Home from '@/views/Home.vue';
-import Document from '@/views/Document.vue';
-import Tab from '@/views/Tab.vue';
-import Image from '@/views/Image.vue';
-import Button from '@/views/Button.vue';
-import Date from '@/views/Date.vue';
-import Component from '@/views/Component.vue';
-import NetworkShow from "@/views/NetworkShow.vue";
 import GridShow from "@/views/GridShow.vue";
 import Database from "@/views/Database.vue";
-import ProjectCreator from "@/components/projectcreator/ProjectCreator.vue";
-import ThreeVisualizer from "@/views/ThreeVisualizer.vue";
-import { Grid } from '@element-plus/icons';
+// import ProjectCreator from "@/components/projectcreator/ProjectCreator.vue";
+// import CythonEditor from '@/editor/CythonEditor.vue';
 /**
  * 
  * 路由配置规则：
@@ -81,10 +73,19 @@ export const staticRoutes = [
           icon: 'coin'
         }
       },
+      // {
+      //   path: 'projectCreator',
+      //   name: 'New Project ...',
+      //   component: ProjectCreator,
+      //   children: [],
+      //   meta: {
+      //     icon: 'magic-stick'
+      //   }
+      // }, 
       {
-        path: 'projectCreator',
-        name: 'New Project ...',
-        component: ProjectCreator,
+        path: 'cythonEditor',
+        name: 'Editor',
+        component: () => import('@/editor/CythonEditor.vue'),
         children: [],
         meta: {
           icon: 'magic-stick'
@@ -92,15 +93,6 @@ export const staticRoutes = [
       }
     ],
   },
-  // {
-  //   path: '/threejs-test',
-  //   name: 'Threejs',
-  //   component: ThreeVisualizer,
-  //   children: [],
-  //   meta: {
-  //     icon: 'el-icon-s-home'
-  //   }
-  // },
   {
     path: '/doc',
     name: 'Documentations',

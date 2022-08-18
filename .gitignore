@@ -2,7 +2,9 @@
 node_modules
 /dist
 *.pyc
-
+build
+webdist
+MelodieStudio.egginfo
 # local env files
 .env.local
 .env.*.local
@@ -22,3 +24,10 @@ pnpm-debug.log*
 *.sln
 *.sw?
 .history/*
+.melodiestudio
+__pycache__
+*.pyc
+*.sqlite
+MelodieStudio/static
+.history
+.pytest_cache

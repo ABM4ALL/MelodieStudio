@@ -38,7 +38,7 @@ export default {
   setup() {
     const themeApi = useTheme();
     const router = useRouter();
-    let variables = reactive(variable);
+    const variables = reactive(variable);
     const envName = reactive({ title: process.env.VUE_APP_TITLE });
     const mockData = reactive({ data: {} });
     function jumpToInner(path: string) {

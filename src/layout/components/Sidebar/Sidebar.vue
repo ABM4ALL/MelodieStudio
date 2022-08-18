@@ -60,46 +60,43 @@ export default {
   },
 };
 </script>
-<style lang="less">
-@import "@/style/variable.less";
-#app {
-  .el-menu-item {
-    display: flex;
-    align-items: center;
-  }
-  .is-active > .el-sub-menu__title {
-    color: @subMenuActiveText !important;
-  }
-  .submenu-title-noDropdown,
-  .el-sub-menu__title,
-  .el-menu-item {
-    font-weight: bold;
-    &:hover {
-      background-color: @menuHover !important;
-    }
-  }
-  .el-sub-menu__title i {
-    height: 18px;
-    color: @menuText !important;
-  }
-  .el-menu-item i {
-    height: 18px;
-    color: @menuText !important;
-  }
-  .el-menu-item.is-active i {
-    color: @menuActiveText !important;
-  }
-  .is-active > .el-sub-menu__title {
-    color: @subMenuActiveText !important;
-  }
-
-  & .nest-menu .el-sub-menu > .el-sub-menu__title,
-  & .el-sub-menu .el-menu-item {
-    min-width: @sideBarWidth !important;
-    background-color: @subMenuBg !important;
-    &:hover {
-      background-color: @subMenuHover !important;
-    }
+<style lang="css">
+/* .el-menu-item {
+  display: flex;
+  align-items: center;
+}
+.is-active  .el-sub-menu__title {
+  color: @subMenuActiveText !important;
+} */
+/* .submenu-title-noDropdown,
+.el-sub-menu__title,
+.el-menu-item {
+  font-weight: bold;
+  &:hover {
+    background-color: @menuHover !important;
   }
 }
+.el-sub-menu__title i {
+  height: 18px;
+  color: @menuText !important;
+}
+.el-menu-item i {
+  height: 18px;
+  color: @menuText !important;
+}
+.el-menu-item.is-active i {
+  color: @menuActiveText !important;
+}
+.is-active > .el-sub-menu__title {
+  color: @subMenuActiveText !important;
+}
+
+& .nest-menu .el-sub-menu > .el-sub-menu__title,
+& .el-sub-menu .el-menu-item {
+  min-width: @sideBarWidth !important;
+  background-color: @subMenuBg !important;
+  &:hover {
+    background-color: @subMenuHover !important;
+  }
+} */
 </style>

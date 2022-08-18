@@ -53,7 +53,6 @@ import {
   getChartPolicies,
   setChartInitialOptions,
 } from "@/api/chart";
-import { RefElement } from "element-plus/es/utils/types";
 import DragContainer from "@/components/basic/DragContainer.vue";
 interface LineChartSeriesOption extends echarts.LineSeriesOption {
   data: Array<Array<number>>;
@@ -182,7 +181,7 @@ export default defineComponent({
       }
       this.needsRender = true;
       this.currentStep += 1;
-      console.log(this.currentStep, this.simulationData);
+      console.log("data updated!");
     },
     clear() {
       for (let i in this.simulationData.series) {
@@ -216,7 +215,7 @@ export default defineComponent({
         document.getElementById(this.chartDOMID) as any
       );
 
-      // let container = this.$refs["chart-container"] as RefElement;
+      // let container = this.$refs["chart-container"] as any;
       // if (container == null) {
       //   console.error("container undefined");
       //   return;

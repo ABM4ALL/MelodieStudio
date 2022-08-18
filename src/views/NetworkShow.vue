@@ -32,7 +32,7 @@ import DynamicForm, {
 } from "@/components/dynamicform/DynamicForm.vue";
 import BaseVisualizer from "@/views/BaseVisualizer.vue";
 import ChartList from "@/components/dynamicChart/ChartList.vue";
-import { DRAWING_MODES } from "@/components/visualizer/visualizerbasics";
+import { DRAWING_MODES } from "@/models/visualizerbasics";
 
 export default defineComponent({
   extends: BaseVisualizer,
