@@ -6,3 +6,5 @@ flask_cors
 astunparse
 pprintast
 watchdog
+flask_sock
+py_ts_interfaces
