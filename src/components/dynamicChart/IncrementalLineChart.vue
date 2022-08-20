@@ -59,7 +59,6 @@ interface LineChartSeriesOption extends echarts.LineSeriesOption {
 }
 
 export default defineComponent({
-  name: "IncrementalLineChart",
   emits: ["initialized"],
   components: { ChartConfig, DragContainer },
   props: {
@@ -214,15 +213,6 @@ export default defineComponent({
       this.$chart = echarts.init(
         document.getElementById(this.chartDOMID) as any
       );
-
-      // let container = this.$refs["chart-container"] as any;
-      // if (container == null) {
-      //   console.error("container undefined");
-      //   return;
-      // }
-      // container.style.left = `${0}px`;
-      // container.style.top = `${getChartPosTop()}px`;
-      // container.style.position = "absolute";
     },
     getChartOption(): any {
       return this.chartOption;
@@ -246,6 +236,4 @@ export default defineComponent({
 });
 </script>
 
-function createLinechartDefaultData() {
-  throw new Error("Function not implemented.");
-}
+

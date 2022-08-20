@@ -12,12 +12,13 @@ if 'build_web' in sys.argv:
     os.system("npm run build -- --dest=./webdist")
     shutil.copytree(WEBDIST_PATH, STATIC_PATH)
     sys.exit()
-    
+
 if 'update_interfaces' in sys.argv:
     os.system("python -m py_ts_interfaces.cli ./MelodieStudio/models.py -o src/models/models.ts")
     sys.exit()
 
-
+if os.path.exists('build'):
+    shutil.rmtree('build')
 setuptools.setup(
     name='MelodieStudio',
     version='0.2.0',
@@ -52,7 +53,9 @@ setuptools.setup(
         'flask_cors',
         'astunparse',
         'pprintast',
-        "watchdog"
+        "watchdog",
+        'flask_sock',
+        'py_ts_interfaces'
     ],
     python_requires='>=3.5',
     entry_points={

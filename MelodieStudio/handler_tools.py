@@ -1,5 +1,6 @@
 import json
 import re
+from MelodieStudio.static_analysis.autocompletion import handle_autocomp
 from flask import Blueprint, request
 
 from .messages import Response
@@ -43,3 +44,11 @@ def create_new_project():
         return Response.ok("Project created!")
     except FileExistsError as e:
         return Response.error(str(e))
+
+@tools.route('autoComplete', methods=['post'])
+def handle_autocomplete():
+    data = json.loads(request.data)
+    
+    code = data['code']
+    pos = data['pos']
+    return Response.ok(handle_autocomp(code, pos))

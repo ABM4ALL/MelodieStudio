@@ -60,26 +60,36 @@ export default defineComponent({
     addData(step: number, data: IncrementalData[]): void {
       for (let i = 0; i < data.length; i++) {
         const chartName = data[i].chartName;
-        const chart = this.$refs[chartName] as typeof IncrementalLineChart;
+        const chart = (this.$refs[chartName] as any)[0];
         const series = data[i].series;
-        if (chart === undefined) {
+        if (chart == null) {
           console.error(
             `chart "${chartName}" undefined! the series config was:`,
             this.seriesConfig
           );
           return;
         }
-        if (series === undefined) {
+        if (series == null) {
           console.error("series undefined!");
           return;
         }
-
+        console.log(
+          chartName,
+          step,
+          series,
+          chart,
+          chart.addData,
+          chart.initChart
+        );
         chart.addData(step, series);
       }
     },
     reset() {
       for (let chartName in this.seriesConfig) {
-        (this.$refs[chartName] as any).clear();
+        const chart = (this.$refs[chartName] as any)[0];
+        if (chart != null) {
+          chart.clear();
+        }
       }
     },
   },

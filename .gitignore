@@ -4,7 +4,7 @@ node_modules
 *.pyc
 build
 webdist
-MelodieStudio.egginfo*
+MelodieStudio.egginfo
 # local env files
 .env.local
 .env.*.local

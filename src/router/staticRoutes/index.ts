@@ -90,6 +90,15 @@ export const staticRoutes = [
         meta: {
           icon: 'magic-stick'
         }
+      },
+      {
+        path: 'cythonEditor2',
+        name: 'Editor',
+        component: () => import('@/editor/CodeEditor.vue'),
+        children: [],
+        meta: {
+          icon: 'magic-stick'
+        }
       }
     ],
   },
