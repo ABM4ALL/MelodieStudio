@@ -83,9 +83,9 @@ export const staticRoutes = [
       //   }
       // }, 
       {
-        path: 'cythonEditor',
-        name: 'Editor',
-        component: () => import('@/editor/CythonEditor.vue'),
+        path: 'visualizer2',
+        name: 'GridNew',
+        component: () => import('@/components/visualizer/GridComponent.vue'),
         children: [],
         meta: {
           icon: 'magic-stick'

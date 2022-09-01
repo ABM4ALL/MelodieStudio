@@ -1,6 +1,5 @@
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const path = require('path');
-
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 function resolve(dir) {
     return path.join(__dirname, '.', dir)
 }
@@ -30,7 +29,7 @@ module.exports = {
         module: {
         },
         plugins: [
-            new MonacoWebpackPlugin()
+            
         ]
     },
     css: {

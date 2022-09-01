@@ -35,4 +35,8 @@ npm run build
 
 ### Database Browser
 
-
+Dist wheel with building webpage:
+```sh
+python build_web.py
+python setup.py bdist_wheel
+```

@@ -24,14 +24,14 @@ import { lua } from "@codemirror/legacy-modes/mode/lua";
 import { python, cython } from "@codemirror/legacy-modes/mode/python";
 
 import { oneDark } from "@codemirror/theme-one-dark";
-import { ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { EditorView, basicSetup } from "codemirror";
 import { CompletionContext } from "@codemirror/autocomplete";
 import { CompletionHandler } from "./completion";
 import { requestAutoComplete } from "@/api/tools";
 const comphandler = new CompletionHandler();
 
-export default {
+export default defineComponent({
   components: {
     Codemirror,
   },
@@ -115,6 +115,9 @@ class CovidDataLoader(DataLoader):
     const myCompletions = async (context: CompletionContext) => {
       let word = context.matchBefore(/[.\w]*/);
       const wordToMatch = context.matchBefore(/[\w]*/);
+      if (word == null) {
+        return;
+      }
       console.log("context", word?.text, word.from, word.to, context.pos);
       if (word.from == word.to && !context.explicit) return null;
       //   const text: string[] = (context.state.doc as any).text;
@@ -131,7 +134,7 @@ class CovidDataLoader(DataLoader):
     };
     cython.languageData!.autocomplete = myCompletions;
   },
-};
+});
 </script>
 <style scoped>
 .editor :deep(.cm-editor) {

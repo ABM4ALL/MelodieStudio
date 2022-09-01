@@ -11,6 +11,7 @@ import {
   STATES,
   VisData,
   VisualizerData,
+  VisualizeViewInitialOption,
 } from "@/models/visualizerbasics";
 import * as echarts from "echarts";
 import "echarts-gl";
@@ -18,6 +19,7 @@ import {
   IncrementalData,
   SeriesConfig,
 } from "@/components/dynamicChart/chartutils";
+import { GridItem } from "@/models/agents";
 export default defineComponent({
   data() {
     return {
@@ -33,9 +35,10 @@ export default defineComponent({
       lastUpdate: 0 as number,
       lastLoopRequest: 0 as number,
       fpsLimit: 10 as number,
-      visualizers: [] as number[],
+      visualizers: [] as VisualizeViewInitialOption[],
 
       seriesConfig: {} as SeriesConfig,
+      visualizerData: {},
     };
   },
   methods: {
@@ -83,14 +86,14 @@ export default defineComponent({
           this.updateParams(data.data as ParamsData);
           return;
         } else if (data.type === "initOption") {
-          const visualizerIDs: number[] = [];
+          const visualizerIDs: VisualizeViewInitialOption[] = [];
           for (let i in data.data) {
             visualizerIDs.push(data.data[i]);
           }
           this.visualizers = visualizerIDs;
           this.$nextTick(() => {
             for (let i in data.data) {
-              (this.$refs[`grid-visualizer-${i}`] as any).setOption(
+              (this.$refs[`grid-visualizer-${i}`] as any)[0].setOption(
                 data.data[i] as echarts.EChartsOption
               );
             }
@@ -110,6 +113,7 @@ export default defineComponent({
             for (let i = 0; i < visualizerData.visualizers.length; i++) {
               // this.setData((data.data as VisualizerData).visualizers[0].data);
               this.setData(i, visualizerData.visualizers[i].data);
+              this.updateData(visualizerData.visualizers[i] as any);
             }
 
             let plots: IncrementalData[] = (data.data as any).plots;
@@ -150,6 +154,12 @@ export default defineComponent({
           }
         }
       };
+    },
+    async updateData(data: {
+      agents: GridItem;
+      spots: GridItem;
+    }): Promise<void> {
+      return;
     },
     async setData(i: number, data: echarts.EChartsOption): Promise<void> {
       return;

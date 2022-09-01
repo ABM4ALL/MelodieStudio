@@ -4,29 +4,23 @@ import shutil
 import sys
 
 import setuptools
-STATIC_PATH = os.path.join(os.path.dirname(__file__), 'MelodieStudio', 'static')
-WEBDIST_PATH = os.path.join(os.path.dirname(__file__), 'webdist')
-if 'build_web' in sys.argv:
-    if os.path.exists(STATIC_PATH):
-        shutil.rmtree(STATIC_PATH)
-    os.system("npm run build -- --dest=./webdist")
-    shutil.copytree(WEBDIST_PATH, STATIC_PATH)
-    sys.exit()
+
 
 if 'update_interfaces' in sys.argv:
-    os.system("python -m py_ts_interfaces.cli ./MelodieStudio/models.py -o src/models/models.ts")
+    os.system(
+        "python -m py_ts_interfaces.cli ./MelodieStudio/models.py -o src/models/models.ts")
     sys.exit()
 
 if os.path.exists('build'):
     shutil.rmtree('build')
 setuptools.setup(
     name='MelodieStudio',
-    version='0.2.0',
+    version='0.3.0',
     description='A web-based toolbox for Melodie package.',
     long_description='',
     long_description_content_type='text/markdown',
-    url='https://github.com/SongminYu/Melodie',
-    author='Songmin Yu',
+    # url='https://github.com/SongminYu/Melodie',
+    author='ABM4ALL',
     author_email='songmin.yu@isi.fraunhofer.de',
     license='BSD 3',
     classifiers=[
@@ -55,7 +49,8 @@ setuptools.setup(
         'pprintast',
         "watchdog",
         'flask_sock',
-        'py_ts_interfaces'
+        'py_ts_interfaces',
+        'jedi'
     ],
     python_requires='>=3.5',
     entry_points={

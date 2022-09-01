@@ -44,7 +44,7 @@
 
     <p style="margin-left: 14px">steps:{{ currentStep }}</p>
     <div style="margin-left: 14px; width: 300px">
-      <el-slider v-model="value" :max="30" :min="1" :step="1" />
+      <el-slider v-model="value" :max="20" :min="1" :step="1" />
     </div>
     <div style="margin-left: 14px">
       <el-tag type="success" v-if="connected">Connected</el-tag>
@@ -70,7 +70,7 @@ export default defineComponent({
   },
   data() {
     return {
-      value: 10,
+      value: 3,
     };
   },
   watch: {

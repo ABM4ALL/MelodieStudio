@@ -5,6 +5,7 @@ import DynamicForm, {
 } from "@/components/dynamicform/DynamicForm.vue";
 import { SeriesModel } from "echarts";
 import { IncrementalData, SeriesConfig } from "../components/dynamicChart/chartutils";
+import { GridItem } from "./agents";
 export enum STATES {
     UNCONFIGURED = 0,
     READY = 1,
@@ -46,6 +47,31 @@ export interface VisualizerData {
     plots: IncrementalData;
 
 }
+
+export interface NewVisualizerData {
+    name: string;
+    agents: GridItem[];
+    spots: GridItem[];
+}
+
+export interface NewVisualizersData {
+    visualizers: NewVisualizerData[];
+    plots: IncrementalData;
+
+}
+
+
+
+interface VisComponentViewInitialOptions {
+    name: string
+}
+
+export interface GridVisComponentViewInitialOptions extends VisComponentViewInitialOptions {
+    columns: number
+    rows: number
+}
+
+export type VisualizeViewInitialOption = GridVisComponentViewInitialOptions
 
 export interface VisData {
     type: string;

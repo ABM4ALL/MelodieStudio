@@ -31,10 +31,27 @@ import {
   getContainerLayout,
 } from "@/components/basic/dragcontainers";
 import { defineComponent, PropType } from "vue";
-import * as echarts from "echarts"
+import * as echarts from "echarts";
 
 interface LineChartSeriesOption extends echarts.LineSeriesOption {
   data: Array<Array<number>>;
+}
+
+function getEventLocation(evt: MouseEvent, parent: HTMLElement) {
+  var offsetX = evt.offsetX;
+  var offsetY = evt.offsetY;
+  const path = (evt as any).path as HTMLDivElement[];
+  for (const elem of path) {
+    if (elem == parent) {
+      break;
+    }
+    offsetX += elem.offsetLeft;
+    offsetY += elem.offsetTop;
+  }
+  return {
+    offsetX,
+    offsetY,
+  };
 }
 
 export default defineComponent({
@@ -153,8 +170,10 @@ export default defineComponent({
       let xP, yP, offset, dir;
       dir = "";
 
-      xP = ev.offsetX;
-      yP = ev.offsetY;
+      const { offsetX, offsetY } = getEventLocation(ev, container);
+      xP = offsetX;
+      yP = offsetY;
+      console.log(xP, yP);
       offset = 10;
 
       if (yP < offset) dir += "n";
