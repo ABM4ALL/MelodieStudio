@@ -51,7 +51,10 @@
     "vue-svg-loader": "^0.16.0",
     "vue-template-compiler": "^2.6.14",
     "vuex": "^4.0.2",
-    "webgl-plot": "^0.7.0"
+    "webgl-plot": "^0.7.0",
+    "xterm": "^4.19.0",
+    "xterm-addon-attach": "^0.6.0",
+    "xterm-addon-fit": "^0.5.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0",

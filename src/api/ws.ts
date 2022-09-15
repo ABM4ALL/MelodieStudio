@@ -2,12 +2,13 @@ import { WSMessage, WSToServerMessage } from "@/models/models";
 import { CommandParams } from "@/models/visualizerbasics";
 
 type CallbackList = ((s: string) => void)[]
-type MessageType = "subprocess-output" | "plot" | "message"
+type MessageType = "subprocess-output" | "plot" | "message" | "pty-output"
 const _handlers: {
     "subprocess-output": CallbackList,
     "plot": CallbackList,
-    "message": CallbackList
-} = { "subprocess-output": [], plot: [], message: [] };
+    "message": CallbackList,
+    "pty-output": CallbackList
+} = { "subprocess-output": [], plot: [], message: [], 'pty-output': [] };
 
 function wsOnMessage(messageEvent: any) {
     const data: WSMessage[] = JSON.parse(messageEvent.data)
@@ -17,6 +18,7 @@ function wsOnMessage(messageEvent: any) {
     if (data == null) {
         throw Error
     }
+    console.log('data', data)
     for (const ws_msg of data) {
         const type = ws_msg.type as MessageType
         let handled = false
@@ -61,6 +63,10 @@ export const addOnMessageHandler = (type: MessageType, handler: (s: any) => void
 
 export const send = (msg: WSToServerMessage) => {
     ws.send(JSON.stringify(msg))
+}
+
+export const sendPtyCommand = (termID: string, cmd: string) => {
+    ws.send(JSON.stringify({ payload: { cmd, termID }, type: "pty-input" }))
 }
 
 export const sendCommand = (cmd: number, data: CommandParams): void => {

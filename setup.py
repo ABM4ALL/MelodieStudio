@@ -50,7 +50,8 @@ setuptools.setup(
         "watchdog",
         'flask_sock',
         'py_ts_interfaces',
-        'jedi'
+        'jedi',
+        "rpyc"
     ],
     python_requires='>=3.5',
     entry_points={

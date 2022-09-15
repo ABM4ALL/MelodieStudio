@@ -99,6 +99,15 @@ export const staticRoutes = [
         meta: {
           icon: 'magic-stick'
         }
+      },
+      {
+        path: 'term',
+        name: 'Terminal',
+        component: () => import('@/components/terminal/TerminalView.vue'),
+        children: [],
+        meta: {
+          icon: 'magic-stick'
+        }
       }
     ],
   },

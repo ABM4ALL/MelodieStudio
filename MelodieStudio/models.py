@@ -11,7 +11,8 @@ class WSMessage(Interface):
     payload: Union[Any, List]
 
     def __post_init__(self) -> None:
-        assert self.type in {"subprocess-output", "plot", "message"}
+        assert self.type in {"subprocess-output",
+                             "plot", "message", 'pty-output'}
 
     def dump(self) -> str:
         return json.dumps(self.to_dict())
@@ -24,6 +25,7 @@ class WSMessage(Interface):
 class WSToServerMessage(Interface):
     type: str
     payload: Any
+
     def __post_init__(self) -> None:
         assert self.type in {"command"}
 

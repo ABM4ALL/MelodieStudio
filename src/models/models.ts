@@ -7,6 +7,6 @@ export interface WSMessage {
 }
 
 export interface WSToServerMessage {
-    type: string;
+    type: "pty-input" | "command";
     payload: any;
 }
