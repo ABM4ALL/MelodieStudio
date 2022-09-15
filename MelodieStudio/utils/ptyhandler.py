@@ -24,7 +24,7 @@ class MelodiePTY:
         self.term_id: str = term_id
         self._win_proc: "PTY" = None
 
-        self._nix_proc = NixProc
+        self._nix_proc: NixProc = None
         if is_windows():
             self.create_on_windows()
         else:
@@ -42,7 +42,7 @@ class MelodiePTY:
         def read_on_windows(proc: PTY):
             while proc.isalive():
                 out = proc.read(blocking=False)
-                if out=="":
+                if out == "":
                     time.sleep(0.1)
                 else:
                     self._on_output(self.term_id, out)
@@ -54,6 +54,7 @@ class MelodiePTY:
 
     def create_on_nix(self):
         import pty
+
         def read_on_nix(fd):
             max_read_bytes = 1024 * 20
             while True:
@@ -64,11 +65,12 @@ class MelodiePTY:
                     output = os.read(fd, max_read_bytes).decode()
                     # if output != "":
                     self._on_output(self.term_id, output)
-        
+
         child_pid, fd = pty.fork()
         if child_pid == 0:
             subprocess.run(self._command)
         else:
+            self._nix_proc = NixProc(fd, child_pid)
             self.start_thread(read_on_nix, (fd,))
 
     def write(self, input: str):
