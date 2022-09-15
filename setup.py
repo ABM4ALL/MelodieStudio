@@ -1,10 +1,13 @@
 import json
 import os
+import platform
 import shutil
 import sys
 
 import setuptools
 
+def is_windows():
+    return platform.system().lower().find('windows') != -1
 
 if 'update_interfaces' in sys.argv:
     os.system(
@@ -52,7 +55,7 @@ setuptools.setup(
         'py_ts_interfaces',
         'jedi',
         "rpyc"
-    ],
+    ]+['pywinpty'] if is_windows() else [],
     python_requires='>=3.5',
     entry_points={
         'console_scripts': [

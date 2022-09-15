@@ -9,8 +9,8 @@ import { FitAddon } from "xterm-addon-fit";
 import { AttachAddon } from "xterm-addon-attach";
 import { addOnMessageHandler, send, sendPtyCommand } from "@/api/ws";
 import { WSMessage } from "@/models/models";
-
-export default {
+import {defineComponent} from "vue"
+export default defineComponent({
   name: "Xterm",
   props: {
     socketURI: {
@@ -52,7 +52,7 @@ export default {
       this.term = term;
       term.onData((data) => {
         console.log("key pressed in browser:", data);
-        sendPtyCommand(this.termID, data);
+        sendPtyCommand(this.termID, data, 'cmd-pty');
         //    this.socket.emit("pty-input", { input: data });
       });
       addOnMessageHandler(
@@ -82,5 +82,5 @@ export default {
       };
     },
   },
-};
+});
 </script>

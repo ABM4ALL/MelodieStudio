@@ -10,7 +10,13 @@ from flask_sock import Sock
 from pytest import console_main
 from .models import WSMessage, WSToServerMessage
 import threading
-import pty
+import platform
+from .utils.ptyhandler import MelodiePTY
+from .utils.machine import is_windows
+if platform.system().lower().find('windows') != -1:
+    from winpty import PtyProcess, PTY
+else:
+    import pty
 
 
 class WSManager:
@@ -51,43 +57,18 @@ class PTYHandleCell(WSHandlerCell):
     def __init__(self) -> None:
         super().__init__()
         self.type = "pty-input"
-        self.shell = os.environ.get('SHELL', 'sh')
-        self.child_pids: Dict[str, int] = {}
-        self.child_fds: Dict[str, int] = {}
-        self.bg_threads: Dict[str, threading.Thread] = {}
-
-    def new_pty(self, termID: str):
-
-        def read_and_forward_pty_output(fd):
-            max_read_bytes = 1024 * 20
-            while True:
-                time.sleep(0.01)
-                timeout_sec = 0
-                (data_ready, _, _) = select.select([fd], [], [], timeout_sec)
-                if data_ready:
-                    output = os.read(fd, max_read_bytes).decode()
-                    # if output != "":
-                    print('send-output', time.time(), termID, output)
-                    send_pty_output(termID, output)
-
-        child_pid, fd = pty.fork()
-        if child_pid == 0:
-            subprocess.run("bash")
-        else:
-            self.child_fds[termID] = fd
-            self.child_pids[termID] = child_pid
-            self.bg_threads[termID] = threading.Thread(
-                target=read_and_forward_pty_output, args=(fd,))
-            self.bg_threads[termID].setDaemon(True)
-            self.bg_threads[termID].start()
+        self.shell = "cmd" if is_windows() else os.environ.get('SHELL', 'sh')
+        self.ptys: Dict[str, MelodiePTY] = {}
 
     def handle(self, msg: Dict[str, Any]):
         cmd = msg['cmd']
         termID = msg['termID']
-        if not termID in self.child_fds:
-            self.new_pty(termID)
-        os.write(self.child_fds[termID], cmd.encode())
-        print(cmd, termID, cmd.encode("utf8"))
+        msg_type = msg['msgType']
+        assert msg_type in {'new-pty', 'close-pty', 'cmd-pty'}
+        if not termID in self.ptys:
+            self.ptys[termID] = MelodiePTY(termID, self.shell, send_pty_output)
+        else:
+            self.ptys[termID].write(cmd)
 
 
 def send_loop():

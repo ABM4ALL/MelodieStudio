@@ -65,8 +65,8 @@ export const send = (msg: WSToServerMessage) => {
     ws.send(JSON.stringify(msg))
 }
 
-export const sendPtyCommand = (termID: string, cmd: string) => {
-    ws.send(JSON.stringify({ payload: { cmd, termID }, type: "pty-input" }))
+export const sendPtyCommand = (termID: string, cmd: string, msgType: 'new-pty' | 'close-pty' | 'cmd-pty') => {
+    ws.send(JSON.stringify({ payload: { cmd, termID, msgType}, type: "pty-input" }))
 }
 
 export const sendCommand = (cmd: number, data: CommandParams): void => {

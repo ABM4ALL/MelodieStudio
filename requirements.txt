@@ -13,3 +13,6 @@ astunparse
 pprintast
 websockets
 watchdog
+jedi
+flask_sock
+astroid
