@@ -5,5 +5,5 @@
 # @File: __init__.py
 
 from .main import studio_main
-from .config_manager import ConfigureManager
+from .utils.config_manager import ConfigureManager
 from .management import *

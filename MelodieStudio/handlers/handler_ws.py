@@ -5,18 +5,22 @@ import select
 import time
 from typing import Any, Dict, List, Union
 import queue
-from flask import Flask
+import uuid
+from flask import Blueprint, Flask, request
 from flask_sock import Sock
 from pytest import console_main
-from .models import WSMessage, WSToServerMessage
+from ..models.models import WSMessage, WSToServerMessage
 import threading
 import platform
-from .utils.ptyhandler import MelodiePTY
-from .utils.machine import is_windows
+from ..utils.ptyhandler import MelodiePTY
+from ..utils.machine import is_windows
+from .messages import Response
 if platform.system().lower().find('windows') != -1:
     from winpty import PtyProcess, PTY
 else:
     import pty
+
+pty_mgr = Blueprint('pty', __name__)
 
 
 class WSManager:
@@ -70,6 +74,20 @@ class PTYHandleCell(WSHandlerCell):
         else:
             self.ptys[termID].write(cmd)
 
+    def create_pty(self, termID: str, cmd: str) -> bool:
+        if termID not in self.ptys:
+            self.ptys[termID] = MelodiePTY(termID, cmd, send_pty_output)
+            return True
+        else:
+            return False
+
+    def resize(self, termID: str, rows: int, cols: int) -> bool:
+        if termID not in self.ptys:
+            return False
+        else:
+            self.ptys[termID].resize()
+            return True
+
 
 def send_loop():
     while 1:
@@ -88,12 +106,13 @@ def send_loop():
             ws = ws_mgr.websockets[ws_key]
             if ws.connected:
                 ws.send(json.dumps([ws_msg.to_dict() for ws_msg in values]))
-                print(f"send at {time.time()}", values[0].payload)
+                # print(f"send at {time.time()}", values[0].payload)
             else:
                 ws_mgr.remove(ws)
 
 
-ws_handlers = PTYHandleCell()
+pty_handle_cell = PTYHandleCell()
+ws_handlers = pty_handle_cell
 
 
 def register_websocket_handlers(app: Flask):
@@ -127,6 +146,39 @@ def send_subprocess_output(type: str, content: str):
     send_queue.put(
         WSMessage("subprocess-output",
                   {"type": type, "content": content}))
+
+
+def emit_removed_fsitem_evt(fsitem_name: str):
+    send_queue.put(
+        WSMessage("fs-event",
+                  {"type": "removed",
+                   "parent": os.path.dirname(fsitem_name),
+                   "deleted": {"absPath": fsitem_name}}))
+
+
+def emit_added_fsitem_evt( abs_path: str):
+    send_queue.put(
+        WSMessage("fs-event",
+                  {"type": "added",
+                   "parent": os.path.dirname(abs_path),
+                   "added": {"name": os.path.dirname(abs_path), "absPath": abs_path, "type":  "directory" if os.path.isdir(abs_path) else "file"}}))
+
+
+@pty_mgr.route("/create", methods=['POST'])
+def new_terminal():
+    data = json.loads(request.data)
+    cmd = data['cmd']
+    new_terminal_id = str(uuid.uuid1())
+    return Response.ok({'termID': new_terminal_id}) if pty_handle_cell.create_pty(new_terminal_id, cmd) else Response.error("terminal id duplicated!")
+
+
+@pty_mgr.route("/resize", methods=['POST'])
+def resize_terminal():
+    data = json.loads(request.data)
+    cmd = data['cmd']
+    new_terminal_id = str(uuid.uuid1())
+    pty_handle_cell
+    return Response.ok({'termID': new_terminal_id}) if pty_handle_cell.create_pty(new_terminal_id, cmd) else Response.error("terminal id duplicated!")
 
 
 sock = None

@@ -4,7 +4,8 @@
 # @Email: 1295752786@qq.com
 # @File: handler_charts.py
 import json
-import os.path
+import os
+import shutil
 
 from flask import Blueprint, request
 from .messages import Response
@@ -12,16 +13,27 @@ from .messages import Response
 file_system = Blueprint('fs', __name__)
 
 
-def get_all_file_items(directory: str):
+def get_all_file_items(directory: str, one_layer=False):
     items = []
     for root, dirs, files in os.walk(directory):
         if not os.path.samefile(root, directory):
             continue
         else:
-            for file in files:
-                items.append({'name': file, 'type': 'file'})
+            got_dirs = []
+            got_files = []
             for dir_name in dirs:
-                items.append({'name': dir_name, 'type': 'directory'})
+                got_dirs.append({'name': dir_name, 'type': 'directory',
+                                 "absPath": os.path.join(root, dir_name)})
+            for file in files:
+                got_files.append({'name': file, 'type': 'file',
+                                  "absPath": os.path.join(root, file)})
+        got_dirs.sort(key=lambda item: item['name'])
+        got_files.sort(key=lambda item: item['name'])
+        items.extend(got_dirs)
+
+        items.extend(got_files)
+        if one_layer:
+            break
 
     return items
 
@@ -38,6 +50,16 @@ def all_fs_items():
         return Response.error(f"Directory {directory} does not exist!")
 
 
+@file_system.route('listDir')
+def listdir():
+    directory: str = request.args.get('directory')
+    if not os.path.exists(directory):
+        return Response.error(rf"Directory {directory} does not exist!")
+    else:
+        return Response.ok({"currentDirectory": directory,
+                            "fsItemsList": get_all_file_items(directory, True)})
+
+
 @file_system.route('gotoParentDir')
 def go_to_parent():
     directory: str = request.args.get('directory')
@@ -45,7 +67,7 @@ def go_to_parent():
         directory = os.path.join(os.path.expanduser('~'), 'Desktop')
     directory = os.path.dirname(directory)
     return Response.ok({"currentDirectory": directory,
-                 "fsItemsList": get_all_file_items(directory)})
+                        "fsItemsList": get_all_file_items(directory)})
 
 
 @file_system.route('gotoSubDir')
@@ -56,4 +78,16 @@ def go_to_sub():
         directory = os.path.join(os.path.expanduser('~'), 'Desktop')
     directory = os.path.join(directory, subdir)
     return Response.ok({"currentDirectory": directory,
-                 "fsItemsList": get_all_file_items(directory)})
+                        "fsItemsList": get_all_file_items(directory)})
+
+
+@file_system.route('delete', methods=['POST'])
+def delete_fs_item():
+    print(request.data)
+    item_abs_path: str = json.loads(request.data)['itemName']
+    
+    if os.path.isfile(item_abs_path):
+        os.remove(item_abs_path)
+    else:
+        shutil.rmtree(item_abs_path)
+    return Response.success_msg("Successfully deleted filesystem item!")

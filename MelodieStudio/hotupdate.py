@@ -1,14 +1,17 @@
 from __future__ import print_function
 
 import logging
+import os
 import subprocess
 import sys
 import threading
 import time
 from typing import Callable, Optional, TYPE_CHECKING
 
-from watchdog.events import FileSystemEventHandler, FileSystemEvent
+from watchdog.events import FileSystemEventHandler, FileSystemEvent, FileMovedEvent, FileDeletedEvent
 from watchdog.observers import Observer
+
+from MelodieStudio.handlers.handler_ws import emit_added_fsitem_evt, emit_removed_fsitem_evt
 
 logger = logging.getLogger(__name__)
 observer: Optional[Observer] = None
@@ -24,10 +27,21 @@ class FileMonitorHandler(FileSystemEventHandler):
         self._watch_path = watch_path
         self._callback = callback
 
-    def on_any_event(self, event: FileSystemEvent):
-        if event.src_path.endswith(".py"):
-            logger.info(f"file {event.src_path} changed, now update!")
-            self._callback()
+    # def on_any_event(self, event: FileSystemEvent):
+    #     if event.src_path.endswith(".py"):
+    #         logger.info(f"file {event.src_path} changed, now update!")
+    #         self._callback()
+    def on_created(self, event):
+        logger.warn(f"file {event.src_path} created, now update!")
+        emit_added_fsitem_evt(event.src_path)
+
+    def on_moved(self, event: FileMovedEvent):
+        logger.warn(f"file {event.src_path} moved, now update!")
+        emit_added_fsitem_evt(event.dest_path)
+        emit_removed_fsitem_evt(event.src_path)
+
+    def on_deleted(self, event: FileDeletedEvent):
+        emit_removed_fsitem_evt(event.src_path)
 
 
 class Runner:
@@ -68,7 +82,8 @@ def start_watch_fs(watch_dir: str, callback: Callable[[], None]):
     assert observer is None
     event_handler = FileMonitorHandler(watch_dir, callback)
     observer = Observer()
-    observer.schedule(event_handler, path=watch_dir, recursive=True)  # recursive递归的
+    observer.schedule(event_handler, path=watch_dir,
+                      recursive=True)  # recursive递归的
     observer.start()
 
 

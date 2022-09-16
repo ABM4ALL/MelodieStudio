@@ -1,4 +1,5 @@
 import json
+import os
 import re
 from MelodieStudio.static_analysis.autocompletion import handle_autocomp
 from flask import Blueprint, request
@@ -52,3 +53,7 @@ def handle_autocomplete():
     code = data['code']
     pos = data['pos']
     return Response.ok(handle_autocomp(code, pos))
+
+@tools.route('pwd', methods=['get'])
+def handle_get_cwd():
+    return Response.ok({'pwd': os.getcwd()})

@@ -7,9 +7,9 @@ import json
 import os.path
 
 from flask import Blueprint, request
-from .file_manager import JSONManager
+from ..utils.file_manager import JSONManager
 from .messages import Response
-from .config_manager import get_config_manager
+from ..utils.config_manager import get_config_manager
 
 charts = Blueprint('charts', __name__)
 

@@ -31,5 +31,9 @@ class Response:
         return Response._create_response(Response.OK, "", data)
 
     @staticmethod
+    def success_msg(msg:str) -> str:
+        return Response._create_response(Response.OK, msg, {})
+
+    @staticmethod
     def error(msg: str) -> str:
         return Response._create_response(Response.ERROR, msg, None)

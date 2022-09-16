@@ -6,8 +6,15 @@
 </template>
 <script>
 import layout from "@/layout/index.vue";
+import { getCWD } from "@/api/fs";
+import store from "./store";
 export default {
   setup() {
+    getCWD().then((cwd) => {
+      store.state.cwd = cwd;
+
+      console.log(store.state.cwd, cwd)
+    });
     return {};
   },
   components: {

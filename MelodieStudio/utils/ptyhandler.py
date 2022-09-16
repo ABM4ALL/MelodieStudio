@@ -1,12 +1,15 @@
 from ast import List
+import fcntl
 from io import TextIOWrapper
 import os
 import select
+import struct
 import subprocess
 import threading
 import time
+from turtle import right
 
-from typing import Callable, NamedTuple, Tuple
+from typing import Callable, NamedTuple
 from .machine import is_windows
 
 NixProc = NamedTuple("NixProc", [('fd', TextIOWrapper), ('child_pid', int)])
@@ -78,3 +81,12 @@ class MelodiePTY:
             self._win_proc.write(input)
         else:
             os.write(self._nix_proc.fd, input.encode())
+
+    def resize(self, rows: int, cols: int):
+        if is_windows():
+            raise NotImplementedError
+        else:
+            import termios
+            winsize = struct.pack("HHHH", rows, cols, 0, 0)
+            fcntl.ioctl(self._nix_proc.fd, termios.TIOCSWINSZ, winsize)
+        pass

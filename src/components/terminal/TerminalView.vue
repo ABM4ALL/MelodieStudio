@@ -1,6 +1,25 @@
 <template>
-  <div id="xterm" class="xterm" />
+  <div class="term-outer">
+    <div class="header">
+      <p>Command:{{ cmd }}</p>
+    </div>
+
+    <div :id="elemID" class="terminal" />
+  </div>
 </template>
+
+<style scoped>
+.term-outer {
+  height: 100%;
+}
+
+.term-outer :deep(.terminal) {
+  height: 100%;
+}
+.term-outer :deep(.xterm) {
+  height: 100%;
+}
+</style>
 
 <script lang="ts">
 import "xterm/css/xterm.css";
@@ -9,7 +28,9 @@ import { FitAddon } from "xterm-addon-fit";
 import { AttachAddon } from "xterm-addon-attach";
 import { addOnMessageHandler, send, sendPtyCommand } from "@/api/ws";
 import { WSMessage } from "@/models/models";
-import {defineComponent} from "vue"
+import { defineComponent, ref } from "vue";
+import { createPTY } from "@/api/tools";
+import { ElNotification } from "element-plus";
 export default defineComponent({
   name: "Xterm",
   props: {
@@ -17,17 +38,29 @@ export default defineComponent({
       type: String,
       default: "",
     },
-    termID: {
+    cmd: {
       type: String,
-      required: false,
-      default: `default-terminal`,
+      default: "bash",
     },
   },
   setup() {
     return {
+      elemID: `terminal-${Math.random() + Date.now()}`,
       socket: null as WebSocket | null,
       term: null as Terminal | null,
+      termID: ref(""),
     };
+  },
+  beforeMount() {
+    createPTY(this.cmd)
+      .then((cmd: { termID: string }) => {
+        console.log("created pty:", cmd.termID, cmd);
+        ElNotification.error("PTY connection success!");
+        this.termID = cmd.termID;
+      })
+      .catch(() => {
+        ElNotification.error("Error when creating PTY!");
+      });
   },
   mounted() {
     this.initTerm();
@@ -35,7 +68,6 @@ export default defineComponent({
     // this.initSocket();
   },
   beforeUnmount() {
-    this.socket!.close();
     this.term!.dispose();
   },
   methods: {
@@ -46,15 +78,16 @@ export default defineComponent({
       });
       const fitAddon = new FitAddon();
       term.loadAddon(fitAddon);
-      term.open(document.getElementById("xterm")!);
+      term.open(document.getElementById(this.elemID)!);
       fitAddon.fit();
       term.focus();
       this.term = term;
       term.onData((data) => {
         console.log("key pressed in browser:", data);
-        sendPtyCommand(this.termID, data, 'cmd-pty');
+        sendPtyCommand(this.termID, data, "cmd-pty");
         //    this.socket.emit("pty-input", { input: data });
       });
+      console.log("term-dim", fitAddon.proposeDimensions());
       addOnMessageHandler(
         "pty-output",
         (msg: { output: string; termID: string }) => {

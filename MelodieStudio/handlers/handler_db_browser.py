@@ -11,7 +11,7 @@ from typing import List
 
 from flask import Blueprint, request
 
-from ._config import get_studio_config
+from .._config import get_studio_config
 from .messages import Response
 
 try:

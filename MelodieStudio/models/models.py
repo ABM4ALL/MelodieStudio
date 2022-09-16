@@ -12,7 +12,7 @@ class WSMessage(Interface):
 
     def __post_init__(self) -> None:
         assert self.type in {"subprocess-output",
-                             "plot", "message", 'pty-output'}
+                             "plot", "message", 'pty-output', 'fs-event'}
 
     def dump(self) -> str:
         return json.dumps(self.to_dict())
