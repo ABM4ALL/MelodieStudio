@@ -20,6 +20,8 @@ import pandas as pd
 from flask_cors import CORS
 from werkzeug.utils import redirect
 
+from MelodieStudio.utils.config_manager import get_workdir
+
 from .experiment_status import ExperimentStatus
 from .project_structure import list_all_files,  to_mermaid, get_all_funcdefs, \
     get_flow, to_digraph
@@ -91,7 +93,7 @@ def browse_sqlite():
 
 @app.route('/all_func_defs')
 def get_all_defs():
-    files = list_all_files(os.getcwd(), {'.py'})
+    files = list_all_files(get_workdir(), {'.py'})
     res = []
     for file in files:
         res.append({'title': os.path.basename(file),

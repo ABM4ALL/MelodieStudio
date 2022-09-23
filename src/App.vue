@@ -1,19 +1,19 @@
 <template>
   <div>
-    <router-view v-if="$route.path === '/login'"></router-view>
+    <router-view v-if="$route.path === '/studio-main'"></router-view>
     <layout v-else></layout>
   </div>
 </template>
-<script>
+<script lang="ts">
 import layout from "@/layout/index.vue";
-import { getCWD } from "@/api/fs";
+import { getProjectMeta } from "@/api/fs";
 import store from "./store";
+import { registerEvents } from "@/components/events/globalevents";
+registerEvents();
 export default {
   setup() {
-    getCWD().then((cwd) => {
-      store.state.cwd = cwd;
-
-      console.log(store.state.cwd, cwd)
+    getProjectMeta().then((meta) => {
+      store.commit("SET_PROJECT_META", meta);
     });
     return {};
   },

@@ -1,8 +1,11 @@
 import json
 import os
 import re
+import sys
 from MelodieStudio.static_analysis.autocompletion import handle_autocomp
 from flask import Blueprint, request
+
+from MelodieStudio.utils.config_manager import get_workdir
 
 from .messages import Response
 
@@ -46,14 +49,17 @@ def create_new_project():
     except FileExistsError as e:
         return Response.error(str(e))
 
+
 @tools.route('autoComplete', methods=['post'])
 def handle_autocomplete():
     data = json.loads(request.data)
-    
+    file = data['file']
     code = data['code']
     pos = data['pos']
-    return Response.ok(handle_autocomp(code, pos))
+    return Response.ok(handle_autocomp(code, pos, file))
 
-@tools.route('pwd', methods=['get'])
+
+@tools.route('projectMeta', methods=['get'])
 def handle_get_cwd():
-    return Response.ok({'pwd': os.getcwd()})
+    return Response.ok({'cwd': get_workdir(),
+                        'executable': sys.executable})

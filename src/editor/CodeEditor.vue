@@ -1,26 +1,96 @@
 <template>
   <div class="container">
     <div class="file-tree-container">
-      <file-tree></file-tree>
+      <file-tree @open-file="onOpenFile"></file-tree>
+      <el-button @click="onRequestRun">Run Simulator</el-button>
     </div>
-
-    <cython-editor></cython-editor>
+    <div class="editor-main">
+      <editor-tabs
+        ref="codeEditor"
+        :style="{ height: terminalsShown ? '70%' : '100%' }"
+      ></editor-tabs>
+      <terminal-tabs
+        :style="{
+          height: terminalsShown ? '30%' : '0%',
+          visibility: terminalsShown ? 'unset' : 'none',
+        }"
+      ></terminal-tabs>
+    </div>
   </div>
 </template>
-
 <script lang="ts" setup>
+import {
+  ref,
+  onActivated,
+  onDeactivated,
+  onUnmounted,
+  defineComponent,
+} from "vue";
 import FileTree from "./FileTree.vue";
-import CythonEditor from "./CythonEditor2.vue";
+import EditorTabs from "./EditorTabs.vue";
+
+import TerminalTabs from "@/components/terminal/TerminalTabs.vue";
+import { requestRunCommand } from "@/components/terminal/terminal_events";
+import store from "@/store";
+const onRequestRun = () => {
+  requestRunCommand(
+    `${(store.state as any).controls.interpreterMeta.executable} run_simulator.py`
+  );
+};
+
+const codeEditor = ref(null);
+const terminalsShown = ref(true);
+const onOpenFile = (absPath: string) => {
+  console.log(absPath, codeEditor.value);
+  if (codeEditor.value != null) {
+    (codeEditor.value as any).openFile(absPath);
+  }
+};
+const id = Math.random();
+onActivated(() => {
+  console.log("activated!!!!!!!!", id);
+});
+onDeactivated(() => {
+  console.log("deactivated!!!!!!!!", id);
+});
+onUnmounted(() => {
+  console.log("unmounted!!!", id);
+});
 </script>
 
 <style scoped>
 .file-tree-container {
-  width: 30%;
+  min-width: 300px;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .container {
   display: flex;
   flex-direction: row;
   width: 100%;
+  height: 100%;
+}
+
+.container :deep(.editor-tabs) {
+  height: 100%;
+  /* margin-left: 12px; */
+}
+
+.editor-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: calc(100% - 300px);
+
+  margin-left: 12px;
+}
+
+.container :deep(.el-tabs__content) {
+  height: calc(100% - var(--el-tabs-header-height));
+}
+
+.container :deep(.el-tab-pane) {
+  height: 100%;
 }
 </style>

@@ -9,12 +9,13 @@
           <Head></Head>
         </el-header>
         <el-main>
-            <router-view v-slot="{Component}">
-              <transition name="fade-transform" mode="out-in">
-                <component class="view" :is="Component"></component>
-              </transition>
-            </router-view>
-            <Drawer></Drawer>
+          <router-view v-slot="{ Component }">
+            <!-- <keep-alive > -->
+            <component :is="Component" />
+            <!-- </keep-alive> -->
+          </router-view>
+
+          <Drawer></Drawer>
         </el-main>
       </el-container>
     </el-container>
@@ -22,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { ref, reactive, watchEffect } from "vue";
+import { ref, reactive, watchEffect, KeepAlive } from "vue";
 import { useStore } from "vuex";
 import { useRouter, useRoute } from "vue-router";
 
@@ -33,7 +34,7 @@ import Drawer from "./components/Drawer/index.vue";
 import { useDynamicRoutesHook } from "@/composition/useTagViewApi";
 export default {
   setup() {
-    const {dynamicRouteTags} = useDynamicRoutesHook();
+    const { dynamicRouteTags } = useDynamicRoutesHook();
     const route = useRoute();
     const store = useStore();
     const routes = store.state.controls.staticRoutes;
@@ -47,14 +48,14 @@ export default {
       stop();
     }, 0);
     return {
-      routes
+      routes,
     };
   },
   components: {
     Sidebar,
     Head,
-    Drawer
-  }
+    Drawer,
+  },
 };
 </script>
 <style>
@@ -64,7 +65,7 @@ section.el-container.is-vertical {
   width: calc(100vh - 210px);
 }
 .el-main::-webkit-scrollbar {
-	display: none;
+  display: none;
 }
 .el-aside {
   width: auto !important;
@@ -92,7 +93,7 @@ section.el-container.is-vertical {
 /* fade-transform */
 .fade-transform-leave-active,
 .fade-transform-enter-active {
-  transition: all .5s;
+  transition: all 0.5s;
 }
 
 .fade-transform-enter {

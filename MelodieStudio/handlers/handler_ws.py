@@ -8,7 +8,6 @@ import queue
 import uuid
 from flask import Blueprint, Flask, request
 from flask_sock import Sock
-from pytest import console_main
 from ..models.models import WSMessage, WSToServerMessage
 import threading
 import platform

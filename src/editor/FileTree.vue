@@ -172,7 +172,7 @@ let root: Node | null = null;
 const loadNode = (node: Node, resolve: (data: Tree[]) => void) => {
   if (node.level === 0) {
     root = node;
-    listDir(store.state!.cwd).then((data: FileTreeItem[]) => {
+    listDir((store.state as any).controls.cwd).then((data: FileTreeItem[]) => {
       const l: Tree[] = [];
       if (data == null) {
         resolve(l);
@@ -213,8 +213,8 @@ addOnMessageHandler(
     added?: FileTreeItem;
     removed?: FileTreeItem;
   }) => {
-    console.log("msg", msg, msg.parent == store.state.cwd);
-    if (msg.parent == store.state.cwd) {
+    console.log("msg", msg, msg.parent == (store.state as any).controls.cwd);
+    if (msg.parent == (store.state as any).controls.cwd) {
       if (root == null) {
         throw Error("Root node was null");
       }
@@ -305,8 +305,8 @@ const onDelete = async (file: string) => {
 const filterNode = (value: string, data: Tree) => {
   if (value == "") {
     return true;
-  }else{
-    return data.name.includes(value)
+  } else {
+    return data.name.includes(value);
   }
 };
 

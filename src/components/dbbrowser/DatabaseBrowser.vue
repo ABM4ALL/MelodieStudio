@@ -9,11 +9,7 @@
         />
       </el-col>
       <el-col :span="8">
-        <el-button>
-          Help
-          <!-- <i class="bi-alarm"></i> -->
-          <!-- <i class="el-icon-questionfilled"></i> -->
-        </el-button>
+        <el-button> Help </el-button>
         <el-popover
           placement="bottom-start"
           title="All Tables:"
@@ -23,9 +19,10 @@
           <template #reference>
             <el-button>Desc</el-button>
           </template>
-          <p v-for="tableName in tableNames" :key="tableName">
+          <div v-for="tableName in tableNames" :key="tableName">
             {{ tableName }}
-          </p>
+            <el-button @click="queryData(tableName)"></el-button>
+          </div>
         </el-popover>
 
         <el-popover
@@ -46,14 +43,17 @@
         <el-button @click="queryTable">Query</el-button>
       </el-col>
     </el-row>
-    <el-row style="height: 100%" class="tableContainer">
+    <el-row
+      style="height: calc(100% - var(--el-component-size))"
+      class="tableContainer"
+    >
       <el-table :data="tableData" @scroll="handleScroll" height="100%">
         <el-table-column
           :prop="col.name"
           :label="col.name"
           v-for="col in columns"
           :key="col.name"
-          :min-width="col.name.length * 14"
+          :width="60 + 10 * col.name.length"
         >
         </el-table-column>
       </el-table>
@@ -68,6 +68,9 @@ import { defineComponent } from "@vue/runtime-core";
 import { ElMessage } from "element-plus";
 import parser from "js-sql-parser";
 export default defineComponent({
+  props: {
+    sqlitePath: String,
+  },
   data() {
     return {
       queryForm: {
@@ -110,10 +113,17 @@ export default defineComponent({
     // },
   },
   mounted() {
+    this.getAllTableNames();
     // this.getTables();
     // window.addEventListener("mousewheel", this.handleScroll, true); // 监听（绑定）滚轮滚动事件
   },
   methods: {
+    async queryData(tableName: string) {
+      const sql = `select * from ${tableName} LIMIT 1000`;
+      this.queryForm.sql = sql;
+      await this.$nextTick();
+      this.queryTable();
+    },
     handleScroll(evt) {
       console.log(evt);
       return;
@@ -138,16 +148,21 @@ export default defineComponent({
       this.queryForm.sql = parser.stringify(ast);
     },
     async queryTable() {
-      // console.log(JSON.stringify(ast, null, 2));
-      // console.log(ast);
-      const data: QueriedData = await query(this.queryForm.sql);
+      const data: QueriedData = await query({
+        type: "sqlite",
+        path: this.sqlitePath as string,
+        sql: this.queryForm.sql as string,
+      });
       console.log(data);
       this.columns = data.schema.fields;
       this.tableData = data.data;
       this.getAllTableNames();
     },
     async getAllTableNames() {
-      const tableNames = await getTableNames();
+      const tableNames = await getTableNames({
+        type: "sqlite",
+        path: this.sqlitePath!,
+      });
       this.tableNames = tableNames;
     },
   },

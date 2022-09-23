@@ -7,3 +7,4 @@ export function readFile(filePath: string) {
     xhr.send(null);
     return xhr.status === okStatus ? xhr.responseText : null;
 }
+

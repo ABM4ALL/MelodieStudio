@@ -2,6 +2,7 @@ import Wrapper from '@/layout/components/Wrapper/index.vue';
 import Home from '@/views/Home.vue';
 import GridShow from "@/views/GridShow.vue";
 import Database from "@/views/Database.vue";
+
 // import ProjectCreator from "@/components/projectcreator/ProjectCreator.vue";
 // import CythonEditor from '@/editor/CythonEditor.vue';
 /**
@@ -38,15 +39,15 @@ export const staticRoutes = [
       icon: 'view'
     }
   },
-  //  {
-  //   path: '/grid',
-  //   name: 'Grid',
-  //   component: GridShow,
-  //   children: [],
-  //   meta: {
-  //     icon: 'el-icon-s-home'
-  //   }
-  // },
+  {
+    path: '/network',
+    name: 'Network',
+    component: () => import('@/components/network/NetworkViewer.vue'),
+    children: [],
+    meta: {
+      icon: 'el-icon-s-home'
+    }
+  },
   // {
   //   path: '/chartList',
   //   name: 'ChartListView',
@@ -70,34 +71,28 @@ export const staticRoutes = [
         component: Database,
         children: [],
         meta: {
-          icon: 'coin'
+          icon: 'coin',
+          keepAlive: true
         }
       },
-      // {
-      //   path: 'projectCreator',
-      //   name: 'New Project ...',
-      //   component: ProjectCreator,
-      //   children: [],
-      //   meta: {
-      //     icon: 'magic-stick'
-      //   }
-      // }, 
       {
         path: 'visualizer2',
         name: 'GridNew',
         component: () => import('@/components/visualizer/GridComponent.vue'),
         children: [],
         meta: {
-          icon: 'magic-stick'
+          icon: 'magic-stick',
+          KeepAlive: true,
         }
       },
       {
         path: 'cythonEditor2',
-        name: 'Editor',
+        name: 'CodeEditor',
         component: () => import('@/editor/CodeEditor.vue'),
         children: [],
         meta: {
-          icon: 'magic-stick'
+          icon: 'magic-stick',
+          keepAlive: true,
         }
       },
       {
@@ -108,7 +103,15 @@ export const staticRoutes = [
         meta: {
           icon: 'magic-stick'
         }
-      }
+      }, {
+        path: '/threejs',
+        name: 'ThreeJS',
+        component: () => import('@/components/network/ThreejsViewer.vue'),
+        children: [],
+        meta: {
+          icon: 'el-icon-s-home'
+        }
+      },
     ],
   },
   {

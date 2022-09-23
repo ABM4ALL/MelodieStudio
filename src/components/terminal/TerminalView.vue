@@ -1,6 +1,6 @@
 <template>
   <div class="term-outer">
-    <div class="header">
+    <div class="termview-header">
       <p>Command:{{ cmd }}</p>
     </div>
 
@@ -13,8 +13,12 @@
   height: 100%;
 }
 
+.termview-header {
+  height: 24px;
+}
+
 .term-outer :deep(.terminal) {
-  height: 100%;
+  height: calc(100% - 24px);
 }
 .term-outer :deep(.xterm) {
   height: 100%;
@@ -31,6 +35,8 @@ import { WSMessage } from "@/models/models";
 import { defineComponent, ref } from "vue";
 import { createPTY } from "@/api/tools";
 import { ElNotification } from "element-plus";
+import store from "@/store";
+import { registerOnRunCommand } from "./terminal_events";
 export default defineComponent({
   name: "Xterm",
   props: {
@@ -40,7 +46,7 @@ export default defineComponent({
     },
     cmd: {
       type: String,
-      default: "bash",
+      default: "zsh",
     },
   },
   setup() {
@@ -49,6 +55,7 @@ export default defineComponent({
       socket: null as WebSocket | null,
       term: null as Terminal | null,
       termID: ref(""),
+      initialized: ref(false),
     };
   },
   beforeMount() {
@@ -88,15 +95,29 @@ export default defineComponent({
         //    this.socket.emit("pty-input", { input: data });
       });
       console.log("term-dim", fitAddon.proposeDimensions());
+      
+      registerOnRunCommand((cmd: string) => {
+        this.injectCMD(cmd);
+      });
       addOnMessageHandler(
         "pty-output",
         (msg: { output: string; termID: string }) => {
           console.log("recv msg", msg);
           if (this.term != null && this.termID == msg.termID) {
             this.term.write(msg.output);
+            if (!this.initialized) {
+              this.injectCMD(`cd ${(store.state as any).controls.cwd}`);
+              this.initialized = true;
+            }
           }
         }
       );
+    },
+    injectCMD(cmd: string) {
+      if (this.term != null) {
+        this.term.writeln(cmd);
+        sendPtyCommand(this.termID, cmd + "\n", "cmd-pty");
+      }
     },
     socketOnOpen() {
       this.socket!.onopen = () => {

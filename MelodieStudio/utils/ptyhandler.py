@@ -11,7 +11,7 @@ from turtle import right
 
 from typing import Callable, NamedTuple
 from .machine import is_windows
-
+from .config_manager import get_workdir
 NixProc = NamedTuple("NixProc", [('fd', TextIOWrapper), ('child_pid', int)])
 
 
@@ -32,6 +32,7 @@ class MelodiePTY:
             self.create_on_windows()
         else:
             self.create_on_nix()
+        # self.write(f'cd {get_workdir()}')
 
     def start_thread(self, func, args):
         self._thread = threading.Thread(

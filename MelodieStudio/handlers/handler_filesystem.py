@@ -83,11 +83,33 @@ def go_to_sub():
 
 @file_system.route('delete', methods=['POST'])
 def delete_fs_item():
-    print(request.data)
     item_abs_path: str = json.loads(request.data)['itemName']
-    
+
     if os.path.isfile(item_abs_path):
         os.remove(item_abs_path)
     else:
         shutil.rmtree(item_abs_path)
     return Response.success_msg("Successfully deleted filesystem item!")
+
+
+@file_system.route('getFile', methods=['GET'])
+def get_file():
+    file_abs_path: str = request.args.get('fileName')
+    if not (os.path.isfile(file_abs_path) and os.path.exists(file_abs_path)):
+        return Response.error(f"Filename {file_abs_path} invalid. It may not exist or not a file.")
+    else:
+        with open(file_abs_path, encoding='utf8', errors="replace") as f:
+            s = f.read()
+            print(s)
+            return Response.ok({'content': s})
+
+
+@file_system.route('writeFile', methods=['POST'])
+def write_file():
+    data = json.loads(request.data)
+    file_abs_path = data['fileName']
+    content = data['content']
+    with open(file_abs_path, "w", encoding="utf8") as f:
+        f.write(content)
+    
+    return Response.success_msg("Saved successfully!")

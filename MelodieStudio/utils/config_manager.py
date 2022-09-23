@@ -8,8 +8,21 @@ from typing import Optional
 
 from .file_manager import JSONManager
 
-COMPULSORY_CONFIGS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "compulsory_configs")
-CHART_POLICIES_FILE = os.path.join(COMPULSORY_CONFIGS_DIR, "chart_policies.json")
+COMPULSORY_CONFIGS_DIR = os.path.join(os.path.dirname(
+    os.path.dirname(__file__)), "compulsory_configs")
+CHART_POLICIES_FILE = os.path.join(
+    COMPULSORY_CONFIGS_DIR, "chart_policies.json")
+
+_workdir = ""
+
+
+def set_workdir(new_wd: str):
+    global _workdir
+    _workdir = new_wd
+
+
+def get_workdir() -> str:
+    return _workdir
 
 
 class ConfigureCategory():
@@ -49,7 +62,8 @@ class ConfigureCategory():
             if k in config:
                 self.__dict__[k] = config[k]
             else:
-                raise AttributeError(f"Configure file {self._file} does not define '{k}'")
+                raise AttributeError(
+                    f"Configure file {self._file} does not define '{k}'")
 
     def to_dict(self):
         """
@@ -77,7 +91,8 @@ class ConfigureCategory():
         if not self._initalized:
             super(ConfigureCategory, self).__setattr__(key, value)
         else:
-            assert key in self.__dict__, AttributeError(f"Configure category has no property '{key}'")
+            assert key in self.__dict__, AttributeError(
+                f"Configure category has no property '{key}'")
             self.__dict__[key] = value
             self.save()
 
@@ -99,9 +114,11 @@ class ConfigureManager:
         if not os.path.exists(conf_folder):
             os.mkdir(conf_folder)
         elif os.path.isfile(conf_folder):
-            raise FileExistsError(f"Config folder '{conf_folder}' is a file, not a folder")
+            raise FileExistsError(
+                f"Config folder '{conf_folder}' is a file, not a folder")
         self._conf_folder = conf_folder
-        self.basic_config: BasicConfig = BasicConfig(os.path.join(conf_folder, 'basic_config.json'), False)
+        self.basic_config: BasicConfig = BasicConfig(
+            os.path.join(conf_folder, 'basic_config.json'), False)
 
     def chart_style_config_file(self):
         return os.path.join(self._conf_folder, 'chart_options.json')

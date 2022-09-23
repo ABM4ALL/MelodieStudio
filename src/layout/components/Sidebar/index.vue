@@ -1,39 +1,36 @@
 <template lang="pug">
-el-menu(
-  class="el-menu-vertical-demo"
-  :collapse="state.controls.isCollapse"
-  :collapse-transition="false"
-  router
-  :default-active="currentActiveRoute"
-  :background-color="variables.menuBg"
-  @select="menuSelect"
-  :text-color="variables.menuText"
+el-menu.el-menu-vertical-demo(
+  :collapse="state.controls.isCollapse",
+  :collapse-transition="false",
+  router,
+  :default-active="currentActiveRoute",
+  :background-color="variables.menuBg",
+  @select="menuSelect",
+  :text-color="variables.menuText",
   :active-text-color="variables.menuActiveText"
 )
-  Sidebar(:item="routes" basePath="")
+  Sidebar(:item="routes", basePath="")
 </template>
 
 <script lang="ts">
-import { useStore } from 'vuex';
-import {
-    useRouter, useRoute
-} from "vue-router";
-import {ref, watch, onMounted} from 'vue';
-import Sidebar from './Sidebar.vue';
+import { useStore } from "vuex";
+import { useRouter, useRoute } from "vue-router";
+import { ref, watch, onMounted } from "vue";
+import Sidebar from "./Sidebar.vue";
 
-import {useDynamicRoutesHook} from '@/composition/useTagViewApi';
-import variables from '@/style/variable.less';
+import { useDynamicRoutesHook } from "@/composition/useTagViewApi";
+import variables from "@/style/variable.less";
 export default {
-  props: ['routes'],
-  setup () {
+  props: ["routes"],
+  setup() {
     const store = useStore();
     const route = useRoute();
-    const {dynamicRouteTags} = useDynamicRoutesHook();
+    const { dynamicRouteTags } = useDynamicRoutesHook();
 
-    let currentActiveRoute = ref('');
+    let currentActiveRoute = ref("");
 
     watch(route, (newVal, oldVal) => {
-      if(newVal.meta.activePath) {
+      if (newVal.meta.activePath) {
         currentActiveRoute.value = newVal.meta.activePath as string;
       } else {
         currentActiveRoute.value = newVal.path;
@@ -41,9 +38,9 @@ export default {
     });
 
     function menuSelect(index: any) {
-      let parentPath = '';
-      let parentPathIndex = index.lastIndexOf('/');
-      if( parentPathIndex > 0) {
+      let parentPath = "";
+      let parentPathIndex = index.lastIndexOf("/");
+      if (parentPathIndex > 0) {
         parentPath = index.slice(0, parentPathIndex);
       }
       dynamicRouteTags(index, parentPath);
@@ -52,12 +49,12 @@ export default {
       state: store.state,
       menuSelect,
       variables,
-      currentActiveRoute
+      currentActiveRoute,
     };
   },
   components: {
-    Sidebar
-  }
+    Sidebar,
+  },
 };
 </script>
 <style lang="less" scoped>

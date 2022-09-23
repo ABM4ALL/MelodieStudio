@@ -8,6 +8,13 @@ const defaultRoutes: any = [
     meta: {
       activePath: '/'  // 打开非Menu页面选择当前激活menu
     }
+  },{
+    path: "/studio-main",
+    name: "studio-main",
+    component:  () => import('@/components/mainpanel/MainPage.vue'),
+    // meta: {
+    //   activePath: '/'  // 打开非Menu页面选择当前激活menu
+    // }
   },
   {
     path: '/:pathMatch(.*)*',

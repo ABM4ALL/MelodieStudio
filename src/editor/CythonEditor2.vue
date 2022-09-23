@@ -7,10 +7,11 @@
     :indent-with-tab="true"
     :tab-size="4"
     :extensions="extensions"
-    @ready="log('ready', $event)"
-    @change="log('change', $event)"
+    @ready="handleReady"
+    @change="textChanged($event)"
     @focus="log('focus', $event)"
     @blur="log('blur', $event)"
+    @keydown="onKeyDown"
     ref="editor"
     class="editor"
   />
@@ -24,17 +25,42 @@ import { lua } from "@codemirror/legacy-modes/mode/lua";
 import { python, cython } from "@codemirror/legacy-modes/mode/python";
 
 import { oneDark } from "@codemirror/theme-one-dark";
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, shallowRef } from "vue";
 import { EditorView, basicSetup } from "codemirror";
 import { CompletionContext } from "@codemirror/autocomplete";
 import { CompletionHandler } from "./completion";
 import { requestAutoComplete } from "@/api/tools";
+import { readFile } from "@/utils/utils";
+import { ElNotification } from "element-plus";
+import { getFile, writeFile } from "@/api/fs";
+// import { StateEffect } from "@codemirror/state";
+import { Compartment } from "@codemirror/state";
 const comphandler = new CompletionHandler();
+import { keymap } from "@codemirror/view";
+
+const keyAction = new Compartment();
+const saveOnEnter = keymap.of([
+  {
+    key: "Cmd-K",
+    run: () => {
+      alert("Saving...");
+      return true;
+    },
+    preventDefault: true,
+  },
+]);
 
 export default defineComponent({
   components: {
     Codemirror,
   },
+  props: {
+    file: {
+      type: String,
+      required: true,
+    },
+  },
+  emits: ["unsaved"],
   setup() {
     const code = ref(`
 from typing import TYPE_CHECKING
@@ -96,39 +122,123 @@ class CovidDataLoader(DataLoader):
             g.set_row_generator(generator_func)
 `);
 
-    // console.log(cython.languageData!.autocomplete);
+    const extensions = [
+      basicSetup,
+      StreamLanguage.define(cython),
+      keyAction.of(saveOnEnter),
+    ];
 
-    //   cython.languageData.of({
-    //     autocomplete: myCompletions,
-    //   });
-    // } else console.log("language data null");
-    const extensions = [basicSetup, StreamLanguage.define(cython)];
+    const editor = shallowRef<EditorView | null>(null);
 
     return {
+      lastCode: "",
       code,
       extensions,
+      changedRecently: false,
       log: console.log,
+      timer: -1,
+      editor: editor,
     };
   },
+  beforeMount() {
+    if (this.file != null) {
+      getFile(this.file).then((resp: string) => {
+        if (resp != null) {
+          this.code = resp;
+          this.lastCode = this.code;
+        } else {
+          ElNotification.error(
+            "Cannot read from file " + this.file + `\n Errors: ` + resp
+          );
+        }
+      });
+    }
+  },
+  methods: {
+    textChanged() {
+      this.changedRecently = true;
+    },
+    async onSave() {
+      await writeFile(this.file, this.code).then(() => {
+        this.changedRecently = false;
+        this.lastCode = this.code;
+        this.$emit("unsaved", false);
+      });
+    },
+    keyHandled(evt: any) {
+      console.log(evt);
+    },
+    onKeyDown(evt: KeyboardEvent) {
+      // console.log(evt);
+      if (evt.key == "s" && (evt.metaKey || evt.ctrlKey)) {
+        console.log("save!")
+        this.onSave()
+        evt.preventDefault();
+      }
+    },
+    handleReady({ view, state, container }) {
+      this.editor = view;
+      console.log(view, state, container);
+      console.log(this.editor);
+      // view.dispatch({
+      //   effects: StateEffect.reconfigure.of(
+      //     keymap.of([
+      //       {
+      //         key: "K",
+      //         preventDefault: true,
+      //         run() {
+      //           console.log("aaaaaaaaaa");
+      //           return true;
+      //         },
+      //       },
+      //     ])
+      //   ),
+      // });
+      // const map = {
+      //   "Ctrl+K": function (cm) {
+      //     console.log("cm", cm);
+      //   },
+      // };
+      // view.addKeyMap(map);
+    },
+  },
   mounted() {
-    console.log(this.$refs["editor"]);
+    // console.log();
+
+    this.timer = window.setInterval(() => {
+      console.log(this.changedRecently, this.code != this.lastCode);
+      if (this.changedRecently && this.code != this.lastCode) {
+        this.$emit("unsaved", true);
+      }
+      // const preventSaveOnEnter = keymap.of([
+      //   {
+      //     key: "Enter",
+      //     run: () => {
+      //       alert("Sorry you cannot save at this moment!!");
+      //       return true;
+      //     },
+      //     preventDefault: true,
+      //   },
+      // ]);
+      // this.editor!.dispatch({
+      //   effects: [keyAction.reconfigure([preventSaveOnEnter])],
+      // });
+    }, 1000);
     const myCompletions = async (context: CompletionContext) => {
       let word = context.matchBefore(/[.\w]*/);
       const wordToMatch = context.matchBefore(/[\w]*/);
       if (word == null) {
         return;
       }
-      console.log("context", word?.text, word.from, word.to, context.pos);
       if (word.from == word.to && !context.explicit) return null;
-      //   const text: string[] = (context.state.doc as any).text;
       const res = await requestAutoComplete({
         code: this.code,
         pos: context.pos,
+        file: this.file,
       });
-      console.log("res", res);
       return {
         from: wordToMatch?.from,
-        options: res.data, //.concat(comphandler.getCompletion("", 0, 0)),
+        options: res.data,
         filter: false,
       };
     };
@@ -139,5 +249,7 @@ class CovidDataLoader(DataLoader):
 <style scoped>
 .editor :deep(.cm-editor) {
   width: 100%;
+  height: 100%;
+  
 }
 </style>
