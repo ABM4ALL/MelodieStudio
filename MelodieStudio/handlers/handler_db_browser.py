@@ -12,6 +12,8 @@ from typing import Dict, List
 from flask import Blueprint, request
 import pandas as pd
 
+from MelodieStudio.manipulators.table_manipulator import ExcelManipulator
+
 from .._config import get_studio_config
 from .messages import Response
 
@@ -97,8 +99,14 @@ def df_read():
     _, ext = os.path.splitext(path)
     ext = ext[1:]
     if ext in {'xls', 'xlsx'}:
-        res = pd.read_excel(path)
-        return Response.ok(df_to_json(res))
+        # res = pd.read_excel(path)
+        em = ExcelManipulator(path)
+        sheets = em.get_sheet_names()
+        currentSheet = request.args.get(
+            'sheet') if request.args.get('sheet') else sheets[0]
+        res = em.read_sheet(currentSheet)
+        return Response.ok({"payload": df_to_json(res), "meta": {
+            "widget": "table", "type": "excel", "sheetNames": sheets, 'currentSheet': currentSheet}})
     else:
         raise NotImplementedError(f"Ext type {ext} unsupported!")
 
@@ -114,9 +122,16 @@ def df_write():
     _, ext = os.path.splitext(path)
     ext = ext[1:]
     if ext in {'xls', 'xlsx'}:
-        res = pd.DataFrame(table_data)
+
+        df = pd.DataFrame(table_data)
+        sheet_name = data['sheet']
         try:
-            res.to_excel(path, index=False)
+            # res.to_excel(path, index=False)
+            if sheet_name is not None:
+                em = ExcelManipulator(path)
+                em.write_to_sheet(df, sheet_name)
+            else:
+                df.to_excel(path, index=False)
             return Response.ok('Succeeded saved table file!')
         except Exception as e:
             return Response.ok(f"{e}")

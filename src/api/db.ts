@@ -1,5 +1,6 @@
 import request from "@/request";
 import { ElMessage } from "element-plus";
+import { DataResponse, QueriedData } from "@/models/data_mani"
 export interface DBMeta {
     type: "sqlite"
     sql?: string // sql to execute
@@ -9,17 +10,12 @@ export interface SQLiteMeta extends DBMeta {
     path: string
 }
 
-export interface QueriedData {
-    data: { [key: string]: number | string }[];
-    schema: {
-        fields: { name: string; type: string }[];
-        pandas_version: string;
-    };
-}
+
 
 export interface TableDataMeta {
     path: string
     data?: any
+    sheet?: any
 }
 
 export const getTableNames = async (dbMeta: SQLiteMeta): Promise<string[]> => {
@@ -42,10 +38,11 @@ export const query = async (dbMeta: SQLiteMeta): Promise<QueriedData> => {
     }
 };
 
-export const readTableFile = async (meta: TableDataMeta): Promise<QueriedData> => {
+export const readTableFile = async (meta: TableDataMeta): Promise<DataResponse> => {
     const resp = await request.get("/api/dbBrowser/table_file_read", meta);
     if (resp.status === 0) {
-        return resp.data as QueriedData;
+        console.log(resp.data)
+        return resp.data as DataResponse;
     } else {
         ElMessage.error("Failed to execute command");
         throw Error;

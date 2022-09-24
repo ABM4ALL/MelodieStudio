@@ -61,11 +61,11 @@
   </div>
 </template>
 
-
 <script lang="ts">
-import { getTableNames, QueriedData, query } from "@/api/db";
+import { getTableNames, query } from "@/api/db";
 import { defineComponent } from "@vue/runtime-core";
 import { ElMessage } from "element-plus";
+import { QueriedData } from "@/models/data_mani";
 import parser from "js-sql-parser";
 export default defineComponent({
   props: {
