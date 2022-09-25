@@ -27,6 +27,16 @@ export const deleteFSItem = async (itemName: string): Promise<boolean> => {
     return (await request.post("/api/fs/delete", { itemName })).msg;
 }
 
+/*target could be file name or directory name.*/
+export const moveFSItem = async (src: string, target: string): Promise<boolean> => {
+    return (await request.post("/api/fs/move_to", { src, target })).msg;
+}
+
+export const copyFSItem = async (src: string, target: string): Promise<boolean> => {
+    return (await request.post("/api/fs/copy_to", { src, target })).msg;
+}
+
+
 export const getFile = async (fileName: string): Promise<string> => {
     return (await request.get("/api/fs/getFile", { fileName })).data.content
 }

@@ -3,6 +3,7 @@
 # @Author: Zhanyi Hou
 # @Email: 1295752786@qq.com
 # @File: handler_charts.py
+from email.mime import base
 import json
 import os
 import shutil
@@ -90,6 +91,21 @@ def delete_fs_item():
     else:
         shutil.rmtree(item_abs_path)
     return Response.success_msg("Successfully deleted filesystem item!")
+
+@file_system.route('copy_to', methods=['POST'])
+def copy_fs_item_to():
+    data = json.loads(request.data)
+    src = data['src']
+    target = data['target']
+    target_dir = os.path.dirname(target) if os.path.isfile(target) else target
+    basename = os.path.basename(src)
+    target_abspath = os.path.join(target_dir, basename)
+    if os.path.isfile(src):
+        shutil.copyfile(src, target_abspath)
+    else:
+        shutil.copytree(src, target_abspath)
+        
+    return Response.success_msg("Successfully moved filesystem item!")
 
 
 @file_system.route('getFile', methods=['GET'])

@@ -13,7 +13,7 @@ export interface SQLiteMeta extends DBMeta {
 
 
 export interface TableDataMeta {
-    path: string
+    path?: string
     data?: any
     sheet?: any
 }
@@ -58,3 +58,13 @@ export const writeTableFile = async (meta: TableDataMeta): Promise<boolean> => {
         throw Error;
     }
 };
+
+export const tableToLatex = async (meta: TableDataMeta): Promise<string> => {
+    const resp = await request.post("/api/dbBrowser/table_to_latex", meta);
+    if (resp.status === 0) {
+        return resp.data as string;
+    } else {
+        ElMessage.error("Failed to execute command");
+        throw Error;
+    }
+}

@@ -71,21 +71,19 @@
             <span> {{ data.absPath }}</span>
             <div style="display: flex">
               <el-button type="danger" @click="onDelete(data.absPath)"
-                >删除</el-button
+                >Delete</el-button
+              >
+              <el-button type="primary" @click="onCopy(data.absPath)"
+                >Copy</el-button
+              >
+              <el-button type="primary" @click="onCut(data.absPath)"
+                >Cut</el-button
               >
               <el-button
                 type="primary"
-                @click.stop="
-                  showDialog(
-                    data.absPath.endsWith('/')
-                      ? data.absPath
-                      : getDirName(data.absPath) + '/'
-                  )
-                "
-                >向此路径上传...</el-button
-              >
-              <el-button type="primary" @click="onDownload(data.absPath)"
-                >下载</el-button
+                @click="onPaste(data.absPath)"
+                :disabled="fileToCopyOrCut.absPath == ''"
+                >Paste</el-button
               >
             </div>
           </div>
@@ -130,7 +128,7 @@
 import { defineEmits, onMounted, ref, watch } from "vue";
 import type Node from "element-plus/es/components/tree/src/model/node";
 import { UploadInstance } from "element-plus";
-import { deleteFSItem, listDir } from "@/api/fs";
+import { copyFSItem, deleteFSItem, listDir } from "@/api/fs";
 import { ElNotification } from "element-plus";
 import { baseName, downloadFile, getDirName } from "@/utils/file";
 import { Search, Upload, Download } from "@element-plus/icons-vue";
@@ -140,6 +138,10 @@ const dialogShow = ref(false);
 const fileList = ref<{ name: string }[]>([]);
 const absPathToUpload = ref("");
 const filterText = ref("");
+const fileToCopyOrCut = ref<{ absPath: string; operation: "copy" | "cut" }>({
+  absPath: "",
+  operation: "copy",
+});
 let parentNodeToUpload = "";
 
 export interface FileTreeItem {
@@ -310,24 +312,26 @@ const filterNode = (value: string, data: Tree) => {
   }
 };
 
+const onCopy = (absPath: string) => {
+  fileToCopyOrCut.value = { absPath: absPath, operation: "copy" };
+};
+
+const onCut = (absPath: string) => {
+  fileToCopyOrCut.value = { absPath: absPath, operation: "cut" };
+};
+
+const onPaste = (path: string) => {
+  if (fileToCopyOrCut.value.operation == "copy") {
+    copyFSItem(fileToCopyOrCut.value.absPath, path);
+  } else {
+    ElNotification.warning("Not implemented yet!");
+  }
+  fileToCopyOrCut.value.absPath = "";
+};
+
 watch(filterText, (val) => {
   treeRef.value!.filter(val);
 });
-// onMounted(() => {
-//   window.setTimeout(() => {
-//     expandTreeTo("result/");
-//   }, 1000);
-//   treeRef.value.getNode();
-// });
-
-// const onDownload = async (filePath: string) => {
-//   const content = await getFile(filePath, false);
-//   console.log(content);
-//   const fileBaseName = baseName(filePath);
-
-//   const file = new File([content], fileBaseName);
-//   downloadFile(file);
-// };
 </script>
 
 <style scoped>

@@ -9,13 +9,73 @@
       <template #reference>
         <el-button>Table Edit...</el-button>
       </template>
-      <el-button @click="addRow('after')">Add Row After</el-button>
-      <el-button @click="addRow('before')">Add Row before</el-button>
-      <el-button @click="removeRow()">Remove Row</el-button>
-      <el-button @click="removeColumn()">Remove Column</el-button>
-      <el-button @click="addColumn">Add Column</el-button>
-    </el-popover>
+      <tool-button
+        text="Insert Row After"
+        icon="insert-row-after"
+        @click="addRow('after')"
+        :disabled="!hasCurrentEdit"
+      >
+      </tool-button>
+      <tool-button
+        text="Insert Row Before"
+        icon="insert-row-before"
+        @click="addRow('before')"
+        :disabled="!hasCurrentEdit"
+      >
+      </tool-button>
 
+      <tool-button
+        text="Remove Row"
+        icon="remove-row"
+        @click="removeRow()"
+        :disabled="!hasCurrentEdit"
+      >
+      </tool-button>
+      <tool-button
+        text="Remove Column"
+        icon="remove-column"
+        @click="removeColumn()"
+        :disabled="!hasCurrentEdit"
+      >
+      </tool-button>
+      <tool-button
+        text="Insert Column Before"
+        icon="insert-col-before"
+        @click="addColumn('before')"
+        :disabled="!hasCurrentEdit"
+      >
+      </tool-button>
+
+      <tool-button
+        text="Insert Column After"
+        icon="insert-col-after"
+        @click="addColumn('after')"
+        :disabled="!hasCurrentEdit"
+      >
+      </tool-button>
+    </el-popover>
+    <el-popover trigger="click" :width="250">
+      <template #reference>
+        <el-button>Export table...</el-button>
+      </template>
+      <div style="display: flex; align-items: center">
+        <div style="line-height: 32px">
+          <svg-icon svg-icon-name="latex"></svg-icon>
+        </div>
+        As Latex..
+        <div style="display: flex; flex-grow: 1"></div>
+        <icon-button
+          text="Convert whole table"
+          icon="all"
+          @click="onTableToLatex('all')"
+        />
+        <icon-button
+          text="Convert selection only"
+          icon="selection"
+          @click="onTableToLatex('selection')"
+        />
+      </div>
+    </el-popover>
     <el-auto-resizer>
       <template #default="{ height, width }">
         <el-table-v2
@@ -24,6 +84,9 @@
           :width="width"
           :height="height"
           fixed
+          @mousedown="onTableMouseDown"
+          @mousemove="onTableMouseMove"
+          @mouseup="onTableMouseUp"
         />
       </template>
     </el-auto-resizer>
@@ -44,10 +107,15 @@
   align-items: center;
   justify-content: start;
 }
+
+.table-v2-selected {
+  border: 1px solid #4578f3;
+}
 </style>
 <script setup lang="tsx">
-import { readTableFile, writeTableFile } from "@/api/db";
+import { readTableFile, tableToLatex, writeTableFile } from "@/api/db";
 import { ElInput, ElMessageBox, ElNotification, ElPopover } from "element-plus";
+import SvgIcon from "../basic/SvgIcon.vue";
 import {
   ref,
   onMounted,
@@ -66,8 +134,9 @@ import {
   TableTypes,
 } from "@/models/data_mani";
 import SheetSelector from "./SheetSelector.vue";
-import { number } from "echarts";
-import { af } from "element-plus/es/locale";
+import ToolButton from "@/components/basic/ToolButton.vue";
+import IconButton from "@/components/basic/IconButton.vue";
+import { insertAfter } from "@/utils/utils";
 const Input = resolveDynamicComponent("ElInput") as typeof ElInput;
 const Popover = resolveDynamicComponent("ElPopover") as typeof ElPopover;
 const props = defineProps({
@@ -82,7 +151,7 @@ type ColumnType = {
   title: string;
   width: number;
   type: string;
-  cellRenderer?: ({ rowData, column, rowIndex }) => any;
+  cellRenderer?: ({ rowData, column, rowIndex, columnIndex }) => any;
 };
 
 const emits = defineEmits(["unsaved"]);
@@ -96,7 +165,42 @@ const tableType = ref<TableTypes>("csv");
 /** Only take effect on excel files **/
 const currentSheet = ref<string>("");
 const allSheets = ref<string[]>([]);
-const currentPos = ref<{ row: number; col: string }>({ row: 0, col: "" });
+const currentPos = ref<{ row: number; col: string; enabled: boolean }>({
+  row: 0,
+  col: "",
+  enabled: false,
+});
+
+const selection = ref<{
+  startRowIndex: number;
+  endRowIndex: number;
+  startColIndex: number;
+  endColIndex: number;
+}>({
+  startRowIndex: -1,
+  endRowIndex: -1,
+  startColIndex: -1,
+  endColIndex: -1,
+});
+const existedEditWidgets = ref<number>(0);
+
+const hasCurrentEdit = computed(() => {
+  return existedEditWidgets.value == 1;
+});
+
+const onTableMouseDown = () => {
+  console.log("mousedown");
+};
+
+const onTableMouseUp = () => {
+  console.log("mousedown");
+};
+
+const onTableMouseMove = (evt: MouseEvent) => {
+  if (evt.buttons == 1) {
+    console.log("mousemove");
+  }
+};
 
 type SelectionCellProps = {
   value: string;
@@ -121,12 +225,8 @@ const InputCell: FunctionalComponent<SelectionCellProps> = ({
     }
   };
   const onClick = (evt: MouseEvent): any => {
-    console.log(evt);
     popoverShow.value = true;
   };
-  // const handleBlur = (e)=>{
-  //     console.log('blur!',e)
-  // }
   return (
     <Input
       ref={forwardRef as any}
@@ -146,23 +246,22 @@ const getData = async () => {
   return await readTableFile({ path: props.path });
 };
 
+const onToolbuttonMouseDown = (evt: PointerEvent) => {
+  evt.preventDefault();
+};
+
 const addRow = (pos: "after" | "before") => {
-  console.log("add row!", currentPos.value);
   let split = 0;
   if (pos == "before") {
     split = currentPos.value.row;
   } else {
     split = currentPos.value.row + 1;
   }
-  const before = tableDataNew.value.slice(0, split);
-  const after = tableDataNew.value.slice(split);
   const newRow: { [key: string]: any } = {};
   for (const col of columns.value) {
     newRow[col.dataKey] = { value: null, editing: false };
   }
-  console.log("before", before, "\nafter", after);
-  tableDataNew.value = before.concat([newRow]).concat(after);
-  console.log(tableDataNew.value);
+  tableDataNew.value = insertAfter(tableDataNew.value, newRow, split);
 };
 
 const removeRow = () => {
@@ -183,57 +282,82 @@ const removeColumn = () => {
   }
 };
 
-const addColumn = async () => {
+const addColumn = async (pos: "before" | "after") => {
   const name = (
     await ElMessageBox.prompt("Input the column name", "New Column", {
       confirmButtonText: "OK",
       cancelButtonText: "Cancel",
-      // inputPattern:
-      //   /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
-      // inputErrorMessage: 'Invalid Email',
     })
   ).value;
-  console.log(name);
-  columns.value.push({
-    key: name,
-    dataKey: name,
-    title: name,
-    width: 150,
-    type: "number",
-    cellRenderer,
-  });
+  let split = 0;
+  const colIndex = columns.value.findIndex(
+    (col) => col.dataKey == currentPos.value.col
+  );
+  if (pos == "before") {
+    split = colIndex;
+  } else {
+    split = colIndex + 1;
+  }
+  columns.value = insertAfter(
+    columns.value,
+    {
+      key: name,
+      dataKey: name,
+      title: name,
+      width: 150,
+      type: "number",
+      cellRenderer,
+    },
+    split
+  );
   for (const row of tableDataNew.value) {
     row[name] = { value: null, editing: false };
   }
 };
 
-const cellRenderer = ({ rowData, column, rowIndex }) => {
+const cellRenderer = ({ rowData, column, rowIndex, columnIndex }) => {
   const onChange = (value: string) => {
     rowData[column.dataKey!].value = value;
   };
   const onEnterEditMode = () => {
+    existedEditWidgets.value += 1;
     rowData[column.dataKey!].editing = true;
     currentPos.value.col = column.dataKey;
     currentPos.value.row = rowIndex;
-    console.log("rowIndex", rowIndex);
   };
 
   const onExitEditMode = () => {
+    existedEditWidgets.value -= 1;
     if (column.type == "number") {
       try {
-        const num = Number(rowData[column.dataKey!].value);
-        if (isNaN(num)) {
-          throw `Cannot convert ${rowData[column.dataKey!].value} to number`;
+        // 有可能当前数据已经被删除，这种情况下就无需修改赋值，因为毫无用处了。
+        if (rowData[column.dataKey!] != null) {
+          const num = Number(rowData[column.dataKey!].value);
+          if (isNaN(num)) {
+            throw `Cannot convert ${rowData[column.dataKey!].value} to number`;
+          }
+          rowData[column.dataKey!].value = num;
+          rowData[column.dataKey!].editing = false;
         }
-        rowData[column.dataKey!].value = num;
       } catch (err) {
         ElNotification.error(`${err}`);
         return;
       }
     }
-    rowData[column.dataKey!].editing = false;
-
     emits("unsaved", true);
+  };
+
+  const onMouseDown = () => {
+    selection.value.startRowIndex = rowIndex;
+    selection.value.endRowIndex = rowIndex;
+    selection.value.startColIndex = columnIndex;
+    selection.value.endColIndex = columnIndex;
+  };
+  const mousemove = (evt: MouseEvent) => {
+    if (evt.buttons == 1) {
+      selection.value.endRowIndex = rowIndex;
+      selection.value.endColIndex = columnIndex;
+    }
   };
   const input = ref();
   const setRef = (el) => {
@@ -242,7 +366,42 @@ const cellRenderer = ({ rowData, column, rowIndex }) => {
       el.focus?.();
     }
   };
-  //    onBlur={onExitEditMode}
+
+  const inSelection = () => {
+    const rowLess = Math.min(
+      selection.value.startRowIndex,
+      selection.value.endRowIndex
+    );
+    const rowGreater = Math.max(
+      selection.value.startRowIndex,
+      selection.value.endRowIndex
+    );
+    const colGreater = Math.max(
+      selection.value.startColIndex,
+      selection.value.endColIndex
+    );
+    const colLess = Math.min(
+      selection.value.startColIndex,
+      selection.value.endColIndex
+    );
+    console.log(
+      [rowLess, rowGreater],
+      [colLess, colGreater],
+      columnIndex,
+      rowIndex
+    );
+    if (
+      colLess <= columnIndex &&
+      columnIndex <= colGreater &&
+      rowLess <= rowIndex &&
+      rowIndex <= rowGreater
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   return rowData[column.dataKey].editing ? (
     <InputCell
       forwardRef={setRef}
@@ -252,7 +411,15 @@ const cellRenderer = ({ rowData, column, rowIndex }) => {
       enterPressed={onExitEditMode}
     />
   ) : (
-    <div class="table-v2-inline-editing-trigger" onClick={onEnterEditMode}>
+    <div
+      class={{
+        "table-v2-inline-editing-trigger": true,
+        "table-v2-selected": inSelection(),
+      }}
+      onClick={onEnterEditMode}
+      onMousedown={onMouseDown}
+      onMousemove={mousemove}
+    >
       <div> {rowData[column.dataKey!].value}</div>
     </div>
   );
@@ -272,8 +439,6 @@ const reload = async (resp: DataResponse) => {
   currentSheet.value = (resp.meta as ExcelResponseMeta).currentSheet;
 
   const data = resp.payload;
-
-  console.log(data);
   const cols: ColumnType[] = [
     {
       key: "_index",
@@ -332,11 +497,13 @@ const calcTableDataNew = () =>
     );
   });
 
-const convertTableDataToJson = () => {
+const convertTableDataToJson = (table?: { [key: string]: any }[]) => {
+  if (table == null) {
+    table = tableDataNew.value;
+  }
   const newData: { [key: string]: any }[] = [];
-  for (const row of tableDataNew.value) {
+  for (const row of table) {
     const newRow: { [key: string]: any } = {};
-    console.log(newRow);
     for (const key in row) {
       if (!key.startsWith("_") && row[key] != null) {
         newRow[key] = row[key].value;
@@ -345,8 +512,34 @@ const convertTableDataToJson = () => {
 
     newData.push(newRow);
   }
-  console.log("newData", newData);
   return newData;
+};
+
+const onTableToLatex = async (type: "all" | "selection") => {
+  const table = type == "all" ? tableDataNew.value : await getSlice();
+  const latex = await tableToLatex({ data: convertTableDataToJson(table) });
+  await navigator.clipboard.writeText(latex);
+  ElNotification.success("Latex content has been copied onto the clipboard!");
+};
+
+const getSlice = async () => {
+  const rows = tableDataNew.value.slice(
+    selection.value.startRowIndex,
+    selection.value.endRowIndex + 1
+  );
+  const slicedCols = columns.value.slice(
+    selection.value.startColIndex,
+    selection.value.endColIndex + 1
+  );
+  const rowsSliced: { [key: string]: any }[] = [];
+  for (const row of rows) {
+    const newRow: { [key: string]: any } = {};
+    for (const col of slicedCols) {
+      newRow[col.dataKey] = row[col.dataKey];
+    }
+    rowsSliced.push(newRow);
+  }
+  return rowsSliced;
 };
 
 registerOnSaveCommand(() => {

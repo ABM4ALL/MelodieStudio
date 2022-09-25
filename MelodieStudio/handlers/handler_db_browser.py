@@ -137,3 +137,11 @@ def df_write():
             return Response.ok(f"{e}")
     else:
         raise NotImplementedError(f"Ext type {ext} unsupported!")
+
+
+@db_browser.route('/table_to_latex', methods=['POST'])
+def table_to_latex():
+    data = json.loads(request.data)
+    table_data = data['data']
+    df = pd.DataFrame(table_data)
+    return Response.ok(df.to_latex())
