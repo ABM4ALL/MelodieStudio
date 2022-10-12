@@ -21,3 +21,12 @@ export interface DataResponse {
     payload: QueriedData
     meta: DataResponseMeta | ExcelResponseMeta
 }
+
+export interface MelodieNetwork {
+    props: {
+        directed: boolean,
+        simple: boolean
+    },
+    nodes: { id: number, label: string, pos: { x: 0, y: 0 }, props: { [key: string]: any } }[],
+    edges: { source: number, target: number, props: { [key: string]: any } }[]
+}

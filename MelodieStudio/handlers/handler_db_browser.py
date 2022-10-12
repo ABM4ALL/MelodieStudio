@@ -11,6 +11,7 @@ from typing import Dict, List
 
 from flask import Blueprint, request
 import pandas as pd
+from MelodieStudio.manipulators.network_manipulator import NetworkManipulator
 
 from MelodieStudio.manipulators.table_manipulator import ExcelManipulator
 
@@ -145,3 +146,17 @@ def table_to_latex():
     table_data = data['data']
     df = pd.DataFrame(table_data)
     return Response.ok(df.to_latex())
+
+
+@db_browser.route('/read_network', methods=['GET'])
+def read_network():
+    path = request.args.get('path')
+    return Response.ok(NetworkManipulator(path).read_gexf_file())
+
+
+@db_browser.route('/write_network', methods=['POST'])
+def write_network():
+    data = json.loads(request.data)
+    path = data['path']
+    gexf_str = data['gexfString']
+    return Response.ok(NetworkManipulator(path).write_gexf_file(gexf_str))

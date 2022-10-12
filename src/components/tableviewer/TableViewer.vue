@@ -124,9 +124,13 @@ import {
   FunctionalComponent,
   resolveDynamicComponent,
   defineEmits,
+  onBeforeUnmount,
 } from "vue";
 import { isEqual } from "lodash";
-import { registerOnSaveCommand } from "../events/globalevents";
+import {
+  registerOnSaveCommand,
+  unregisterOnSaveCommand,
+} from "../events/globalevents";
 import {
   DataResponse,
   DataResponseMeta,
@@ -159,7 +163,6 @@ const columns = ref<ColumnType[]>([]);
 const tableData = ref<{ [key: string]: number | string }[]>([]);
 
 const tableDataNew = ref<{ [key: string]: any }[]>([]);
-const tableDataOriginal = { value: [] };
 const tableType = ref<TableTypes>("csv");
 
 /** Only take effect on excel files **/
@@ -171,6 +174,7 @@ const currentPos = ref<{ row: number; col: string; enabled: boolean }>({
   enabled: false,
 });
 
+/* Selection area */
 const selection = ref<{
   startRowIndex: number;
   endRowIndex: number;
@@ -473,17 +477,12 @@ const reload = async (resp: DataResponse) => {
     counter++;
   }
   tableDataNew.value = calcTableDataNew();
-  tableDataOriginal.value = JSON.parse(JSON.stringify(tableDataNew.value));
-};
-
-const isDataChanged = (): boolean => {
-  return isEqual(tableDataNew.value, tableDataOriginal.value);
 };
 
 const calcTableDataNew = () =>
   tableData.value.map((values, rowIndex) => {
-    return columns.value.reduce(
-      (rowData, column, columnIndex) => {
+    const val = columns.value.reduce(
+      (rowData, column) => {
         rowData[column.dataKey] = {
           value: values[column.dataKey],
           editing: false,
@@ -491,10 +490,10 @@ const calcTableDataNew = () =>
         return rowData;
       },
       {
-        id: `0`,
-        parentId: null,
       }
     );
+    console.log("val", val);
+    return val;
   });
 
 const convertTableDataToJson = (table?: { [key: string]: any }[]) => {
@@ -542,12 +541,18 @@ const getSlice = async () => {
   return rowsSliced;
 };
 
-registerOnSaveCommand(() => {
+const onSaveCommand = () => {
   writeTableFile({
     path: props.path,
     data: convertTableDataToJson(),
     sheet: currentSheet.value,
   });
   emits("unsaved", false);
+};
+
+onBeforeUnmount(() => {
+  unregisterOnSaveCommand(onSaveCommand);
 });
+
+registerOnSaveCommand(onSaveCommand);
 </script>

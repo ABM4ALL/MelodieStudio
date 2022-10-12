@@ -1,7 +1,7 @@
 <style >
 .container {
   position: absolute;
-  background-color: antiquewhite;
+  background-color: white;
   padding: 10px;
 }
 </style>

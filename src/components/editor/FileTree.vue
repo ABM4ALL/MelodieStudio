@@ -65,6 +65,7 @@
               <span v-if="data.absPath !== ''">{{
                 baseName(data.absPath)
               }}</span>
+              <file-tree-buttons :absPath="data.absPath"></file-tree-buttons>
             </div>
           </template>
           <div style="display: flex; flex-direction: column">
@@ -134,6 +135,11 @@ import { baseName, downloadFile, getDirName } from "@/utils/file";
 import { Search, Upload, Download } from "@element-plus/icons-vue";
 import store from "@/store";
 import { addOnMessageHandler } from "@/api/ws";
+import {
+  FILETREE_ITEMTYPES,
+  loadItemActions,
+} from "./filetree-utils/filetree-items";
+import FileTreeButtons from "./filetree-utils/FileTreeButtons.vue"
 const dialogShow = ref(false);
 const fileList = ref<{ name: string }[]>([]);
 const absPathToUpload = ref("");
@@ -368,6 +374,9 @@ watch(filterText, (val) => {
   border-radius: 2px;
   text-align: left;
   padding-left: 8px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
 
 .selected-tree-node {

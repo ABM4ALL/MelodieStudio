@@ -27,6 +27,12 @@
           @unsaved="setUnsaved(file.absPath, $event)"
           :path="file.absPath"
         ></table-viewer>
+        <network-viewer
+        v-as-editor
+          v-if="file.type == 'network'"
+          @unsaved="setUnsaved(file.absPath, $event)"
+          :path="file.absPath"
+        ></network-viewer>
       </div>
     </el-tab-pane>
   </el-tabs>
@@ -36,6 +42,7 @@
 import CythonEditor from "./CythonEditor2.vue";
 import DatabaseBrowser from "@/components/dbbrowser/DatabaseBrowser.vue";
 import TableViewer from "@/components/tableviewer/TableViewer.vue";
+import NetworkViewer from "@/components/network/NetworkViewerNew.vue"
 import { defineComponent, ref, defineExpose } from "vue";
 import { ElNotification } from "element-plus";
 import { baseName, getExt } from "@/utils/file";
@@ -58,6 +65,7 @@ const getFileType = (path: string): string => {
     xls: "table",
     xlsx: "table",
     csv: "table",
+    gexf: "network",
   };
   return fileTypeMap[ext];
 };

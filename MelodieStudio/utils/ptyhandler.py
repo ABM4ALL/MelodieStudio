@@ -5,6 +5,8 @@ import os
 import select
 import struct
 import subprocess
+import sys
+from this import d
 import threading
 import time
 from turtle import right
@@ -15,13 +17,22 @@ from .config_manager import get_workdir
 NixProc = NamedTuple("NixProc", [('fd', TextIOWrapper), ('child_pid', int)])
 
 
+class MelodiePTYError(Exception):
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
+
+    def __repr__(self) -> str:
+        return self.msg
+
+
 class MelodiePTY:
     """
     Wrapper for winpty and builtin-pty
     """
 
-    def __init__(self, term_id: str, command: str, on_output: Callable[[str], None]) -> None:
+    def __init__(self, term_id: str, command: str, on_output: Callable[[str], None], on_close: Callable[[str], None]) -> None:
         self._on_output = on_output
+        self._on_close = on_close
         self._command = command
         self._thread: threading.Thread = None
         self.term_id: str = term_id
@@ -51,10 +62,16 @@ class MelodiePTY:
                 else:
                     self._on_output(self.term_id, out)
 
-        proc = PTY(80, 25)
+        proc = PTY(80, 14)
         proc.spawn(self._command)
         self._win_proc = proc
         self.start_thread(read_on_windows, (proc,))
+
+    def close(self):
+        """
+        Close this pty.
+        """
+        self._on_close(self.term_id)
 
     def create_on_nix(self):
         import pty
@@ -64,15 +81,26 @@ class MelodiePTY:
             while True:
                 time.sleep(0.01)
                 timeout_sec = 0
+                
                 (data_ready, _, _) = select.select([fd], [], [], timeout_sec)
                 if data_ready:
-                    output = os.read(fd, max_read_bytes).decode()
-                    # if output != "":
+                    output = os.read(fd, max_read_bytes)
+                    if len(output)==0:
+                        break
+                    output = output.decode(
+                        errors="replace")
                     self._on_output(self.term_id, output)
+            self.close()
 
+        print("command", self._command)
         child_pid, fd = pty.fork()
         if child_pid == 0:
-            subprocess.run(self._command)
+            try:
+                ret = subprocess.run(self._command, close_fds=True)
+                print(f"\n\n\nProcess '{ret.args}' finished with return code {ret.returncode}")
+                sys.exit()
+            except FileNotFoundError as e:
+                raise MelodiePTYError(e)
         else:
             self._nix_proc = NixProc(fd, child_pid)
             self.start_thread(read_on_nix, (fd,))

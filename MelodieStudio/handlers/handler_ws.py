@@ -8,10 +8,11 @@ import queue
 import uuid
 from flask import Blueprint, Flask, request
 from flask_sock import Sock
+import psutil
 from ..models.models import WSMessage, WSToServerMessage
 import threading
 import platform
-from ..utils.ptyhandler import MelodiePTY
+from ..utils.ptyhandler import MelodiePTY, MelodiePTYError
 from ..utils.machine import is_windows
 from .messages import Response
 if platform.system().lower().find('windows') != -1:
@@ -63,19 +64,30 @@ class PTYHandleCell(WSHandlerCell):
         self.shell = "cmd" if is_windows() else os.environ.get('SHELL', 'sh')
         self.ptys: Dict[str, MelodiePTY] = {}
 
+    def get_pty_ids(self) -> List[str]:
+        """
+        Get all active ptys
+
+        """
+        return [pty_id for pty_id in self.ptys]
+
+    def on_pty_close(self, pty_id: str):
+        pty = self.ptys.pop(pty_id)
+        return
+
     def handle(self, msg: Dict[str, Any]):
         cmd = msg['cmd']
         termID = msg['termID']
         msg_type = msg['msgType']
         assert msg_type in {'new-pty', 'close-pty', 'cmd-pty'}
         if not termID in self.ptys:
-            self.ptys[termID] = MelodiePTY(termID, self.shell, send_pty_output)
+            self.ptys[termID] = MelodiePTY(termID, self.shell, send_pty_output, self.on_pty_close)
         else:
             self.ptys[termID].write(cmd)
 
     def create_pty(self, termID: str, cmd: str) -> bool:
         if termID not in self.ptys:
-            self.ptys[termID] = MelodiePTY(termID, cmd, send_pty_output)
+            self.ptys[termID] = MelodiePTY(termID, cmd, send_pty_output, self.on_pty_close)
             return True
         else:
             return False
@@ -84,7 +96,7 @@ class PTYHandleCell(WSHandlerCell):
         if termID not in self.ptys:
             return False
         else:
-            self.ptys[termID].resize()
+            self.ptys[termID].resize(rows, cols)
             return True
 
 
@@ -135,6 +147,9 @@ def register_websocket_handlers(app: Flask):
 
 
 def send_pty_output(term_id: str, content: str):
+    if content == "":
+        # print('empty output pty', term_id)
+        return
     send_queue.put(
         WSMessage("pty-output", {'output': content, 'termID': term_id})
     )
@@ -155,7 +170,7 @@ def emit_removed_fsitem_evt(fsitem_name: str):
                    "deleted": {"absPath": fsitem_name}}))
 
 
-def emit_added_fsitem_evt( abs_path: str):
+def emit_added_fsitem_evt(abs_path: str):
     send_queue.put(
         WSMessage("fs-event",
                   {"type": "added",
@@ -168,16 +183,29 @@ def new_terminal():
     data = json.loads(request.data)
     cmd = data['cmd']
     new_terminal_id = str(uuid.uuid1())
-    return Response.ok({'termID': new_terminal_id}) if pty_handle_cell.create_pty(new_terminal_id, cmd) else Response.error("terminal id duplicated!")
+    try:
+        pty_handle_cell.create_pty(new_terminal_id, cmd)
+        print(psutil.Process().children(recursive=True))
+        return Response.ok({'termID': new_terminal_id})
+    except MelodiePTYError as e:
+        import traceback
+        traceback.print_exc()
+        return Response.error(str(e))
+
+
+@pty_mgr.route("/all", methods=['GET'])
+def get_active_ptys():
+    return Response.ok({'terms': pty_handle_cell.get_pty_ids()})
 
 
 @pty_mgr.route("/resize", methods=['POST'])
 def resize_terminal():
     data = json.loads(request.data)
-    cmd = data['cmd']
-    new_terminal_id = str(uuid.uuid1())
-    pty_handle_cell
-    return Response.ok({'termID': new_terminal_id}) if pty_handle_cell.create_pty(new_terminal_id, cmd) else Response.error("terminal id duplicated!")
+    termID = data['termID']
+    rows = data['rows']
+    cols = data['cols']
+    pty_handle_cell.resize(termID, rows, cols)
+    return Response.success_msg("Resize succeeded!")
 
 
 sock = None

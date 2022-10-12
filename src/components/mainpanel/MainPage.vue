@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import CodeEditor from "@/editor/CodeEditor.vue";
+import CodeEditor from "@/components/editor/CodeEditor.vue";
 </script>
 
 <style>

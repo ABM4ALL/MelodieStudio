@@ -3,8 +3,7 @@ import Home from '@/views/Home.vue';
 import GridShow from "@/views/GridShow.vue";
 import Database from "@/views/Database.vue";
 
-// import ProjectCreator from "@/components/projectcreator/ProjectCreator.vue";
-// import CythonEditor from '@/editor/CythonEditor.vue';
+
 /**
  * 
  * 路由配置规则：
@@ -28,7 +27,8 @@ export const staticRoutes = [
     meta: {
       icon: 'home-filled',
       title: "Melody Studio"
-    }
+    },
+    redirect: "/studio-main"
   },
   {
     path: '/visualizer',
@@ -42,7 +42,7 @@ export const staticRoutes = [
   {
     path: '/network',
     name: 'Network',
-    component: () => import('@/components/network/NetworkViewer.vue'),
+    component: () => import('@/components/network/NetworkViewerNew.vue'),
     children: [],
     meta: {
       icon: 'el-icon-s-home'
@@ -88,7 +88,7 @@ export const staticRoutes = [
       {
         path: 'cythonEditor2',
         name: 'CodeEditor',
-        component: () => import('@/editor/CodeEditor.vue'),
+        component: () => import('@/components/editor/CodeEditor.vue'),
         children: [],
         meta: {
           icon: 'magic-stick',

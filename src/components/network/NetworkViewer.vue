@@ -10,7 +10,7 @@ import * as echarts from "echarts";
 import "echarts-gl";
 // import ChartList from "@/components/dynamicChart/ChartList.vue";
 import { DRAWING_MODES } from "@/models/visualizerbasics";
-
+import { loadNetworkFromFile } from "@/api/io";
 export default defineComponent({
   name: "hello",
   data() {
@@ -180,6 +180,7 @@ export default defineComponent({
     this.initChart();
     // this.connect();
     console.log(JSON.stringify(this.option));
+    // loadNetworkFromFile();
   },
   methods: {
     initChart() {
