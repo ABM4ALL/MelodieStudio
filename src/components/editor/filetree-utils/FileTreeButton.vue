@@ -20,8 +20,9 @@ const props = defineProps({
 });
 
 const onClick = () => {
+  const shortDesc: string = props.action.action.shortDesc != null ? props.action.action.shortDesc : baseName(props.fileABSPath)
   if (props.action.action.cmd != null) {
-    requestRunCommand(formatCMD(props.fileABSPath, props.action.action.cmd), baseName(props.fileABSPath));
+    requestRunCommand(formatCMD(props.fileABSPath, props.action.action.cmd), shortDesc);
   } else if (props.action.action.emitter != null) {
     props.action.action.emitter();
   } else {

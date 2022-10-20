@@ -7,6 +7,9 @@ export interface FileTreeItemAction {
     icon: 'run' | 'build' | 'visualize',
     label: string,
     action: {
+        // Short description to describe what this command is doing.
+        // This description will be displayed on the terminals tab.
+        shortDesc?: string,
         cmd?: string,
         emitter?: () => void
     }
@@ -20,16 +23,6 @@ interface FileTreeItemType {
 
 export const FILETREE_ITEMTYPES: FileTreeItemType[] = [
     {
-        match: new RegExp(".*\\.py$"),
-        actions: [{
-            icon: 'run',
-            label: 'Run this file',
-            action: {
-                cmd: '$INTERPRETER $FILEPATH'
-            }
-        }]
-    },
-    {
         match: new RegExp("run_simulator\\.py$"),
         actions: [{
             icon: 'visualize',
@@ -39,20 +32,34 @@ export const FILETREE_ITEMTYPES: FileTreeItemType[] = [
                     requestOpenVisualizer()
                 }
             }
+        }, {
+            icon: 'run',
+            label: 'Run Simulator',
+            action: {
+                shortDesc: "Simulator",
+                cmd: '$INTERPRETER $FILEPATH'
+            }
         }]
-    }
+    }, {
+        match: new RegExp(".*\\.py$"),
+        actions: [{
+            icon: 'run',
+            label: 'Run this file',
+            action: {
+                cmd: '$INTERPRETER $FILEPATH'
+            }
+        }]
+    },
 ]
 
 export const loadItemActions = (fileABSPath) => {
     const fileBaseName = baseName(fileABSPath)
-    // fileBaseName
-    let actions: FileTreeItemAction[] = []
     for (const itemType of FILETREE_ITEMTYPES) {
         if (itemType.match.test(fileBaseName)) {
-            actions = actions.concat(itemType.actions)
+            return itemType.actions
         }
     }
-    return actions
+    return []
 }
 
 

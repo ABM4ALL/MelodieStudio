@@ -2,7 +2,6 @@
   <div class="container">
     <div class="file-tree-container">
       <file-tree @open-file="onOpenFile"></file-tree>
-      <el-button @click="onRequestRun">Run Simulator</el-button>
     </div>
     <div class="editor-main">
       <editor-tabs
@@ -32,13 +31,6 @@ import EditorTabs from "./EditorTabs.vue";
 import TerminalTabs from "@/components/terminal/TerminalTabs.vue";
 import { requestRunCommand } from "@/components/terminal/terminal_events";
 import store from "@/store";
-const onRequestRun = () => {
-  requestRunCommand(
-    `${
-      (store.state as any).controls.interpreterMeta.executable
-    } run_simulator.py`
-  );
-};
 
 const codeEditor = ref(null);
 const terminalsShown = ref(true);
