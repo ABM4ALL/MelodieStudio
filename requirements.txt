@@ -16,3 +16,4 @@ watchdog
 jedi
 flask_sock
 astroid
+psutil

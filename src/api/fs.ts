@@ -19,7 +19,7 @@ export const listDir = async (directory: string): Promise<any> => {
     return (await request.get("/api/fs/listDir", { directory })).data.fsItemsList;
 };
 
-export const getProjectMeta = async (): Promise<{ cwd: string, executable: string }> => {
+export const getProjectMeta = async (): Promise<{ cwd: string, executable: string, os: "windows" | "linux" | 'darwin' }> => {
     return (await request.get("/api/tools/projectMeta")).data;
 }
 

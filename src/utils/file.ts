@@ -35,6 +35,7 @@ export const baseName = (absPath: string): string => {
   if (absPath == null) {
     return "";
   }
+  absPath = absPath.replaceAll("\\", "/")
   const len = absPath.split("/").length;
   if (absPath.endsWith("/")) {
     return absPath.split("/")[len - 2];
@@ -44,6 +45,7 @@ export const baseName = (absPath: string): string => {
 };
 
 export const getDirName = (absPath: string): string => {
+  absPath = absPath.replaceAll("\\", "/")
   const pos = absPath.lastIndexOf('/');
   return absPath.substring(0, pos);
 }

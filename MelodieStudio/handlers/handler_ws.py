@@ -80,15 +80,16 @@ class PTYHandleCell(WSHandlerCell):
         pty = self.ptys.pop(pty_id)
         send_pty_status(pty_id, 'closed')
 
-    def close_term(self, termID: str):
+    def close_term(self, termID: str, soft=True):
         """
         Close Terminal
 
         """
         pty = self.ptys[termID]
-        # if pty.close()
-        pty.write_bytes(b"\x03")
-
+        if soft:
+            pty.soft_close()
+        else:
+            raise NotImplementedError
 
     def handle(self, msg: Dict[str, Any]):
         cmd = msg['cmd']

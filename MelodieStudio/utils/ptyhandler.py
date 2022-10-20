@@ -1,5 +1,3 @@
-from ast import List
-import fcntl
 from io import TextIOWrapper
 import os
 import select
@@ -56,17 +54,24 @@ class MelodiePTY:
         self._thread.start()
 
     def create_on_windows(self):
-        from winpty import PTY
+        from winpty import PTY, WinptyError
 
         def read_on_windows(proc: PTY):
-            while proc.isalive():
-                out = proc.read(blocking=False)
-                if out == "":
-                    time.sleep(0.1)
-                else:
-                    self._on_output(self.term_id, out)
+            try:
+                while proc.isalive():
+                    out = proc.read(blocking=False)
+                    if out == "":
+                        time.sleep(0.1)
+                    else:
+                        self._on_output(self.term_id, out)
+            except WinptyError:
+                import traceback
+                traceback.print_exc()
+            finally:
+                self.close()
 
         proc = PTY(80, 14)
+        print(self._command)
         proc.spawn(self._command)
         self._win_proc = proc
         self.start_thread(read_on_windows, (proc,))
@@ -112,22 +117,33 @@ class MelodiePTY:
 
     def write(self, input: str):
         if is_windows():
+            # print('wrote', input, input.encode('utf8'))
             self._win_proc.write(input)
         else:
-            print('input.encode', input.encode())
+            # print('input.encode', input.encode())
             os.write(self._nix_proc.fd, input.encode())
 
     def write_bytes(self, input: bytes):
-        if is_windows():
-            self._win_proc.write(input)
-        else:
-            os.write(self._nix_proc.fd, input)
+        assert not is_windows()
+        os.write(self._nix_proc.fd, input)
 
     def resize(self, rows: int, cols: int):
         if is_windows():
-            raise NotImplementedError
+            self._win_proc.set_size(cols, rows)
         else:
             import termios
+            import fcntl
             winsize = struct.pack("HHHH", rows, cols, 0, 0)
             fcntl.ioctl(self._nix_proc.fd, termios.TIOCSWINSZ, winsize)
         pass
+
+    def soft_close(self):
+            
+        """
+        Close Terminal
+
+        """
+        if is_windows():
+            self.write(b'\x03'.decode('ascii'))
+        else:
+            self.write_bytes(b"\x03")

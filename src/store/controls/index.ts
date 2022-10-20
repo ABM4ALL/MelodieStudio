@@ -3,6 +3,7 @@ export default {
   state: {
     isCollapse: false, // 控制菜单展开与折叠
     staticRoutes: staticRoutes,
+    os: "",
     cwd: "",
     interpreterMeta: { executable: "" },
   },
@@ -12,9 +13,9 @@ export default {
     },
     SET_PROJECT_META(state, meta) {
       state.cwd = meta.cwd;
-
       state.interpreterMeta.executable = meta.executable;
-    }
+      state.os = meta.os;
+    },
   },
   actions: {
   },

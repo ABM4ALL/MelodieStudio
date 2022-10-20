@@ -1,46 +1,21 @@
 <template>
-  <el-tabs
-    v-model="currentTermID"
-    :class="{ 'mld-terminal-tabs': true }"
-    @tab-click="handleTabClick"
-  >
-    <el-tab-pane
-      :name="term.id"
-      v-for="term in terms"
-      :key="term.id"
-    >
+  <el-tabs v-model="currentTermID" :class="{ 'mld-terminal-tabs': true }" @tab-click="handleTabClick">
+    <el-tab-pane :name="term.id" v-for="term in terms" :key="term.id">
       <template #label>
-        <el-popover
-          placement="bottom-start"
-          :width="200"
-          trigger="hover"
-          :show-after="500"
-        >
+        <el-popover placement="bottom-start" :width="200" trigger="hover" :show-after="500">
           <template #reference>
             <span class="term-label">
-              <div
-                :class="{
-                  'status-indicator': true,
-                  'term-open': !term.closed,
-                  'term-closed': term.closed,
-                }"
-              ></div>
+              <div :class="{
+                'status-indicator': true,
+                'term-open': !term.closed,
+                'term-closed': term.closed,
+              }"></div>
               <span style="margin-left: 6px">{{ term.name }}</span>
             </span>
           </template>
           Status: {{ term.closed ? "Stopped" : "Running" }}
-          <icon-button
-            v-if="term.closed"
-            @click="onRestartRequest(term.id)"
-            icon="run"
-            text="Restart"
-          ></icon-button>
-          <icon-button
-            v-else
-            @click="onCloseRequest(term.id)"
-            icon="stop"
-            text="Soft stop"
-          ></icon-button>
+          <icon-button v-if="term.closed" @click="onRestartRequest(term.id)" icon="run" text="Restart"></icon-button>
+          <icon-button v-else @click="onCloseRequest(term.id)" icon="stop" text="Soft stop"></icon-button>
           <!-- <el-button v-if="term.closed">Restart</el-button> -->
           <!-- <el-button v-else >Stop</el-button> -->
         </el-popover>
@@ -61,6 +36,7 @@ import { registerOnRunCommandRequest } from "../events/globalevents";
 import { addOnMessageHandler } from "@/api/ws";
 import store from "@/store";
 import { TerminalType } from "@/models/models";
+import { formatTerminalCommand, getSystemTerminal } from "./terminal_utils";
 
 export default defineComponent({
   components: { TerminalView, IconButton },
@@ -103,7 +79,7 @@ export default defineComponent({
     allActivePTYs().then((ptys: TerminalType[]) => {
       console.log("ptys", ptys);
       if (ptys.length == 0) {
-        createPTY("bash", "Terminal")
+        createPTY(getSystemTerminal(), "Terminal")
           .then((terminal: TerminalType) => {
             console.log("created pty:", terminal.id, terminal);
             ElNotification.success("PTY connection success!");
@@ -125,7 +101,7 @@ export default defineComponent({
         return;
       }
       createPTY(
-        ["bash", "-c", `cd ${(store.state as any).controls.cwd} &&` + cmd],
+        formatTerminalCommand( `cd ${(store.state as any).controls.cwd} &&` + cmd),
         termName
       )
         .then((terminal: TerminalType) => {

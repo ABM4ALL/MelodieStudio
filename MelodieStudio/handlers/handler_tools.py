@@ -1,5 +1,6 @@
 import json
 import os
+import platform
 import re
 import sys
 from MelodieStudio.static_analysis.autocompletion import handle_autocomp
@@ -62,4 +63,5 @@ def handle_autocomplete():
 @tools.route('projectMeta', methods=['get'])
 def handle_get_cwd():
     return Response.ok({'cwd': get_workdir(),
-                        'executable': sys.executable})
+                        'executable': sys.executable,
+                        'os': platform.system().lower()})
