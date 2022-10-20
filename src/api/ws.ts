@@ -2,14 +2,10 @@ import { WSMessage, WSToServerMessage } from "@/models/models";
 import { CommandParams } from "@/models/visualizerbasics";
 
 type CallbackList = ((s: string) => void)[]
-type MessageType = "subprocess-output" | "plot" | "message" | "pty-output" | "fs-event"
+type MessageType = "subprocess-output" | "plot" | "message" | "pty-output" | "pty-status-change" | "fs-event"
 const _handlers: {
-    "subprocess-output": CallbackList,
-    "plot": CallbackList,
-    "message": CallbackList,
-    "pty-output": CallbackList,
-    'fs-event': CallbackList
-} = { "subprocess-output": [], plot: [], message: [], 'pty-output': [], 'fs-event': [] };
+    [key in MessageType]: CallbackList
+} = { "subprocess-output": [], plot: [], message: [], 'pty-output': [], 'fs-event': [], 'pty-status-change': [] };
 
 function wsOnMessage(messageEvent: any) {
     const data: WSMessage[] = JSON.parse(messageEvent.data)
@@ -19,7 +15,6 @@ function wsOnMessage(messageEvent: any) {
     if (data == null) {
         throw Error
     }
-    console.log('data', data)
     for (const ws_msg of data) {
         const type = ws_msg.type as MessageType
         let handled = false

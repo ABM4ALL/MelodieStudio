@@ -13,11 +13,11 @@ export const unregisterOnSaveCommand = (callback: (cmd: string) => void) => {
     emitter.off('request-save', callback as Handler)
 }
 
-export const requestRunCommand = (cmd: string) => {
-    emitter.emit('request-run-command', cmd)
+export const requestRunCommand = (cmd: string, termName: string) => {
+    emitter.emit('request-run-command', { cmd, termName })
 }
 
-export const registerOnRunCommandRequest = (callback: (cmd: string) => void) => {
+export const registerOnRunCommandRequest = (callback: (cfg: { cmd: string, termName: string }) => void) => {
     emitter.on('request-run-command', callback as Handler)
 }
 
@@ -28,4 +28,12 @@ export const registerEvents = () => {
             e.preventDefault()
         }
     });
+}
+
+export const setOnOpenVisualizer = (callback: () => void) => {
+    emitter.on('open-visualizer', callback as Handler)
+}
+
+export const requestOpenVisualizer = () => {
+    emitter.emit('open-visualizer')
 }

@@ -39,6 +39,7 @@ export default defineComponent({
 
       seriesConfig: {} as SeriesConfig,
       visualizerData: {},
+      unMounted: false,
     };
   },
   methods: {
@@ -60,6 +61,9 @@ export default defineComponent({
       if (this.connected) {
         return;
       } else {
+        if (this.unMounted) {
+          return;
+        }
         setTimeout(() => {
           this.connect();
           console.log("trying to reconnect...");

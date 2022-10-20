@@ -30,7 +30,8 @@ class MelodiePTY:
     Wrapper for winpty and builtin-pty
     """
 
-    def __init__(self, term_id: str, command: str, on_output: Callable[[str], None], on_close: Callable[[str], None]) -> None:
+    def __init__(self, term_id: str, command: str, on_output: Callable[[str], None], on_close: Callable[[str], None], name) -> None:
+        self.name: str = name
         self._on_output = on_output
         self._on_close = on_close
         self._command = command
@@ -44,6 +45,9 @@ class MelodiePTY:
         else:
             self.create_on_nix()
         # self.write(f'cd {get_workdir()}')
+
+    def to_dict(self):
+        return {"id": self.term_id, "name": self.name, "command": self._command, "closed": False}
 
     def start_thread(self, func, args):
         self._thread = threading.Thread(
@@ -81,11 +85,11 @@ class MelodiePTY:
             while True:
                 time.sleep(0.01)
                 timeout_sec = 0
-                
+
                 (data_ready, _, _) = select.select([fd], [], [], timeout_sec)
                 if data_ready:
                     output = os.read(fd, max_read_bytes)
-                    if len(output)==0:
+                    if len(output) == 0:
                         break
                     output = output.decode(
                         errors="replace")
@@ -97,7 +101,8 @@ class MelodiePTY:
         if child_pid == 0:
             try:
                 ret = subprocess.run(self._command, close_fds=True)
-                print(f"\n\n\nProcess '{ret.args}' finished with return code {ret.returncode}")
+                print(
+                    f"\n\n\nProcess '{ret.args}' finished with return code {ret.returncode}")
                 sys.exit()
             except FileNotFoundError as e:
                 raise MelodiePTYError(e)
@@ -109,7 +114,14 @@ class MelodiePTY:
         if is_windows():
             self._win_proc.write(input)
         else:
+            print('input.encode', input.encode())
             os.write(self._nix_proc.fd, input.encode())
+
+    def write_bytes(self, input: bytes):
+        if is_windows():
+            self._win_proc.write(input)
+        else:
+            os.write(self._nix_proc.fd, input)
 
     def resize(self, rows: int, cols: int):
         if is_windows():

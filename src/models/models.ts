@@ -10,3 +10,10 @@ export interface WSToServerMessage {
     type: "pty-input" | "command";
     payload: any;
 }
+
+export interface TerminalType {
+    id: string;
+    name: string;
+    closed: boolean;
+    command: string;
+}

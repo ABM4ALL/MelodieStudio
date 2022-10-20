@@ -25,13 +25,8 @@
 import "xterm/css/xterm.css";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
-import { AttachAddon } from "xterm-addon-attach";
-import { addOnMessageHandler, send, sendPtyCommand } from "@/api/ws";
-import { WSMessage } from "@/models/models";
+import { addOnMessageHandler, sendPtyCommand } from "@/api/ws";
 import { defineComponent, ref } from "vue";
-
-import { ElNotification } from "element-plus";
-import store from "@/store";
 import { registerOnRunCommand } from "./terminal_events";
 import { resizePTY } from "@/api/tools";
 export default defineComponent({
@@ -62,12 +57,14 @@ export default defineComponent({
         function isReize() {
           const style = document!.defaultView!.getComputedStyle(el);
           if (width !== style.width || height !== style.height) {
-            binding.value(); // 关键
+            if (style.width.endsWith("px") && style.height.endsWith("px")) {
+              binding.value(); // 关键
+            }
           }
           width = style.width;
           height = style.height;
         }
-        el.__vueSetInterval__ = setInterval(isReize, 300);
+        el.__vueSetInterval__ = setInterval(isReize, 1000);
       },
       unmounted(el) {
         clearInterval(el.__vueSetInterval__);
@@ -77,7 +74,6 @@ export default defineComponent({
   setup() {
     return {
       elemID: `terminal-${Math.random() + Date.now()}`,
-      socket: null as WebSocket | null,
       term: null as Terminal | null,
       fitAddon: null as FitAddon | null,
       // termID: ref(""),
@@ -91,7 +87,7 @@ export default defineComponent({
   // },
   mounted() {
     this.initTerm();
-    this.term?.writeln("Welcome!");
+    this.term?.writeln("Welcome! Press Enter to start terminal interaction!");
   },
   beforeUnmount() {
     this.term!.dispose();
@@ -131,10 +127,15 @@ export default defineComponent({
           console.log("recv msg", msg);
           if (this.term != null && this.termID == msg.termID) {
             this.term.write(msg.output);
-            // if (!this.initialized) {
-            //   this.injectCMD(`cd ${(store.state as any).controls.cwd}`);
-            //   this.initialized = true;
-            // }
+          }
+        }
+      );
+
+      addOnMessageHandler(
+        "pty-status-change",
+        (msg: { output: string; termID: string }) => {
+          if (this.term != null && this.termID == msg.termID) {
+            console.log("status changed!", msg);
           }
         }
       );
@@ -144,22 +145,6 @@ export default defineComponent({
         this.term.writeln(cmd);
         sendPtyCommand(this.termID, cmd + "\n", "cmd-pty");
       }
-    },
-    socketOnOpen() {
-      this.socket!.onopen = () => {
-        // 链接成功后
-        this.initTerm();
-      };
-    },
-    socketOnClose() {
-      this.socket!.onclose = () => {
-        // console.log('close socket')
-      };
-    },
-    socketOnError() {
-      this.socket!.onerror = () => {
-        // console.log('socket 链接失败')
-      };
     },
   },
 });

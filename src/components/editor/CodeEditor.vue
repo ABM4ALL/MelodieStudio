@@ -34,7 +34,9 @@ import { requestRunCommand } from "@/components/terminal/terminal_events";
 import store from "@/store";
 const onRequestRun = () => {
   requestRunCommand(
-    `${(store.state as any).controls.interpreterMeta.executable} run_simulator.py`
+    `${
+      (store.state as any).controls.interpreterMeta.executable
+    } run_simulator.py`
   );
 };
 
@@ -70,6 +72,8 @@ onUnmounted(() => {
   flex-direction: row;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .container :deep(.editor-tabs) {

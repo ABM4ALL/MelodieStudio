@@ -10,31 +10,6 @@
           </el-button>
         </template>
       </el-input>
-      <el-button-group
-        style="display: flex; flex-wrap: nowrap; margin-left: 8px"
-      >
-        <el-button @click="onDownload(selected)">
-          <el-icon>
-            <upload></upload>
-          </el-icon>
-        </el-button>
-        <el-button
-          @click="
-            showDialog(
-              selected.endsWith('/') ? selected : getDirName(selected) + '/'
-            )
-          "
-        >
-          <el-icon>
-            <upload />
-          </el-icon>
-        </el-button>
-        <el-button @click="onDelete(selected)">
-          <el-icon>
-            <delete />
-          </el-icon>
-        </el-button>
-      </el-button-group>
     </div>
     <el-tree
       :props="props"
@@ -65,6 +40,7 @@
               <span v-if="data.absPath !== ''">{{
                 baseName(data.absPath)
               }}</span>
+              <div style="flex-grow: 1"></div>
               <file-tree-buttons :absPath="data.absPath"></file-tree-buttons>
             </div>
           </template>
@@ -140,6 +116,7 @@ import {
   loadItemActions,
 } from "./filetree-utils/filetree-items";
 import FileTreeButtons from "./filetree-utils/FileTreeButtons.vue"
+import { setOnOpenVisualizer } from "../events/globalevents";
 const dialogShow = ref(false);
 const fileList = ref<{ name: string }[]>([]);
 const absPathToUpload = ref("");
@@ -241,6 +218,7 @@ addOnMessageHandler(
     }
   }
 );
+
 
 const onNodeDoubleClick = (data: Tree) => {
   selected.value = data.absPath;

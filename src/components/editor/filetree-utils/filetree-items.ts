@@ -1,12 +1,14 @@
+import { requestOpenVisualizer } from "@/components/events/globalevents";
 import store from "@/store";
 import { baseName } from "@/utils/file";
 
 type ENV_VAR = 'INTERPRETER' | 'FILEPATH' | "FILEBASENAME";
 export interface FileTreeItemAction {
-    icon: 'run' | 'build',
+    icon: 'run' | 'build' | 'visualize',
     label: string,
     action: {
-        cmd?: string
+        cmd?: string,
+        emitter?: () => void
     }
 }
 interface FileTreeItemType {
@@ -18,12 +20,24 @@ interface FileTreeItemType {
 
 export const FILETREE_ITEMTYPES: FileTreeItemType[] = [
     {
-        match: new RegExp(".*.py"),
+        match: new RegExp(".*\\.py$"),
         actions: [{
             icon: 'run',
             label: 'Run this file',
             action: {
                 cmd: '$INTERPRETER $FILEPATH'
+            }
+        }]
+    },
+    {
+        match: new RegExp("run_simulator\\.py$"),
+        actions: [{
+            icon: 'visualize',
+            label: 'Open Visualizer',
+            action: {
+                emitter: () => {
+                    requestOpenVisualizer()
+                }
             }
         }]
     }
@@ -32,12 +46,13 @@ export const FILETREE_ITEMTYPES: FileTreeItemType[] = [
 export const loadItemActions = (fileABSPath) => {
     const fileBaseName = baseName(fileABSPath)
     // fileBaseName
+    let actions: FileTreeItemAction[] = []
     for (const itemType of FILETREE_ITEMTYPES) {
         if (itemType.match.test(fileBaseName)) {
-            return itemType.actions
+            actions = actions.concat(itemType.actions)
         }
     }
-    return []
+    return actions
 }
 
 

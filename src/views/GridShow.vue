@@ -1,5 +1,5 @@
 <template>
-  <div style="position: relative">
+  <div style="position: relative; height: 100%">
     <toolbar
       @reset="reset"
       @step="step"
@@ -9,30 +9,32 @@
       :currentStep="currentStep"
       :connected="connected"
     ></toolbar>
-    <dynamic-form
-      :interactiveParams="interactiveParams"
-      @param-changed="paramChanged"
-      :paramsModified="paramsModified"
-    ></dynamic-form>
-    <el-row>
-      <grid-component
-        :ref="`grid-visualizer-new-${i}`"
-        v-for="(_item, i) in visualizers"
-        :key="i"
-        :name="_item.name"
-        :visualizerIndex="i"
-        :visualizerData="visualizerData[_item.name]"
-        :desiredFPS="fpsLimit"
-        :columns="_item.columns"
-        :rows="_item.rows"
-      >
-      </grid-component>
-    </el-row>
-    <chart-list
-      :seriesConfig="seriesConfig"
-      ref="chartList"
-      :style="{ position: 'absolute' }"
-    ></chart-list>
+    <div style="position: relative; overflow: scroll; height: 100%">
+      <dynamic-form
+        :interactiveParams="interactiveParams"
+        @param-changed="paramChanged"
+        :paramsModified="paramsModified"
+      ></dynamic-form>
+      <el-row>
+        <grid-component
+          :ref="`grid-visualizer-new-${i}`"
+          v-for="(_item, i) in visualizers"
+          :key="i"
+          :name="_item.name"
+          :visualizerIndex="i"
+          :visualizerData="visualizerData[_item.name]"
+          :desiredFPS="fpsLimit"
+          :columns="_item.columns"
+          :rows="_item.rows"
+        >
+        </grid-component>
+      </el-row>
+      <chart-list
+        :seriesConfig="seriesConfig"
+        ref="chartList"
+        :style="{ position: 'absolute' }"
+      ></chart-list>
+    </div>
   </div>
 </template>
 
@@ -73,6 +75,10 @@ export default defineComponent({
   },
   beforeCreate() {
     getContainersLayout();
+  },
+  beforeUnmount() {
+    this.unMounted = true;
+    this.$ws.close();
   },
   mounted() {
     this.connect();

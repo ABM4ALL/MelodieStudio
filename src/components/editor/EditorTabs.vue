@@ -28,11 +28,18 @@
           :path="file.absPath"
         ></table-viewer>
         <network-viewer
-        v-as-editor
+          v-as-editor
           v-if="file.type == 'network'"
           @unsaved="setUnsaved(file.absPath, $event)"
           :path="file.absPath"
         ></network-viewer>
+        <grid-show v-if="file.type == 'visualizer'"></grid-show>
+        <!-- <network-viewer
+          v-as-editor
+          v-if="file.type == 'network'"
+          @unsaved="setUnsaved(file.absPath, $event)"
+          :path="file.absPath"
+        ></network-viewer> -->
       </div>
     </el-tab-pane>
   </el-tabs>
@@ -42,17 +49,20 @@
 import CythonEditor from "./CythonEditor2.vue";
 import DatabaseBrowser from "@/components/dbbrowser/DatabaseBrowser.vue";
 import TableViewer from "@/components/tableviewer/TableViewer.vue";
-import NetworkViewer from "@/components/network/NetworkViewerNew.vue"
+import NetworkViewer from "@/components/network/NetworkViewerNew.vue";
+import GridShow from "@/views/GridShow.vue";
 import { defineComponent, ref, defineExpose } from "vue";
 import { ElNotification } from "element-plus";
 import { baseName, getExt } from "@/utils/file";
+import { fa } from "element-plus/es/locale";
+import { setOnOpenVisualizer } from "../events/globalevents";
 
 const activeName = ref("");
 const openedFiles = ref<
   {
     absPath: string;
     name: string;
-    type: "python" | "plain" | string;
+    type: "python" | "plain" | "table" | "builtin" | string;
     unsaved: boolean;
   }[]
 >([]);
@@ -95,6 +105,22 @@ const openFile = (fileName: string) => {
   }
   activeName.value = fileName;
 };
+
+const openVisualizer = () => {
+  if (openedFiles.value.findIndex((file) => file.absPath == "visualizer") < 0) {
+    openedFiles.value.push({
+      absPath: "visualizer",
+      name: "visualizer",
+      type: "visualizer",
+      unsaved: false,
+    });
+  }
+  activeName.value = 'visualizer'
+};
+
+setOnOpenVisualizer(() => {
+  openVisualizer();
+});
 
 const closeFile = (fileName: string) => {
   const index = openedFiles.value.findIndex((file) => file.absPath == fileName);

@@ -65,15 +65,30 @@ class PTYHandleCell(WSHandlerCell):
         self.ptys: Dict[str, MelodiePTY] = {}
 
     def get_pty_ids(self) -> List[str]:
-        """
-        Get all active ptys
 
-        """
+        # Get all active ptys
         return [pty_id for pty_id in self.ptys]
 
+    def all_active_ptys(self) -> List[str]:
+        return [self.ptys[pty_id].to_dict() for pty_id in self.ptys]
+
     def on_pty_close(self, pty_id: str):
+        """
+        Handle PTY closed event.
+
+        """
         pty = self.ptys.pop(pty_id)
-        return
+        send_pty_status(pty_id, 'closed')
+
+    def close_term(self, termID: str):
+        """
+        Close Terminal
+
+        """
+        pty = self.ptys[termID]
+        # if pty.close()
+        pty.write_bytes(b"\x03")
+
 
     def handle(self, msg: Dict[str, Any]):
         cmd = msg['cmd']
@@ -81,16 +96,17 @@ class PTYHandleCell(WSHandlerCell):
         msg_type = msg['msgType']
         assert msg_type in {'new-pty', 'close-pty', 'cmd-pty'}
         if not termID in self.ptys:
-            self.ptys[termID] = MelodiePTY(termID, self.shell, send_pty_output, self.on_pty_close)
+            raise KeyError("Terminal %s not in ptys")
         else:
             self.ptys[termID].write(cmd)
 
-    def create_pty(self, termID: str, cmd: str) -> bool:
+    def create_pty(self, termID: str, cmd: str, name: str) -> MelodiePTY:
         if termID not in self.ptys:
-            self.ptys[termID] = MelodiePTY(termID, cmd, send_pty_output, self.on_pty_close)
-            return True
+            self.ptys[termID] = MelodiePTY(
+                termID, cmd, send_pty_output, self.on_pty_close, name)
+            return self.ptys[termID]
         else:
-            return False
+            return None
 
     def resize(self, termID: str, rows: int, cols: int) -> bool:
         if termID not in self.ptys:
@@ -155,6 +171,17 @@ def send_pty_output(term_id: str, content: str):
     )
 
 
+def send_pty_status(term_id: str, status: str):
+    """
+    Send PTY status to frontend.
+
+    """
+    assert status in {'closed', 'opened'}, status
+    send_queue.put(
+        WSMessage("pty-status-change", {'termID': term_id, "status": status})
+    )
+
+
 def send_subprocess_output(type: str, content: str):
     assert type in {"stderr", "stdout"}, "Invalid type" + type
     send_queue.put(
@@ -181,12 +208,14 @@ def emit_added_fsitem_evt(abs_path: str):
 @pty_mgr.route("/create", methods=['POST'])
 def new_terminal():
     data = json.loads(request.data)
+    print(data)
     cmd = data['cmd']
+    name = data['name']
     new_terminal_id = str(uuid.uuid1())
     try:
-        pty_handle_cell.create_pty(new_terminal_id, cmd)
+        new_term = pty_handle_cell.create_pty(new_terminal_id, cmd, name)
         print(psutil.Process().children(recursive=True))
-        return Response.ok({'termID': new_terminal_id})
+        return Response.ok(new_term.to_dict())
     except MelodiePTYError as e:
         import traceback
         traceback.print_exc()
@@ -195,7 +224,7 @@ def new_terminal():
 
 @pty_mgr.route("/all", methods=['GET'])
 def get_active_ptys():
-    return Response.ok({'terms': pty_handle_cell.get_pty_ids()})
+    return Response.ok(pty_handle_cell.all_active_ptys())
 
 
 @pty_mgr.route("/resize", methods=['POST'])
@@ -206,6 +235,14 @@ def resize_terminal():
     cols = data['cols']
     pty_handle_cell.resize(termID, rows, cols)
     return Response.success_msg("Resize succeeded!")
+
+
+@pty_mgr.route("/close", methods=['POST'])
+def close_terminal():
+    data = json.loads(request.data)
+    termID = data['termID']
+    pty_handle_cell.close_term(termID)
+    return Response.success_msg("Close Succeeded!")
 
 
 sock = None
