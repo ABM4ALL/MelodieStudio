@@ -16,7 +16,7 @@ def new_id():
 class Block:
     def __init__(self, _expr: typing.List[stmt], parent=None, last_item=None):
         self._id = new_id()
-        assert (isinstance(parent, IfBlock) or parent is None), type(parent)
+        assert isinstance(parent, IfBlock) or parent is None, type(parent)
         self._parent: typing.Union[IfBlock] = parent
         self._last_item: Block = last_item
         self._expr: typing.List[stmt] = _expr
@@ -82,7 +82,7 @@ class CustomNodeVisitor(NodeVisitor):
         self._blocks = []
 
     def recursive(func: typing.Callable):
-        """ decorator to make visitor work recursive """
+        """decorator to make visitor work recursive"""
 
         def wrapper(self, node):
             func(self, node)
@@ -108,7 +108,9 @@ class CustomNodeVisitor(NodeVisitor):
         for item in node.orelse:
             self.visit(item)
 
-    def visit_complex_content(self, exprs: typing.List[stmt], parent: typing.Union[IfBlock]):
+    def visit_complex_content(
+        self, exprs: typing.List[stmt], parent: typing.Union[IfBlock]
+    ):
         content = []
         current_basic_block: typing.List[stmt] = []
         for item in exprs:
@@ -117,7 +119,9 @@ class CustomNodeVisitor(NodeVisitor):
             else:
                 last_item = None
             if isinstance(item, If):
-                content.append(BasicBlock(current_basic_block, parent=parent, last_item=last_item))
+                content.append(
+                    BasicBlock(current_basic_block, parent=parent, last_item=last_item)
+                )
                 current_basic_block = []
                 content.append(IfBlock(item, parent=parent, last_item=last_item))
             else:
@@ -127,7 +131,9 @@ class CustomNodeVisitor(NodeVisitor):
         else:
             last_item = None
         if len(current_basic_block) > 0:
-            content.append(BasicBlock(current_basic_block, parent=parent, last_item=last_item))
+            content.append(
+                BasicBlock(current_basic_block, parent=parent, last_item=last_item)
+            )
         self._blocks.extend(content)
 
     def get_block_by_expr(self, _expr):

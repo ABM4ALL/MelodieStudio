@@ -8,10 +8,10 @@ from typing import Optional
 
 from .file_manager import JSONManager
 
-COMPULSORY_CONFIGS_DIR = os.path.join(os.path.dirname(
-    os.path.dirname(__file__)), "compulsory_configs")
-CHART_POLICIES_FILE = os.path.join(
-    COMPULSORY_CONFIGS_DIR, "chart_policies.json")
+COMPULSORY_CONFIGS_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "compulsory_configs"
+)
+CHART_POLICIES_FILE = os.path.join(COMPULSORY_CONFIGS_DIR, "chart_policies.json")
 
 _workdir = ""
 
@@ -25,9 +25,9 @@ def get_workdir() -> str:
     return _workdir
 
 
-class ConfigureCategory():
+class ConfigureCategory:
     def __init__(self, file_path: str, readonly: bool = True):
-        self.__dict__['_initalized'] = False
+        self.__dict__["_initalized"] = False
         self._file = file_path
         self._readonly = readonly
         self.setup()
@@ -57,13 +57,14 @@ class ConfigureCategory():
             raise Exception(err)
 
         for k, v in self.__dict__.items():
-            if k.startswith('_'):
+            if k.startswith("_"):
                 continue
             if k in config:
                 self.__dict__[k] = config[k]
             else:
                 raise AttributeError(
-                    f"Configure file {self._file} does not define '{k}'")
+                    f"Configure file {self._file} does not define '{k}'"
+                )
 
     def to_dict(self):
         """
@@ -92,7 +93,8 @@ class ConfigureCategory():
             super(ConfigureCategory, self).__setattr__(key, value)
         else:
             assert key in self.__dict__, AttributeError(
-                f"Configure category has no property '{key}'")
+                f"Configure category has no property '{key}'"
+            )
             self.__dict__[key] = value
             self.save()
 
@@ -115,16 +117,18 @@ class ConfigureManager:
             os.mkdir(conf_folder)
         elif os.path.isfile(conf_folder):
             raise FileExistsError(
-                f"Config folder '{conf_folder}' is a file, not a folder")
+                f"Config folder '{conf_folder}' is a file, not a folder"
+            )
         self._conf_folder = conf_folder
         self.basic_config: BasicConfig = BasicConfig(
-            os.path.join(conf_folder, 'basic_config.json'), False)
+            os.path.join(conf_folder, "basic_config.json"), False
+        )
 
     def chart_style_config_file(self):
-        return os.path.join(self._conf_folder, 'chart_options.json')
+        return os.path.join(self._conf_folder, "chart_options.json")
 
     def layout_file(self):
-        return os.path.join(self._conf_folder, 'chart_layout.json')
+        return os.path.join(self._conf_folder, "chart_layout.json")
 
     def basic_config_file(self):
         return os.path.join(self._conf_folder, "basic_config_file.json")

@@ -1,19 +1,19 @@
 <template>
   <div class="container">
+
     <div class="file-tree-container">
       <file-tree @open-file="onOpenFile"></file-tree>
     </div>
     <div class="editor-main">
-      <editor-tabs
-        ref="codeEditor"
-        :style="{ height: terminalsShown ? '70%' : '100%' }"
-      ></editor-tabs>
-      <terminal-tabs
-        :style="{
-          height: terminalsShown ? '30%' : '0%',
-          visibility: terminalsShown ? 'unset' : 'none',
-        }"
-      ></terminal-tabs>
+      <div :style="{ height: terminalsShown ? '70%' : '100%', position: 'relative' }">
+        <editor-tabs ref="codeEditor" style="height: 100%;"></editor-tabs>
+        <float-label></float-label>
+      </div>
+
+      <terminal-tabs :style="{
+        height: terminalsShown ? '30%' : '0%',
+        visibility: terminalsShown ? 'unset' : 'none',
+      }"></terminal-tabs>
     </div>
   </div>
 </template>
@@ -27,7 +27,7 @@ import {
 } from "vue";
 import FileTree from "./FileTree.vue";
 import EditorTabs from "./EditorTabs.vue";
-
+import FloatLabel from "@/components/float-label/FloatLabel.vue"
 import TerminalTabs from "@/components/terminal/TerminalTabs.vue";
 import { requestRunCommand } from "@/components/terminal/terminal_events";
 import store from "@/store";

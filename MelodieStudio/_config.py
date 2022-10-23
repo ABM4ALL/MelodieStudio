@@ -4,6 +4,7 @@
 # @Email: 1295752786@qq.com
 # @File: _config.py
 from typing import Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from Melodie import Config
 

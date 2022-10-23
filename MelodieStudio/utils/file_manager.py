@@ -3,12 +3,11 @@ import os
 from typing import ClassVar, Dict, Any, List, Optional, Tuple, Type, Union
 
 
-class JSONManager():
-
+class JSONManager:
     @staticmethod
-    def from_file(file_name: str, allowed_types: Type[dict]) -> Tuple[
-        Optional[Union[List[Any], Dict[str, Any]]],
-        Union[str, None]]:
+    def from_file(
+        file_name: str, allowed_types: Type[dict]
+    ) -> Tuple[Optional[Union[List[Any], Dict[str, Any]]], Union[str, None]]:
         if not os.path.exists(file_name):
             return None, f"File '{file_name}' does not exist!"
         try:
@@ -23,7 +22,9 @@ class JSONManager():
             return None, f"Decode error occured for file '{file_name}'"
 
     @staticmethod
-    def to_file(obj: Union[Dict[str, Any], List[Any]], file_name: str) -> Union[str, None]:
+    def to_file(
+        obj: Union[Dict[str, Any], List[Any]], file_name: str
+    ) -> Union[str, None]:
         try:
             with open(file_name, "w", encoding="utf8") as f:
                 json.dump(obj, f, indent=4)
@@ -32,7 +33,7 @@ class JSONManager():
             return f"{e}"
 
 
-class ChartsConfigManager():
+class ChartsConfigManager:
     def __init__(self) -> None:
         pass
 

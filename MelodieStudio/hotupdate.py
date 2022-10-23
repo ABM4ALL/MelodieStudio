@@ -8,10 +8,18 @@ import threading
 import time
 from typing import Callable, Optional, TYPE_CHECKING
 
-from watchdog.events import FileSystemEventHandler, FileSystemEvent, FileMovedEvent, FileDeletedEvent
+from watchdog.events import (
+    FileSystemEventHandler,
+    FileSystemEvent,
+    FileMovedEvent,
+    FileDeletedEvent,
+)
 from watchdog.observers import Observer
 
-from MelodieStudio.handlers.handler_ws import emit_added_fsitem_evt, emit_removed_fsitem_evt
+from MelodieStudio.handlers.handler_ws import (
+    emit_added_fsitem_evt,
+    emit_removed_fsitem_evt,
+)
 
 logger = logging.getLogger(__name__)
 observer: Optional[Observer] = None
@@ -57,8 +65,12 @@ class Runner:
 
     def stdout_loop(self):
         time.sleep(0.5)
-        self.p = subprocess.Popen([sys.executable, self.executable_file], shell=False, stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE)  # 使用管道
+        self.p = subprocess.Popen(
+            [sys.executable, self.executable_file],
+            shell=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )  # 使用管道
         while self.p.poll() is None:
             line = self.p.stdout.readline().decode("utf8")
             sys.stdout.write(line)
@@ -82,12 +94,11 @@ def start_watch_fs(watch_dir: str, callback: Callable[[], None]):
     assert observer is None
     event_handler = FileMonitorHandler(watch_dir, callback)
     observer = Observer()
-    observer.schedule(event_handler, path=watch_dir,
-                      recursive=True)  # recursive递归的
+    observer.schedule(event_handler, path=watch_dir, recursive=True)  # recursive递归的
     observer.start()
 
 
-def create_runner(config: 'Config'):
+def create_runner(config: "Config"):
     global _current_runner
     if _current_runner is not None:
         _current_runner.stop()

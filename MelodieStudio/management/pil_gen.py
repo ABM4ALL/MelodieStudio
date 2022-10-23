@@ -22,9 +22,9 @@ vals = vals / (np.max(vals) - np.min(vals)) * 255
 
 for i in range(size[0]):
     for j in range(size[1]):
-        colored_vals[i][j][0] = (255 - vals[i][j])
-        colored_vals[i][j][1] = (vals[i][j] - 255)
+        colored_vals[i][j][0] = 255 - vals[i][j]
+        colored_vals[i][j][1] = vals[i][j] - 255
 print(colored_vals)
-img = Image.fromarray(np.uint8(colored_vals), mode='RGB')
+img = Image.fromarray(np.uint8(colored_vals), mode="RGB")
 img.show()
-img.save('img.png')
+img.save("img.png")

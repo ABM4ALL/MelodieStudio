@@ -25,18 +25,18 @@ except ImportError:
 
     traceback.print_exc()
 
-db_browser = Blueprint('dbBrowser', __name__)
+db_browser = Blueprint("dbBrowser", __name__)
 
 
 def df_to_json(df: pd.DataFrame):
     with tempfile.NamedTemporaryFile(delete=False) as tf:
-        df.to_json(tf.name, orient='table', indent=4, index=False)
+        df.to_json(tf.name, orient="table", indent=4, index=False)
         data = tf.read()
         tf.close()
     data = json.loads(data)
-    for item in data["schema"]['fields']:
-        if item['type'] == 'integer':
-            item['type'] = 'number'
+    for item in data["schema"]["fields"]:
+        if item["type"] == "integer":
+            item["type"] = "number"
     return data
 
 
@@ -50,7 +50,7 @@ def read_sql(db_type, meta, sql) -> dict:
     with tempfile.NamedTemporaryFile(delete=False) as tf:
         res = pd.read_sql(sql, engine)
 
-        res.to_json(tf.name, orient='table', indent=4, index=False)
+        res.to_json(tf.name, orient="table", indent=4, index=False)
         data = tf.read()
         tf.close()
     engine.dispose()
@@ -67,13 +67,13 @@ def get_table_names(db_type: str, conn_params: Dict) -> List[str]:
     return table_names
 
 
-@db_browser.route('/query')
+@db_browser.route("/query")
 def db_browser_query():
-    db_type = request.args.get('type')
-    sql = request.args.get('sql')
-    if db_type == 'sqlite':
-        conn_meta = {'path': request.args.get('path')}
-        if not os.path.exists(conn_meta['path']):
+    db_type = request.args.get("type")
+    sql = request.args.get("sql")
+    if db_type == "sqlite":
+        conn_meta = {"path": request.args.get("path")}
+        if not os.path.exists(conn_meta["path"]):
             return Response.error(f"SQLite file {conn_meta['db_path']} not found!")
     else:
         return Response.error(f"Database type {request.args.get('type')} unsupported!")
@@ -81,51 +81,61 @@ def db_browser_query():
     return Response.ok(read_sql(db_type, conn_meta, sql))
 
 
-@db_browser.route('/tableNames')
+@db_browser.route("/tableNames")
 def browse_sqlite():
     conn_meta = {}
-    db_type = request.args.get('type')
-    if db_type == 'sqlite':
-        conn_meta = {'path': request.args.get('path')}
-        if not os.path.exists(conn_meta['path']):
+    db_type = request.args.get("type")
+    if db_type == "sqlite":
+        conn_meta = {"path": request.args.get("path")}
+        if not os.path.exists(conn_meta["path"]):
             return Response.error(f"SQLite file {conn_meta['db_path']} not found!")
     else:
         return Response.error(f"Database type {request.args.get('type')} unsupported!")
     return Response.ok(get_table_names(db_type, conn_meta))
 
 
-@db_browser.route('/table_file_read')
+@db_browser.route("/table_file_read")
 def df_read():
-    path = request.args.get('path')
+    path = request.args.get("path")
     _, ext = os.path.splitext(path)
     ext = ext[1:]
-    if ext in {'xls', 'xlsx'}:
+    if ext in {"xls", "xlsx"}:
         # res = pd.read_excel(path)
         em = ExcelManipulator(path)
         sheets = em.get_sheet_names()
-        currentSheet = request.args.get(
-            'sheet') if request.args.get('sheet') else sheets[0]
+        currentSheet = (
+            request.args.get("sheet") if request.args.get("sheet") else sheets[0]
+        )
         res = em.read_sheet(currentSheet)
-        return Response.ok({"payload": df_to_json(res), "meta": {
-            "widget": "table", "type": "excel", "sheetNames": sheets, 'currentSheet': currentSheet}})
+        return Response.ok(
+            {
+                "payload": df_to_json(res),
+                "meta": {
+                    "widget": "table",
+                    "type": "excel",
+                    "sheetNames": sheets,
+                    "currentSheet": currentSheet,
+                },
+            }
+        )
     else:
         raise NotImplementedError(f"Ext type {ext} unsupported!")
 
 
-@db_browser.route('/table_file_write', methods=['POST'])
+@db_browser.route("/table_file_write", methods=["POST"])
 def df_write():
     print(request.data)
     data = json.loads(request.data)
 
-    path = data['path']
-    table_data = data['data']
+    path = data["path"]
+    table_data = data["data"]
 
     _, ext = os.path.splitext(path)
     ext = ext[1:]
-    if ext in {'xls', 'xlsx'}:
+    if ext in {"xls", "xlsx"}:
 
         df = pd.DataFrame(table_data)
-        sheet_name = data['sheet']
+        sheet_name = data["sheet"]
         try:
             # res.to_excel(path, index=False)
             if sheet_name is not None:
@@ -133,30 +143,30 @@ def df_write():
                 em.write_to_sheet(df, sheet_name)
             else:
                 df.to_excel(path, index=False)
-            return Response.ok('Succeeded saved table file!')
+            return Response.ok("Succeeded saved table file!")
         except Exception as e:
             return Response.ok(f"{e}")
     else:
         raise NotImplementedError(f"Ext type {ext} unsupported!")
 
 
-@db_browser.route('/table_to_latex', methods=['POST'])
+@db_browser.route("/table_to_latex", methods=["POST"])
 def table_to_latex():
     data = json.loads(request.data)
-    table_data = data['data']
+    table_data = data["data"]
     df = pd.DataFrame(table_data)
     return Response.ok(df.to_latex())
 
 
-@db_browser.route('/read_network', methods=['GET'])
+@db_browser.route("/read_network", methods=["GET"])
 def read_network():
-    path = request.args.get('path')
+    path = request.args.get("path")
     return Response.ok(NetworkManipulator(path).read_gexf_file())
 
 
-@db_browser.route('/write_network', methods=['POST'])
+@db_browser.route("/write_network", methods=["POST"])
 def write_network():
     data = json.loads(request.data)
-    path = data['path']
-    gexf_str = data['gexfString']
+    path = data["path"]
+    gexf_str = data["gexfString"]
     return Response.ok(NetworkManipulator(path).write_gexf_file(gexf_str))

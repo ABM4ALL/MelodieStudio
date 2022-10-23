@@ -40,16 +40,17 @@ export const FILETREE_ITEMTYPES: FileTreeItemType[] = [
                 cmd: '$INTERPRETER $FILEPATH'
             }
         }]
-    }, {
-        match: new RegExp(".*\\.py$"),
-        actions: [{
-            icon: 'run',
-            label: 'Run this file',
-            action: {
-                cmd: '$INTERPRETER $FILEPATH'
-            }
-        }]
-    },
+    }, 
+    // {
+    //     match: new RegExp(".*\\.py$"),
+    //     actions: [{
+    //         icon: 'run',
+    //         label: 'Run this file',
+    //         action: {
+    //             cmd: '$INTERPRETER $FILEPATH'
+    //         }
+    //     }]
+    // },
 ]
 
 export const loadItemActions = (fileABSPath) => {

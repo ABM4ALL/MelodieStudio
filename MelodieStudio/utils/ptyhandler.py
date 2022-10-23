@@ -4,15 +4,14 @@ import select
 import struct
 import subprocess
 import sys
-from this import d
 import threading
 import time
-from turtle import right
 
 from typing import Callable, NamedTuple
 from .machine import is_windows
 from .config_manager import get_workdir
-NixProc = NamedTuple("NixProc", [('fd', TextIOWrapper), ('child_pid', int)])
+
+NixProc = NamedTuple("NixProc", [("fd", TextIOWrapper), ("child_pid", int)])
 
 
 class MelodiePTYError(Exception):
@@ -28,7 +27,14 @@ class MelodiePTY:
     Wrapper for winpty and builtin-pty
     """
 
-    def __init__(self, term_id: str, command: str, on_output: Callable[[str], None], on_close: Callable[[str], None], name) -> None:
+    def __init__(
+        self,
+        term_id: str,
+        command: str,
+        on_output: Callable[[str], None],
+        on_close: Callable[[str], None],
+        name,
+    ) -> None:
         self.name: str = name
         self._on_output = on_output
         self._on_close = on_close
@@ -45,11 +51,15 @@ class MelodiePTY:
         # self.write(f'cd {get_workdir()}')
 
     def to_dict(self):
-        return {"id": self.term_id, "name": self.name, "command": self._command, "closed": False}
+        return {
+            "id": self.term_id,
+            "name": self.name,
+            "command": self._command,
+            "closed": False,
+        }
 
     def start_thread(self, func, args):
-        self._thread = threading.Thread(
-            target=func, args=args)
+        self._thread = threading.Thread(target=func, args=args)
         self._thread.setDaemon(True)
         self._thread.start()
 
@@ -66,6 +76,7 @@ class MelodiePTY:
                         self._on_output(self.term_id, out)
             except WinptyError:
                 import traceback
+
                 traceback.print_exc()
             finally:
                 self.close()
@@ -96,8 +107,7 @@ class MelodiePTY:
                     output = os.read(fd, max_read_bytes)
                     if len(output) == 0:
                         break
-                    output = output.decode(
-                        errors="replace")
+                    output = output.decode(errors="replace")
                     self._on_output(self.term_id, output)
             self.close()
 
@@ -107,7 +117,8 @@ class MelodiePTY:
             try:
                 ret = subprocess.run(self._command, close_fds=True)
                 print(
-                    f"\n\n\nProcess '{ret.args}' finished with return code {ret.returncode}")
+                    f"\n\n\nProcess '{ret.args}' finished with return code {ret.returncode}"
+                )
                 sys.exit()
             except FileNotFoundError as e:
                 raise MelodiePTYError(e)
@@ -133,17 +144,18 @@ class MelodiePTY:
         else:
             import termios
             import fcntl
+
             winsize = struct.pack("HHHH", rows, cols, 0, 0)
             fcntl.ioctl(self._nix_proc.fd, termios.TIOCSWINSZ, winsize)
         pass
 
     def soft_close(self):
-            
+
         """
         Close Terminal
 
         """
         if is_windows():
-            self.write(b'\x03'.decode('ascii'))
+            self.write(b"\x03".decode("ascii"))
         else:
             self.write_bytes(b"\x03")

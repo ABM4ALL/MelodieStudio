@@ -1,20 +1,7 @@
 <template>
-  <codemirror
-    v-model="code"
-    placeholder="Code goes here..."
-    :style="{ height: '400px' }"
-    :autofocus="true"
-    :indent-with-tab="true"
-    :tab-size="4"
-    :extensions="extensions"
-    @ready="handleReady"
-    @change="textChanged($event)"
-    @focus="log('focus', $event)"
-    @blur="log('blur', $event)"
-    @keydown="onKeyDown"
-    ref="editor"
-    class="editor"
-  />
+  <codemirror v-model="code" placeholder="Code goes here..." :style="{ height: '400px' }" :autofocus="true"
+    :indent-with-tab="true" :tab-size="4" :extensions="extensions" @ready="handleReady" @change="textChanged($event)"
+    @focus="log('focus', $event)" @blur="log('blur', $event)" @keydown="onKeyDown" ref="editor" class="editor" />
 </template>
 
 <script lang="ts">
@@ -37,6 +24,10 @@ import { getFile, writeFile } from "@/api/fs";
 import { Compartment } from "@codemirror/state";
 const comphandler = new CompletionHandler();
 import { keymap } from "@codemirror/view";
+
+import { cursorTooltip, wordHover, wordHoverConstructor } from "./tooltip";
+
+
 
 const keyAction = new Compartment();
 const saveOnEnter = keymap.of([
@@ -122,18 +113,18 @@ class CovidDataLoader(DataLoader):
             g.set_row_generator(generator_func)
 `);
 
-    const extensions = [
-      basicSetup,
-      StreamLanguage.define(cython),
-      keyAction.of(saveOnEnter),
-    ];
 
+
+
+
+
+    // extensions.push(cursorTooltip());
     const editor = shallowRef<EditorView | null>(null);
 
     return {
       lastCode: "",
       code,
-      extensions,
+      extensions: [] as any[],
       changedRecently: false,
       log: console.log,
       timer: -1,
@@ -141,6 +132,14 @@ class CovidDataLoader(DataLoader):
     };
   },
   beforeMount() {
+    const extensions: any[] = [
+      basicSetup,
+      StreamLanguage.define(cython),
+      keyAction.of(saveOnEnter),
+      wordHoverConstructor(this)
+    ];
+    this.extensions = extensions;
+    
     if (this.file != null) {
       getFile(this.file).then((resp: string) => {
         if (resp != null) {
@@ -203,27 +202,18 @@ class CovidDataLoader(DataLoader):
     },
   },
   mounted() {
-    // console.log();
 
     this.timer = window.setInterval(() => {
       console.log(this.changedRecently, this.code != this.lastCode);
       if (this.changedRecently && this.code != this.lastCode) {
         this.$emit("unsaved", true);
       }
-      // const preventSaveOnEnter = keymap.of([
-      //   {
-      //     key: "Enter",
-      //     run: () => {
-      //       alert("Sorry you cannot save at this moment!!");
-      //       return true;
-      //     },
-      //     preventDefault: true,
-      //   },
-      // ]);
-      // this.editor!.dispatch({
-      //   effects: [keyAction.reconfigure([preventSaveOnEnter])],
-      // });
     }, 1000);
+    const compStatus = {
+      lastWordToPull: "",
+      lastPulledCompletions: [] as { label: string }[],
+      lastPullPos: 0,
+    }
     const myCompletions = async (context: CompletionContext) => {
       let word = context.matchBefore(/[.\w]*/);
       const wordToMatch = context.matchBefore(/[\w]*/);
@@ -231,18 +221,43 @@ class CovidDataLoader(DataLoader):
         return;
       }
       if (word.from == word.to && !context.explicit) return null;
-      const res = await requestAutoComplete({
-        code: this.code,
-        pos: context.pos,
-        file: this.file,
-      });
-      return {
-        from: wordToMatch?.from,
-        options: res.data,
-        filter: false,
-      };
+
+      const lastChar = word.text.at(-1)
+      console.log(lastChar, wordToMatch, compStatus,
+        lastChar != null, /[\w]*/.test(lastChar!), wordToMatch != null, wordToMatch!.text.startsWith(compStatus.lastWordToPull));
+      if (lastChar != null && /\w/.test(lastChar) && wordToMatch != null && wordToMatch.text.startsWith(compStatus.lastWordToPull)
+        && compStatus.lastPullPos <= context.pos
+      ) {
+        const l: { label: string }[] = []
+        for (const comp of compStatus.lastPulledCompletions) {
+          if (comp.label.toLowerCase().startsWith(wordToMatch.text.toLowerCase())) {
+            l.push(comp)
+          }
+        }
+        console.log(l)
+        return {
+          from: wordToMatch?.from,
+          options: l,
+          filter: false,
+        }
+      } else {
+        const res = await requestAutoComplete({
+          code: this.code,
+          pos: context.pos,
+          file: this.file,
+        });
+        compStatus.lastPulledCompletions = res.data
+        compStatus.lastWordToPull = wordToMatch!.text
+        compStatus.lastPullPos = context.pos
+        return {
+          from: wordToMatch?.from,
+          options: res.data,
+          filter: false,
+        };
+      }
     };
     cython.languageData!.autocomplete = myCompletions;
+
   },
 });
 </script>
@@ -250,6 +265,6 @@ class CovidDataLoader(DataLoader):
 .editor :deep(.cm-editor) {
   width: 100%;
   height: 100%;
-  
+
 }
 </style>

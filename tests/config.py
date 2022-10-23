@@ -6,7 +6,8 @@
 import os
 import sys
 
-sys.path.append("/Users/hzy/Documents/Projects/MelodieABM/Melodie")
-sys.path.append("/Users/hzy/Documents/Projects/MelodieABM/MelodieStudioPackage")
-resources_path = os.path.join(os.path.dirname(__file__), 'resources')
-print(resources_path)
+root = os.path.join(os.path.dirname(os.path.dirname(__file__)))
+print(root)
+sys.path.append(root)
+# sys.path.append("/Users/hzy/Documents/Projects/MelodieABM/MelodieStudioPackage")
+resources_path = os.path.join(os.path.dirname(__file__), "resources")

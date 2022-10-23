@@ -5,18 +5,17 @@
 # @File: test_configs.py
 import os.path
 from config import resources_path
-from MelodieStudio.config_manager import ConfigureCategory, ConfigureManager
+from MelodieStudio.utils.config_manager import ConfigureCategory, ConfigureManager
 
 
 class ReadonlyConfigCategory(ConfigureCategory):
-
     def setup(self):
         self.CHART_STYLE_CONFIG_FILE = "xxx"
         self.CHART_POLICIES_CONFIG_FILE = "yyy"
 
 
 def test_config_readonly():
-    path = os.path.join(resources_path, 'json', "config_readonly.json")
+    path = os.path.join(resources_path, "json", "config_readonly.json")
     category1 = ReadonlyConfigCategory(path)
     try:
         category1.CHART_POLICIES_CONFIG_FILE = "/home/user/cfg.json"
@@ -25,7 +24,7 @@ def test_config_readonly():
 
 
 def test_config_read_write():
-    path = os.path.join(resources_path, 'json', "config_read_write.json")
+    path = os.path.join(resources_path, "json", "config_read_write.json")
     if os.path.exists(path):
         os.remove(path)
     category1 = ReadonlyConfigCategory(path, False)
@@ -35,5 +34,5 @@ def test_config_read_write():
 
 
 def test_config_manager():
-    folder = os.path.join(resources_path, 'json')
+    folder = os.path.join(resources_path, "json")
     ConfigureManager(folder)

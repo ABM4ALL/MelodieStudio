@@ -16,8 +16,9 @@ class PSO(object):
         self.dim = 2  # 搜索空间的维度
         self.max_steps = max_steps  # 迭代次数
         self.x_bound = [-10, 10]  # 解空间范围
-        self.x = np.random.uniform(self.x_bound[0], self.x_bound[1],
-                                   (self.population_size, self.dim))  # 初始化粒子群位置
+        self.x = np.random.uniform(
+            self.x_bound[0], self.x_bound[1], (self.population_size, self.dim)
+        )  # 初始化粒子群位置
         self.v = np.random.rand(self.population_size, self.dim)  # 初始化粒子群速度
         fitness = self.calculate_fitness(self.x)
         self.p = self.x  # 个体的最佳位置
@@ -34,10 +35,14 @@ class PSO(object):
             r1 = np.random.rand(self.population_size, self.dim)
             r2 = np.random.rand(self.population_size, self.dim)
             # 更新速度和权重
-            self.v = self.w * self.v + self.c1 * r1 * (self.p - self.x) + self.c2 * r2 * (self.pg - self.x)
+            self.v = (
+                self.w * self.v
+                + self.c1 * r1 * (self.p - self.x)
+                + self.c2 * r2 * (self.pg - self.x)
+            )
             self.x = self.v + self.x
             plt.clf()
-            plt.scatter(self.x[:, 0], self.x[:, 1], s=30, color='k')
+            plt.scatter(self.x[:, 0], self.x[:, 1], s=30, color="k")
             plt.xlim(self.x_bound[0], self.x_bound[1])
             plt.ylim(self.x_bound[0], self.x_bound[1])
             plt.pause(0.01)
@@ -50,7 +55,10 @@ class PSO(object):
             if np.min(fitness) < self.global_best_fitness:
                 self.pg = self.x[np.argmin(fitness)]
                 self.global_best_fitness = np.min(fitness)
-            print('best fitness: %.5f, mean fitness: %.5f' % (self.global_best_fitness, np.mean(fitness)))
+            print(
+                "best fitness: %.5f, mean fitness: %.5f"
+                % (self.global_best_fitness, np.mean(fitness))
+            )
 
 
 pso = PSO(100, 100)

@@ -11,13 +11,15 @@ from ..utils.file_manager import JSONManager
 from .messages import Response
 from ..utils.config_manager import get_config_manager
 
-charts = Blueprint('charts', __name__)
+charts = Blueprint("charts", __name__)
 
 
-@charts.route('getChartPolicies')
+@charts.route("getChartPolicies")
 def chart_policies():
     chart_type: str = request.args.get("chartType")
-    policies, err = JSONManager.from_file(get_config_manager().chart_policies_file(), dict)
+    policies, err = JSONManager.from_file(
+        get_config_manager().chart_policies_file(), dict
+    )
     if err is not None:
         return Response.error(err)
     if chart_type not in policies.keys():
@@ -26,10 +28,12 @@ def chart_policies():
         return Response.ok(policies[chart_type])
 
 
-@charts.route('chartOptions')
+@charts.route("chartOptions")
 def chart_option():
     chart_name = request.args.get("chartName")
-    options, err = JSONManager.from_file(get_config_manager().chart_style_config_file(), dict)
+    options, err = JSONManager.from_file(
+        get_config_manager().chart_style_config_file(), dict
+    )
     if err is not None:
         return Response.error(err)
     chart_options = options.get(chart_name)
@@ -39,9 +43,11 @@ def chart_option():
         return Response.ok(chart_options)
 
 
-@charts.route('deleteChartOptions', methods=["post"])
+@charts.route("deleteChartOptions", methods=["post"])
 def delete_chart_options():
-    options, err = JSONManager.from_file(get_config_manager().chart_style_config_file(), dict)
+    options, err = JSONManager.from_file(
+        get_config_manager().chart_style_config_file(), dict
+    )
     if err is not None:
         return Response.error(err)
     data = json.loads(request.data)
@@ -50,14 +56,16 @@ def delete_chart_options():
         return Response.error(f"chart {chart_name} options not saved")
     else:
         options.pop(chart_name)
-        err = JSONManager.to_file(options, get_config_manager().chart_style_config_file())
+        err = JSONManager.to_file(
+            options, get_config_manager().chart_style_config_file()
+        )
         if err is not None:
             return Response.error(err)
         else:
             return Response.ok("ok")
 
 
-@charts.route('setChartOptions', methods=["post"])
+@charts.route("setChartOptions", methods=["post"])
 def set_chart_option():
     """
     This method will overwrite the whole config of one chart.
@@ -83,7 +91,7 @@ def set_chart_option():
         return Response.ok("msg")
 
 
-@charts.route('getLayout')
+@charts.route("getLayout")
 def get_layout():
     layout_file = get_config_manager().layout_file()
 
@@ -94,12 +102,12 @@ def get_layout():
         return Response.ok(options)
 
 
-@charts.route('saveLayout', methods=["post"])
+@charts.route("saveLayout", methods=["post"])
 def save_layout():
     data = json.loads(request.data)
     layout_file = get_config_manager().layout_file()
     print(data, layout_file)
-    layout_data = data['layout']
+    layout_data = data["layout"]
     err = JSONManager.to_file(layout_data, layout_file)
     if err is not None:
         return Response.error(err)

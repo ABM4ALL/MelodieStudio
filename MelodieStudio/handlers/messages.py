@@ -14,11 +14,10 @@ class Response:
     def _create_response(status: int, message: str, data: Any) -> str:
         assert status in {Response.OK, Response.ERROR}
         try:
-            resp = json.dumps({"status": status,
-                               "msg": message,
-                               "data": data})
+            resp = json.dumps({"status": status, "msg": message, "data": data})
         except TypeError:
             import traceback
+
             traceback.print_exc()
             logger.error(str(data))
             # return

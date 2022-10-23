@@ -11,11 +11,11 @@ class Query(graphene.ObjectType):
     hero = graphene.Field(Hero)
 
     def resolve_hero(self, info):
-        return Hero(id=1, name='wsq', age=123)
+        return Hero(id=1, name="wsq", age=123)
 
 
 schema = graphene.Schema(query=Query)
-query = '''
+query = """
     query something{
       hero {
         id
@@ -23,7 +23,7 @@ query = '''
         age
       }
     }
-'''
+"""
 result = schema.execute(query)
 print(result)
 print(result.data)

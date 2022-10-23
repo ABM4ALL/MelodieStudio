@@ -11,8 +11,14 @@ class WSMessage(Interface):
     payload: Union[Any, List]
 
     def __post_init__(self) -> None:
-        assert self.type in {"subprocess-output",
-                             "plot", "message", 'pty-output', 'fs-event', 'pty-status-change'}
+        assert self.type in {
+            "subprocess-output",
+            "plot",
+            "message",
+            "pty-output",
+            "fs-event",
+            "pty-status-change",
+        }
 
     def dump(self) -> str:
         return json.dumps(self.to_dict())
@@ -33,4 +39,4 @@ class WSToServerMessage(Interface):
         return json.dumps(self.to_dict())
 
     def to_dict(self) -> str:
-        return {"type": self.type, 'payload': self.payload}
+        return {"type": self.type, "payload": self.payload}

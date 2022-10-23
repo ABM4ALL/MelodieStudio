@@ -3,8 +3,6 @@ import openpyxl
 import pandas as pd
 
 
-
-
 class ExcelManipulator:
     def __init__(self, filename: str) -> None:
         self.filename = filename
@@ -22,10 +20,12 @@ class ExcelManipulator:
             book = openpyxl.load_workbook(self.filename)
             sheet_exist = sheet_name in self.get_sheet_names()
         if sheet_exist:
-            with pd.ExcelWriter(self.filename, engine='openpyxl', mode="a", if_sheet_exists="replace") as writer:
+            with pd.ExcelWriter(
+                self.filename, engine="openpyxl", mode="a", if_sheet_exists="replace"
+            ) as writer:
                 df.to_excel(writer, sheet_name=sheet_name, index=False)
         else:
-            writer = pd.ExcelWriter(self.filename, engine='openpyxl')
+            writer = pd.ExcelWriter(self.filename, engine="openpyxl")
             print(sheet_exist)
             if book is not None:
                 writer.book = book

@@ -3,7 +3,7 @@ import os
 import platform
 import re
 import sys
-from MelodieStudio.static_analysis.autocompletion import handle_autocomp
+from MelodieStudio.static_analysis.autocompletion import handle_autocomp, handle_hint
 from flask import Blueprint, request
 
 from MelodieStudio.utils.config_manager import get_workdir
@@ -11,39 +11,42 @@ from MelodieStudio.utils.config_manager import get_workdir
 from .messages import Response
 
 try:
-    from Melodie.templates.create_template import create_project, new_project_config_default
+    from Melodie.templates.create_template import (
+        create_project,
+        new_project_config_default,
+    )
 except:
     import traceback
 
     traceback.print_exc()
 
-tools = Blueprint('tools', __name__)
+tools = Blueprint("tools", __name__)
 
 
 def name_convert_to_snake(name: str) -> str:
     """驼峰转下划线"""
-    if '_' not in name:
-        name = re.sub(r'([a-z])([A-Z])', r'\1_\2', name)
+    if "_" not in name:
+        name = re.sub(r"([a-z])([A-Z])", r"\1_\2", name)
     else:
-        raise ValueError(f'{name}字符中包含下划线，无法转换')
+        raise ValueError(f"{name}字符中包含下划线，无法转换")
     return name.lower()
 
 
-@tools.route('test', methods=['get'])
+@tools.route("test", methods=["get"])
 def test():
     return Response.ok("Ok")
 
 
-@tools.route('createProject', methods=['post'])
+@tools.route("createProject", methods=["post"])
 def create_new_project():
     data = json.loads(request.data)
     for k, v in data.items():
         k = name_convert_to_snake(k)
         print(k, v)
     new_project_config = new_project_config_default.copy()
-    new_project_config['path'] = data['directory']
-    new_project_config['name'] = data['projectName']
-    new_project_config['alias'] = data['projectNameAlias']
+    new_project_config["path"] = data["directory"]
+    new_project_config["name"] = data["projectName"]
+    new_project_config["alias"] = data["projectNameAlias"]
     try:
         create_project(new_project_config)
         return Response.ok("Project created!")
@@ -51,17 +54,30 @@ def create_new_project():
         return Response.error(str(e))
 
 
-@tools.route('autoComplete', methods=['post'])
+@tools.route("autoComplete", methods=["post"])
 def handle_autocomplete():
     data = json.loads(request.data)
-    file = data['file']
-    code = data['code']
-    pos = data['pos']
+    file = data["file"]
+    code = data["code"]
+    pos = data["pos"]
     return Response.ok(handle_autocomp(code, pos, file))
 
 
-@tools.route('projectMeta', methods=['get'])
+@tools.route("hint", methods=["post"])
+def handle_pophint():
+    data = json.loads(request.data)
+    file = data["file"]
+    code = data["code"]
+    pos = data["pos"]
+    return Response.ok(handle_hint(code, pos, file))
+
+
+@tools.route("projectMeta", methods=["get"])
 def handle_get_cwd():
-    return Response.ok({'cwd': get_workdir(),
-                        'executable': sys.executable,
-                        'os': platform.system().lower()})
+    return Response.ok(
+        {
+            "cwd": get_workdir(),
+            "executable": sys.executable,
+            "os": platform.system().lower(),
+        }
+    )

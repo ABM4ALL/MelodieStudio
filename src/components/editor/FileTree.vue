@@ -11,34 +11,17 @@
         </template>
       </el-input>
     </div>
-    <el-tree
-      :props="props"
-      :load="loadNode"
-      node-key="absPath"
-      lazy
-      ref="treeRef"
-      class="file-tree"
-      :filter-node-method="filterNode"
-    >
+    <el-tree :props="props" :load="loadNode" node-key="absPath" lazy ref="treeRef" class="file-tree"
+      :filter-node-method="filterNode">
       <template #default="{ data }">
-        <el-popover
-          trigger="contextmenu"
-          :show-after="100"
-          placement="right"
-          :width="250"
-        >
+        <el-popover trigger="contextmenu" :show-after="100" placement="right" :width="250">
           <template #reference>
-            <div
-              :class="{
-                'custom-tree-node': true,
-                'selected-tree-node': data.absPath == selected,
-              }"
-              @contextmenu.stop="() => false"
-              @dblclick="onNodeDoubleClick(data)"
-              @click="onNodeClick(data)"
-            >
+            <div :class="{
+              'custom-tree-node': true,
+              'selected-tree-node': data.absPath == selected,
+            }" @contextmenu.stop="() => false" @dblclick="onNodeDoubleClick(data)" @click="onNodeClick(data)">
               <span v-if="data.absPath !== ''">{{
-                baseName(data.absPath)
+              baseName(data.absPath)
               }}</span>
               <div style="flex-grow: 1"></div>
               <file-tree-buttons :absPath="data.absPath"></file-tree-buttons>
@@ -47,21 +30,11 @@
           <div style="display: flex; flex-direction: column">
             <span> {{ data.absPath }}</span>
             <div style="display: flex">
-              <el-button type="danger" @click="onDelete(data.absPath)"
-                >Delete</el-button
-              >
-              <el-button type="primary" @click="onCopy(data.absPath)"
-                >Copy</el-button
-              >
-              <el-button type="primary" @click="onCut(data.absPath)"
-                >Cut</el-button
-              >
-              <el-button
-                type="primary"
-                @click="onPaste(data.absPath)"
-                :disabled="fileToCopyOrCut.absPath == ''"
-                >Paste</el-button
-              >
+              <el-button type="danger" @click="onDelete(data.absPath)">Delete</el-button>
+              <el-button type="primary" @click="onCopy(data.absPath)">Copy</el-button>
+              <el-button type="primary" @click="onCut(data.absPath)">Cut</el-button>
+              <el-button type="primary" @click="onPaste(data.absPath)" :disabled="fileToCopyOrCut.absPath == ''">Paste
+              </el-button>
             </div>
           </div>
         </el-popover>
@@ -72,20 +45,11 @@
   <el-dialog v-model="dialogShow" :append-to-body="true">
     <p v-if="absPathToUpload != ''">上传到{{ absPathToUpload }}</p>
     <p v-else>上传到用户根目录</p>
-    <el-upload
-      ref="uploadRef"
-      class="upload-demo"
-      action="/dev-api/oss"
-      v-model:file-list="fileList"
-      :data="{
-        path:
-          fileList.length == 0 ? 'unknown' : absPathToUpload + fileList[0].name,
-        userID: 1,
-      }"
-      :auto-upload="false"
-      :limit="1"
-      :on-success="onSuccess"
-    >
+    <el-upload ref="uploadRef" class="upload-demo" action="/dev-api/oss" v-model:file-list="fileList" :data="{
+      path:
+        fileList.length == 0 ? 'unknown' : absPathToUpload + fileList[0].name,
+      userID: 1,
+    }" :auto-upload="false" :limit="1" :on-success="onSuccess">
       <template #trigger>
         <el-button type="primary">select file</el-button>
       </template>
@@ -176,6 +140,7 @@ const loadNode = (node: Node, resolve: (data: Tree[]) => void) => {
     });
   } else {
     const nodeData: Tree = node.data as Tree;
+    const t0 = Date.now()
     listDir(nodeData.absPath).then((data: FileTreeItem[]) => {
       const l: Tree[] = [];
       data.forEach((ftItem: FileTreeItem) => {
@@ -185,6 +150,8 @@ const loadNode = (node: Node, resolve: (data: Tree[]) => void) => {
           leaf: ftItem.type == "file",
         });
       });
+      window.setTimeout(() => { console.log(Date.now() - t0) }, 20)
+
       resolve(l);
     });
   }
@@ -339,6 +306,7 @@ watch(filterText, (val) => {
 .file-tree {
   background: none;
 }
+
 .file-tree :deep(.el-tree-node__content) {
   height: 24px;
   --item-height: 24px;
