@@ -114,6 +114,7 @@ export default defineComponent({
       if (direc == "") {
         this.dragMode = "move";
         container!.style.cursor = "default";
+        container!.style.zIndex = "100"
       } else {
         this.dragMode = "resize";
         container!.style.cursor = direc + "-resize";
@@ -152,6 +153,7 @@ export default defineComponent({
         this.chartDOMID
       ) as HTMLDivElement;
       container!.style.cursor = "default";
+      container!.style.zIndex = ""
       this.dragMode = "move";
     },
     getDirection(ev: MouseEvent): string {

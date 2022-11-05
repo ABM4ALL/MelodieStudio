@@ -10,6 +10,9 @@
 - Grep the data structure and format the `DataFrameInfo` of table. Besides, some checks could be performed.
 - Automatically add environment properties to visualizer.
 
+## Version 0.4.0
+- Bugfix: Fixed problem that dragging moves may also move charts in the same layer.
+
 ## Version 0.3.0
 ### New Features:
 - Feature: Fusion workspace on web like an IDE.
