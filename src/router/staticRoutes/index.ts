@@ -1,6 +1,4 @@
 import Wrapper from '@/layout/components/Wrapper/index.vue';
-import Home from '@/views/Home.vue';
-import GridShow from "@/views/GridShow.vue";
 import Database from "@/views/Database.vue";
 
 
@@ -21,8 +19,8 @@ import Database from "@/views/Database.vue";
 export const staticRoutes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'Main',
+    // component: Home,
     children: [],
     meta: {
       icon: 'home-filled',
@@ -31,9 +29,19 @@ export const staticRoutes = [
     redirect: "/studio-main"
   },
   {
+    path: '/home',
+    name: 'Home',
+    component: () => import('@/views/Home.vue'),
+    children: [],
+    meta: {
+      icon: 'home-filled',
+      title: "Melody Studio"
+    },
+  },
+  {
     path: '/visualizer',
     name: 'Visualizer',
-    component: GridShow,
+    component: () => import("@/views/GridShow.vue"),
     children: [],
     meta: {
       icon: 'view'
@@ -113,65 +121,5 @@ export const staticRoutes = [
         }
       },
     ],
-  },
-  {
-    path: '/doc',
-    name: 'Documentations',
-    redirect: '/doc/doctext',
-    component: Wrapper,
-    meta: {
-      icon: 'document'
-    },
-
-    children: [
-      {
-        path: 'doctext',
-        name: 'Text',
-        component: Wrapper,
-        meta: {
-          icon: 'el-icon-s-data'
-        },
-        children: []
-        // children: [
-        //   {
-        //     path: 'doctxtooo',
-        //     name: '文本1',
-        //     component: Wrapper,
-        //     meta: {
-        //       icon: ''
-        //     },
-        //     children: [
-        //       {
-        //         path: 'docimg1',
-        //         name: '文本内容',
-        //         component: Image,
-        //         children: [],
-        //         meta: {
-        //           icon: ''
-        //         }
-        //       }
-        //     ]
-        //   },
-        //   {
-        //     path: 'doctxtiii',
-        //     name: '文本2',
-        //     component: Document,
-        //     children: [],
-        //     meta: {
-        //       icon: ''
-        //     }
-        //   }
-        // ]
-      },
-      // {
-      //   path: 'docimg',
-      //   name: '图像',
-      //   component: Image,
-      //   children: [],
-      //   meta: {
-      //     icon: 'el-icon-camera'
-      //   }
-      // }
-    ]
   },
 ];

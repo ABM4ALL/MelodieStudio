@@ -1,6 +1,8 @@
 import * as echarts from "echarts";
 export enum CHART_TYPES {
     LINE_CHART = "lineChart",
+    BAR_CHART = 'bar',
+    PIE_CHART = 'pie'
 }
 const COLORS = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'];
 
@@ -19,6 +21,7 @@ export interface SingleSeriesConfig {
     seriesName: string;
     data: number[];
     latest_data: number;
+    type: "line" | "pie" | "bar"
 }
 // {<chartName>: [{name: series1}, {name: series2}]}
 export interface SeriesConfig {
@@ -41,6 +44,7 @@ export const generateLineSeriesGeneralOption = (name: string): echarts.LineSerie
         name: name,
         data: [],
         type: "line",
+        // type: "bar",
         smooth: true,
 
         lineStyle: {

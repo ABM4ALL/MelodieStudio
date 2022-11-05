@@ -29,5 +29,6 @@ __pycache__
 *.pyc
 *.sqlite
 MelodieStudio/static
+MelodieStudio.egg-info
 .history
 .pytest_cache

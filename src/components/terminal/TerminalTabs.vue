@@ -36,7 +36,7 @@ import { registerOnRunCommandRequest } from "../events/globalevents";
 import { addOnMessageHandler } from "@/api/ws";
 import store from "@/store";
 import { TerminalType } from "@/models/models";
-import { formatTerminalCommand, getSystemTerminal } from "./terminal_utils";
+import { formatTerminalCommand, generateChdirCommand, getSystemTerminal } from "./terminal_utils";
 
 export default defineComponent({
   components: { TerminalView, IconButton },
@@ -101,7 +101,7 @@ export default defineComponent({
         return;
       }
       createPTY(
-        formatTerminalCommand( `cd ${(store.state as any).controls.cwd} &&` + cmd),
+        formatTerminalCommand(generateChdirCommand((store.state as any).controls.cwd) +` &&` + cmd),
         termName
       )
         .then((terminal: TerminalType) => {

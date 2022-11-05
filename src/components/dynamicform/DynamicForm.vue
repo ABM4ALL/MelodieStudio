@@ -1,57 +1,33 @@
 <template>
-  <div style="width: 300px">
-    <div
-      class="slider-demo-block"
-      v-for="(item, index) in inputModels"
-      :key="index"
-    >
-      <span class="demonstration">{{ item.name }}</span>
-      <el-slider
-        v-model="inputValues[item.name].value"
-        v-if="item.type === 'number'"
-        :min="item.min"
-        :max="item.max"
-        :step="item.step"
-        @change="onSliderMove"
-      ></el-slider>
-      <div v-if="item.type === 'selection'">
-        <el-select
-          v-model="inputValues[item.name].value"
-          placeholder="Select"
-          v-if="item.selections.length > 3"
-        >
-          <el-option
-            v-for="item in item.selections"
-            :key="item"
-            :label="item"
-            :value="item"
-          >
-          </el-option>
-        </el-select>
-        <el-radio-group v-model="inputValues[item.name].value" v-else>
-          <el-radio
-            :label="selection"
-            v-for="(selection, i) in item.selections"
-            :key="i"
-            >{{ selection }}</el-radio
-          >
-        </el-radio-group>
-      </div>
-      <div v-if="item.type === 'boolean'">
-        <el-switch v-model="inputValues[item.name].value"></el-switch>
-      </div>
+  <drag-container :slotComponentID="'visualizer-' + item.name" class="slider-demo-block" v-for="(item, index) in inputModels"
+    :key="index">
+
+    <span class="demonstration">{{ item.name }}</span>
+    <el-slider v-model="inputValues[item.name].value" v-if="item.type === 'number'" :min="item.min" :max="item.max"
+      :step="item.step" @change="onSliderMove"></el-slider>
+    <div v-if="item.type === 'selection'">
+      <el-select v-model="inputValues[item.name].value" placeholder="Select" v-if="item.selections.length > 3">
+        <el-option v-for="item in item.selections" :key="item" :label="item" :value="item">
+        </el-option>
+      </el-select>
+      <el-radio-group v-model="inputValues[item.name].value" v-else>
+        <el-radio :label="selection" v-for="(selection, i) in item.selections" :key="i">{{ selection }}</el-radio>
+      </el-radio-group>
     </div>
-    <el-alert
-      v-if="paramsModified"
-      type="error"
-      :closable="false"
-      title="Warning: Parameters has changed, please reset the model."
-    >
+    <div v-if="item.type === 'boolean'">
+      <el-switch v-model="inputValues[item.name].value"></el-switch>
+    </div>
+
+    <el-alert v-if="paramsModified" type="error" :closable="false"
+      title="Warning: Parameters has changed, please reset the model.">
     </el-alert>
-  </div>
+    <!-- </div> -->
+  </drag-container>
 </template>
 
 <script lang="ts">
+
+import DragContainer from "@/components/basic/DragContainer.vue";
 import { ref, defineComponent, PropType } from "vue";
 
 export interface ParamType {
@@ -82,6 +58,7 @@ export interface ParamsData {
 }
 
 export default defineComponent({
+  components: { DragContainer },
   props: {
     interactiveParams: Object as PropType<ParamsData>,
     paramsModified: Boolean as PropType<boolean>,

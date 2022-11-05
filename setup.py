@@ -1,3 +1,4 @@
+from distutils.command.install import INSTALL_SCHEMES
 import json
 import os
 import platform
@@ -19,6 +20,22 @@ if "update_interfaces" in sys.argv:
 
 if os.path.exists("build"):
     shutil.rmtree("build")
+
+INSTALL_REQUIRES = [
+    "chardet",
+    "websockets",
+    "sqlalchemy",
+    "flask",
+    "flask_cors",
+    "astunparse",
+    "pprintast",
+    "watchdog",
+    "flask_sock",
+    "py_ts_interfaces",
+    "jedi",
+    "rpyc",
+    "pywinpty; os_name=='nt'",
+]
 setuptools.setup(
     name="MelodieStudio",
     version="0.3.0",
@@ -45,24 +62,8 @@ setuptools.setup(
     packages=setuptools.find_namespace_packages(
         include=["MelodieStudio", "MelodieStudio.*"]
     ),
-    install_requires=[
-        "chardet",
-        "websockets",
-        "sqlalchemy",
-        "flask",
-        "flask_cors",
-        "astunparse",
-        "pprintast",
-        "watchdog",
-        "flask_sock",
-        "py_ts_interfaces",
-        "jedi",
-        "rpyc",
-    ]
-    + ["pywinpty"]
-    if is_windows()
-    else [],
-    python_requires=">=3.5",
+    install_requires=INSTALL_REQUIRES,
+    python_requires=">3.5",
     entry_points={"console_scripts": ["Melodie=Melodie.scripts.scripts:cli"]},
     include_package_data=True,
 )

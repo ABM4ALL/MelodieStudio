@@ -6,21 +6,13 @@
 }
 </style>
 <template>
-  <div
-    class="container"
-    @mousemove="onMouseMove"
-    @mouseout="onMouseOut"
-    @mousedown="onMouseDown"
-    @mouseup="onMouseUp"
+  <div class="container" @mousemove="onMouseMove" @mouseout="onMouseOut" @mousedown="onMouseDown" @mouseup="onMouseUp"
     :style="{
       height: height + 'px',
       width: width + 'px',
       left: left + 'px',
       top: top + 'px',
-    }"
-    :id="chartDOMID"
-    ref="chart-container"
-  >
+    }" :id="chartDOMID" ref="chart-container">
     <slot></slot>
   </div>
 </template>
@@ -191,7 +183,7 @@ export default defineComponent({
       } else {
         container!.style.cursor = "default";
       }
-      if (evt.buttons === 1) {
+      if (evt.buttons === 1 && (evt.ctrlKey || evt.metaKey)) {
         let container = this.$refs["chart-container"] as any;
         if (container == null) {
           console.error("container undefined");

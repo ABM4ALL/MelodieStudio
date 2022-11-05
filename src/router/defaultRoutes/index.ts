@@ -15,6 +15,13 @@ const defaultRoutes: any = [
     // meta: {
     //   activePath: '/'  // 打开非Menu页面选择当前激活menu
     // }
+  },{
+    path: "/full-page-visualizer",
+    name: "full-page-visualizer",
+    component:  () => import('@/views/GridShow.vue'),
+    // meta: {
+    //   activePath: '/'  // 打开非Menu页面选择当前激活menu
+    // }
   },
   {
     path: '/:pathMatch(.*)*',

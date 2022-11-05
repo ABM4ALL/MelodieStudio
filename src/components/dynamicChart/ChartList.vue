@@ -1,22 +1,23 @@
 <template>
-  <el-row>
-    <incremental-line-chart
-      :externalConfig="config"
-      v-for="(seriesConf, key) in seriesConfig"
-      :key="key"
-      :chartName="key"
-      :ref="key"
-      :seriesConfig="seriesConf.series"
-    ></incremental-line-chart>
+  <el-row v-for="(seriesConf, key) in seriesConfig" :key="key">
+    <incremental-line-chart :externalConfig="config" 
+      :chartName="key" :ref="key" :seriesConfig="seriesConf.series" v-if="seriesConf.type=='line'">
+    </incremental-line-chart>
+    <pie-chart  :chartName="key" :ref="key" :seriesConfig="seriesConf.series" v-if="seriesConf.type=='pie'">
+    
+    </pie-chart>
+    <bar-chart :chartName="key" :ref="key" :seriesConfig="seriesConf.series" v-if="seriesConf.type=='bar'"></bar-chart>
   </el-row>
 </template>
 
 <script lang="ts">
 import IncrementalLineChart from "@/components/dynamicChart/IncrementalLineChart.vue";
+import PieChart from "@/components/dynamicChart/PieChart.vue"
+import BarChart from "@/components/dynamicChart/BarChart.vue"
 import { defineComponent, PropType } from "@vue/runtime-core";
 import { SeriesConfig, IncrementalData } from "./chartutils";
 export default defineComponent({
-  components: { IncrementalLineChart },
+  components: { IncrementalLineChart, PieChart, BarChart },
   props: {
     seriesConfig: {
       type: Object as PropType<SeriesConfig>,
@@ -97,4 +98,5 @@ export default defineComponent({
 </script>
 
 <style>
+
 </style>

@@ -2,10 +2,10 @@ import { ChartPolicies } from "@/components/dynamicChart/chartutils";
 import { LayoutManager } from "@/components/basic/dragcontainers";
 import request from "@/request";
 import { EChartsCoreOption } from "echarts";
-export const getChartInitialOptions = async (chartName: string): Promise<echarts.EChartsCoreOption | null> => {
+export const getChartInitialOptions = async (chartName: string): Promise<echarts.EChartsOption | null> => {
     const resp = await request.get("/api/charts/chartOptions", { chartName });
     if (resp.status === 0) {
-        return resp.data as EChartsCoreOption;
+        return resp.data as echarts.EChartsOption;
     } else {
         console.error(resp.msg);
         return null;

@@ -48,7 +48,18 @@ class MelodiePTY:
             self.create_on_windows()
         else:
             self.create_on_nix()
-        # self.write(f'cd {get_workdir()}')
+        if isinstance(command, str) and command in {'cmd', "bash"}:
+            if is_windows():
+                cwd_disk_sym = os.getcwd().lower().replace("\\", "/").split('/')[0]
+                wd_disk_sym = get_workdir().lower().replace("\\", "/").split("/")[0]
+                print(cwd_disk_sym, wd_disk_sym)
+                if cwd_disk_sym!=wd_disk_sym:
+                    self.write(f'cd /d {get_workdir()} \r\n')
+                    return
+                else:
+                    self.write(f'cd {get_workdir()}\r\n')
+                    return
+            self.write(f'cd {get_workdir()}\n')
 
     def to_dict(self):
         return {

@@ -20,12 +20,10 @@ import { requestAutoComplete } from "@/api/tools";
 import { readFile } from "@/utils/utils";
 import { ElNotification } from "element-plus";
 import { getFile, writeFile } from "@/api/fs";
-// import { StateEffect } from "@codemirror/state";
 import { Compartment } from "@codemirror/state";
-const comphandler = new CompletionHandler();
 import { keymap } from "@codemirror/view";
 
-import { cursorTooltip, wordHover, wordHoverConstructor } from "./tooltip";
+import { wordHoverConstructor } from "./tooltip";
 
 
 
@@ -139,7 +137,7 @@ class CovidDataLoader(DataLoader):
       wordHoverConstructor(this)
     ];
     this.extensions = extensions;
-    
+
     if (this.file != null) {
       getFile(this.file).then((resp: string) => {
         if (resp != null) {

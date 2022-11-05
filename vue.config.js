@@ -29,7 +29,7 @@ module.exports = {
         module: {
         },
         plugins: [
-            
+        //   new BundleAnalyzerPlugin()
         ]
     },
     css: {
