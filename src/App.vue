@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <router-view v-if="$route.path === '/studio-main' || $route.path === '/full-page-visualizer' || $route.path ==='/'" ></router-view>
+  <div style="height: 100vh; width: 100vw">
+    <router-view v-if="$route.path === '/studio-main' || $route.path === '/full-page-visualizer' || $route.path === '/'">
+    </router-view>
     <layout v-else></layout>
   </div>
 </template>
@@ -22,6 +23,22 @@ export default {
   },
 };
 </script>
+<style>
+#app {
+  height: 100vh;
+}
+
+html {
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+}
+
+body {
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+}
+</style>
+
 <style lang="less">
 @import "@/style/variable.less";
 
@@ -40,5 +57,7 @@ body {
     background: @menuActiveText; // button 主题色保持一致
     border-color: @menuActiveText;
   }
+
+
 }
 </style>

@@ -28,3 +28,7 @@ export function copyToClip(content: string) {
     document.body.removeChild(aux);
 
 }
+
+export const deepCopy = <T>(obj): T => {
+    return JSON.parse(JSON.stringify(obj))
+}

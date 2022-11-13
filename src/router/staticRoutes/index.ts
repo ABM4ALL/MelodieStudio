@@ -1,6 +1,6 @@
 import Wrapper from '@/layout/components/Wrapper/index.vue';
 import Database from "@/views/Database.vue";
-
+// import DynamicFormNew from 
 
 /**
  * 
@@ -77,6 +77,18 @@ export const staticRoutes = [
         path: 'dbBrowser',
         name: 'DB Browser',
         component: Database,
+        children: [],
+        meta: {
+          icon: 'coin',
+          keepAlive: true
+        }
+      }, 
+      {
+        path: 'form-demo',
+        name: 'Form demo',
+        // eslint-disable-next-line
+        // @ts-ignore
+        component: () => import("@/components/dynamicform/DynamicFormNew.vue"),
         children: [],
         meta: {
           icon: 'coin',

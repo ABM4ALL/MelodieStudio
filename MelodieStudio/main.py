@@ -1,5 +1,5 @@
 import logging
-import os.path
+import os
 import time
 from typing import TYPE_CHECKING
 import argparse
@@ -72,6 +72,7 @@ def studio_main(config: "Config" = None):
         wd = os.getcwd()
     else:
         wd = args.workdir
+        wd = os.path.abspath(wd)
         assert os.path.exists(wd), FileNotFoundError(f"Workdir {wd} not found!")
     set_workdir(wd)
     if config is None:

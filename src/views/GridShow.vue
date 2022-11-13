@@ -1,39 +1,42 @@
+<style scoped>
+.params-area {
+  max-height: calc(100vh - 50px - 20px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  max-width: calc(var(--form-width) + 1vw);
+  --form-width: 22vw;
+  --label-width: 12vw;
+}
+
+.widgets-area{
+  position: relative;
+  flex-grow: 1;
+  overflow: scroll;
+}
+</style>
 <template>
-  <div style="position: relative; height: 100%">
-    <toolbar
-      @reset="reset"
-      @step="step"
-      @loop="loop"
-      @pause="pause"
-      @fps-limit-change="fpsLimit = $event"
-      :currentStep="currentStep"
-      :connected="connected"
-    ></toolbar>
-    <div style="position: relative; overflow: scroll; height: 100%">
-      <dynamic-form
-        :interactiveParams="interactiveParams"
-        @param-changed="paramChanged"
-        :paramsModified="paramsModified"
-      ></dynamic-form>
-      <el-row>
-        <grid-component
-          :ref="`grid-visualizer-new-${i}`"
-          v-for="(_item, i) in visualizers"
-          :key="i"
-          :name="_item.name"
-          :visualizerIndex="i"
-          :visualizerData="visualizerData[_item.name]"
-          :desiredFPS="fpsLimit"
-          :columns="_item.columns"
-          :rows="_item.rows"
-        >
+  <div
+    style="position: relative; height: 100%; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box;">
+    <toolbar @reset="reset" @step="step" @loop="loop" @pause="pause" @fps-limit-change="fpsLimit = $event"
+      :currentStep="currentStep" :connected="connected"></toolbar>
+    <div style="position: relative; flex-grow: 1; display: flex; flex-direction: row;">
+      <div class="params-area">
+        <params-selector @load-params="onLoadParams" @export-database="onDownloadDatabase" @save-params="onSaveParams"
+          @save-database="onSaveDatabase" :param-sets="interactiveParams.allParamSetNames">
+        </params-selector>
+        <dynamic-form ref="dynamic-form"></dynamic-form>
+      </div>
+      <div class="widgets-area">
+        <grid-component :ref="`grid-visualizer-new-${i}`" v-for="(_item, i) in visualizers" :key="i" :name="_item.name"
+          :visualizerIndex="i" :visualizerData="visualizerData[_item.name]" :desiredFPS="fpsLimit"
+          :columns="_item.columns" :rows="_item.rows">
         </grid-component>
-      </el-row>
-      <chart-list
-        :seriesConfig="seriesConfig"
-        ref="chartList"
-        :style="{ position: 'absolute' }"
-      ></chart-list>
+        <!-- </el-row> -->
+        <chart-list :seriesConfig="seriesConfig" ref="chartList" :style="{ position: 'absolute' }"></chart-list>
+      </div>
+      <!-- <el-row> -->
+
     </div>
   </div>
 </template>
@@ -42,10 +45,9 @@
 import { defineComponent, nextTick } from "vue";
 import * as echarts from "echarts";
 import "echarts-gl";
-import DynamicForm, {
-  ParamType,
-  ParamsData,
-} from "@/components/dynamicform/DynamicForm.vue";
+
+import DynamicForm from "@/components/dynamicform/DynamicFormNew.vue";
+
 import { getContainersLayout } from "@/components/basic/dragcontainers";
 import BaseVisualizer from "../components/visualizer/BaseVisualizerComponent.vue";
 import ChartList from "@/components/dynamicChart/ChartList.vue";
@@ -53,7 +55,8 @@ import GridVisualizer from "@/components/visualizer/GridVisualizer.vue";
 import Toolbar from "@/components/visualizer/Toolbar.vue";
 import GridComponent from "@/components/visualizer/GridComponent.vue";
 import { GridItem } from "@/models/agents";
-import { NewVisualizerData } from "@/models/visualizerbasics";
+import { COMMANDS, NewVisualizerData } from "@/models/visualizerbasics";
+import ParamsSelector from "@/components/visualizer/ParamsSelector.vue"
 export default defineComponent({
   extends: BaseVisualizer,
   components: {
@@ -61,6 +64,7 @@ export default defineComponent({
     ChartList,
     Toolbar,
     GridComponent,
+    ParamsSelector
   },
   name: "hello",
   data() {
@@ -116,6 +120,19 @@ export default defineComponent({
     sendCommand(cmd: number, data: any): void {
       this.$ws.send(JSON.stringify({ cmd: cmd, data: data }));
     },
+    onSaveParams(paramSetName: string): void {
+      this.$ws.send(JSON.stringify({ cmd: COMMANDS.SAVE_PARAMS, data: { name: paramSetName, params: (this.$refs['dynamic-form'] as any).getValues() } }));
+    },
+    onLoadParams(paramSetName: string): void {
+      this.$ws.send(JSON.stringify({ cmd: COMMANDS.GET_PARAMS, data: { name: paramSetName } }));
+    },
+    onSaveDatabase(databaseName: string): void {
+      this.$ws.send(JSON.stringify({ cmd: COMMANDS.SAVE_DATA, data: { name: databaseName } }));
+    },
+    onDownloadDatabase(exportedName: string): void {
+      this.$ws.send(JSON.stringify({ cmd: COMMANDS.DOWNLOAD_DATA, data: { name: exportedName } }));
+    }
+
   },
 });
 </script>

@@ -28,7 +28,12 @@ export enum COMMANDS {
     START = 3,
     GET_PARAMS = 4,
     SET_PARAMS = 5,
-    INIT_OPTIONS = 6
+    INIT_OPTIONS = 6,
+    SAVE_PARAMS = 7,
+    // LOAD_PARAMS = 8,
+    SAVE_DATA = 8,
+    DOWNLOAD_DATA = 9,
+    // GENERAL_COMMAND = 10
 }
 
 export type StatusType = number;
@@ -71,12 +76,24 @@ export interface GridVisComponentViewInitialOptions extends VisComponentViewInit
     rows: number
 }
 
+export interface NotificationModel {
+    title: string
+    type: "error" | "info" | "warning" | "success"
+    message: string
+}
+
+export interface FileModel {
+    name: string
+    content: string // base64 content
+    // data: any
+}
+
 export type VisualizeViewInitialOption = GridVisComponentViewInitialOptions
 
 export interface VisData {
     type: string;
     period: number;
-    data: VisualizerData | ParamsData | SeriesConfig;
+    data: VisualizerData | ParamsData | SeriesConfig | NotificationModel | FileModel;
     modelState: ModelStateType;
     status: StatusType;
 }

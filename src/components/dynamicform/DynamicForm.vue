@@ -55,6 +55,7 @@ export interface InitialParams {
 export interface ParamsData {
   paramModels: Array<ParamType | NumberParamType | SelectionParamType>;
   initialParams: InitialParams;
+  allParamSetNames: string[]
 }
 
 export default defineComponent({

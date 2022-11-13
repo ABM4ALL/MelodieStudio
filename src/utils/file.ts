@@ -91,3 +91,31 @@ export function downloadImage(id: string, name: string) {
   };
   image.src = (document.getElementById(id) as HTMLImageElement).src;
 }
+
+//下载base64文件
+function dataURLtoBlob(dataurl, name) {//name:文件名
+  const mime = name.substring(name.lastIndexOf('.') + 1)//后缀名
+  const bstr = window.atob(dataurl)
+  let n = bstr.length
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+
+function downloadSomeFile(url: string, name: string) {
+  const a = document.createElement("a")//创建a标签触发点击下载
+  a.setAttribute("href", url)//附上
+  a.setAttribute("download", name)
+  a.setAttribute("target", "_blank")
+  let clickEvent = document.createEvent("MouseEvents");
+  clickEvent.initEvent("click", true, true);
+  a.dispatchEvent(clickEvent);
+}
+//主函数
+export function downloadFileByBase64(name: string, base64: string) {
+  const myBlob = dataURLtoBlob(base64, name)
+  const myUrl = URL.createObjectURL(myBlob)
+  downloadSomeFile(myUrl, name)
+}

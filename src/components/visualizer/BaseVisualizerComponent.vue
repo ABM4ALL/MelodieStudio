@@ -8,6 +8,8 @@ import {
   CommandParams,
   COMMANDS,
   DRAWING_MODES,
+  FileModel,
+  NotificationModel,
   STATES,
   VisData,
   VisualizerData,
@@ -20,6 +22,8 @@ import {
   SeriesConfig,
 } from "@/components/dynamicChart/chartutils";
 import { GridItem } from "@/models/agents";
+import { ElNotification } from "element-plus";
+import { downloadFile, downloadFileByBase64 } from "@/utils/file";
 export default defineComponent({
   data() {
     return {
@@ -45,16 +49,20 @@ export default defineComponent({
   methods: {
     updateParams(params: ParamsData) {
       this.interactiveParams = params;
+      console.log('pppppppp', (this.$refs['dynamic-form'] as any), params);
+      (this.$refs['dynamic-form'] as any).setupModels(params.paramModels);
+      (this.$refs['dynamic-form'] as any).setupValues(params.initialParams);
 
       this.$nextTick(() => {
         this.paramsModified = false;
       });
     },
-    paramChanged(params: InitialParams) {
-      this.paramValues = params;
-      this.paramsModified = true;
-    },
-    sendCommand(cmd: number, data: CommandParams): void {
+    // paramChanged(params: InitialParams) {
+    //   this.paramValues = params;
+    //   this.paramsModified = true;
+    //   // this.$refs['dynamic-form'].paramValues = 
+    // },
+    sendCommand(cmd: COMMANDS, data: CommandParams | any): void {
       this.$ws.send(JSON.stringify({ cmd: cmd, data: data }));
     },
     reconnect() {
@@ -75,7 +83,7 @@ export default defineComponent({
       this.$ws.onopen = () => {
         console.log("websocket ready!");
 
-        this.sendCommand(COMMANDS.GET_PARAMS, {});
+        this.sendCommand(COMMANDS.GET_PARAMS, { name: "" });
         this.sendCommand(COMMANDS.INIT_OPTIONS, {});
         this.sendCommand(COMMANDS.CURRENT_DATA, {});
         this.connected = true;
@@ -89,6 +97,16 @@ export default defineComponent({
         if (data.type === "params") {
           this.updateParams(data.data as ParamsData);
           return;
+        } else if (data.type == "notification") {
+          const notification = data.data as NotificationModel
+          ElNotification({ ...notification })
+          return
+        } else if (data.type == "file") {
+          const f = data.data as FileModel
+          // const file = new File()
+          // file.arrayBuffer
+          downloadFileByBase64(f.name, f.content)
+          // console.log(file)
         } else if (data.type === "initOption") {
           const visualizerIDs: VisualizeViewInitialOption[] = [];
           for (let i in data.data) {
@@ -176,8 +194,9 @@ export default defineComponent({
 
     reset() {
       this.sendCommand(COMMANDS.RESET, {
-        params: this.paramValues,
+        params: (this.$refs['dynamic-form'] as any).getValues(),
       });
+      (this.$refs['dynamic-form'] as any).setUnmodified()
       this.paramsModified = false;
       this.visualizationState = this.STATES.STEP;
       this.sendCommand(COMMANDS.CURRENT_DATA, {});
