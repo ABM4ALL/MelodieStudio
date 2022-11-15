@@ -3,9 +3,11 @@
     <router-view v-if="$route.path === '/studio-main' || $route.path === '/full-page-visualizer' || $route.path === '/'">
     </router-view>
     <layout v-else></layout>
+    <Drawer></Drawer>
   </div>
 </template>
 <script lang="ts">
+import Drawer from "@/layout/components/Drawer/index.vue"
 import layout from "@/layout/index.vue";
 import { getProjectMeta } from "@/api/fs";
 import store from "./store";
@@ -19,7 +21,8 @@ export default {
     return {};
   },
   components: {
-    layout
+    layout,
+    Drawer
   },
 };
 </script>

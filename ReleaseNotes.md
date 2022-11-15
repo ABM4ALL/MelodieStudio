@@ -11,6 +11,9 @@
 - Automatically add environment properties to visualizer.
 
 ## Version 0.4.0
+- Feature: Complexed tree parameters
+- Feature: Full paged visualizer for showing on the big screen
+- Feature: Router panel on the page
 - Bugfix: Fixed problem that dragging moves may also move charts in the same layer.
 
 ## Version 0.3.0

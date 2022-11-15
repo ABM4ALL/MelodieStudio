@@ -9,7 +9,7 @@
   --label-width: 12vw;
 }
 
-.widgets-area{
+.widgets-area {
   position: relative;
   flex-grow: 1;
   overflow: scroll;
@@ -57,6 +57,7 @@ import GridComponent from "@/components/visualizer/GridComponent.vue";
 import { GridItem } from "@/models/agents";
 import { COMMANDS, NewVisualizerData } from "@/models/visualizerbasics";
 import ParamsSelector from "@/components/visualizer/ParamsSelector.vue"
+import { ElNotification } from "element-plus";
 export default defineComponent({
   extends: BaseVisualizer,
   components: {
@@ -121,7 +122,13 @@ export default defineComponent({
       this.$ws.send(JSON.stringify({ cmd: cmd, data: data }));
     },
     onSaveParams(paramSetName: string): void {
-      this.$ws.send(JSON.stringify({ cmd: COMMANDS.SAVE_PARAMS, data: { name: paramSetName, params: (this.$refs['dynamic-form'] as any).getValues() } }));
+      if (this.interactiveParams.allParamSetNames.indexOf(paramSetName) < 0) {
+        this.$ws.send(JSON.stringify({ cmd: COMMANDS.SAVE_PARAMS, data: { name: paramSetName, params: (this.$refs['dynamic-form'] as any).getValues() } }));
+        this.interactiveParams.allParamSetNames.push(paramSetName)
+      } else {
+        ElNotification.error(`Duplicated parameter set name: ${paramSetName}`)
+      }
+
     },
     onLoadParams(paramSetName: string): void {
       this.$ws.send(JSON.stringify({ cmd: COMMANDS.GET_PARAMS, data: { name: paramSetName } }));

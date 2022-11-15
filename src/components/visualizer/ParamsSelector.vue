@@ -12,24 +12,25 @@
 </style>
 <template>
     <div>
-        <el-popover trigger="click" width="240">
+        <el-popover trigger="click" width="160">
             <template #reference>
-                <el-button>Parameter...</el-button>
+                <el-button>Scenario...</el-button>
             </template>
             <div class="popover-buttonlist">
-                <el-button @click="onSaveParams">Save as..</el-button>
-                <el-button @click="loadParamSetDialogShow = true">Load params...</el-button>
-                <el-button @click="onSaveData">Save simulation data as...</el-button>
-                <el-button @click="onDownloadDatabase">Export simulation data</el-button>
+                <el-button @click="onSaveParams">Save</el-button>
+                <el-button @click="loadParamSetDialogShow = true">Load</el-button>
+                <!-- <el-button @click="onSaveData">Save simulation data as...</el-button> -->
+                <!-- <el-button @click="onDownloadDatabase">Export</el-button> -->
             </div>
         </el-popover>
 
     </div>
-    <el-dialog v-model="loadParamSetDialogShow" :append-to-body="true">
+    <el-dialog v-model="loadParamSetDialogShow" :append-to-body="true" width="30vw">
         <div>
-            <div v-for="paramSetName in paramSets" :key="paramSetName">
+            <div v-for="paramSetName in paramSets" :key="paramSetName" style="display: flex; margin-top: 12px">
                 <span> {{ paramSetName }}</span>
-                <el-button @click="onLoadParams(paramSetName)"></el-button>
+                <div style="flex-grow: 1"></div>
+                <el-button @click="onLoadParams(paramSetName)" type="primary">Load</el-button>
             </div>
         </div>
     </el-dialog>

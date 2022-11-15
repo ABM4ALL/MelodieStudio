@@ -38,7 +38,7 @@ INSTALL_REQUIRES = [
 ]
 setuptools.setup(
     name="MelodieStudio",
-    version="0.3.0",
+    version="0.4.0",
     description="A web-based toolbox for Melodie package.",
     long_description="",
     long_description_content_type="text/markdown",

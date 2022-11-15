@@ -14,8 +14,6 @@
             <component :is="Component" />
             <!-- </keep-alive> -->
           </router-view>
-
-          <Drawer></Drawer>
         </el-main>
       </el-container>
     </el-container>
