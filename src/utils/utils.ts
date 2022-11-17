@@ -32,3 +32,20 @@ export function copyToClip(content: string) {
 export const deepCopy = <T>(obj): T => {
     return JSON.parse(JSON.stringify(obj))
 }
+
+export const eliminateFloatRoundoffError = (s: string) => {
+    if (s.indexOf('.') !== -1) {
+        const fractionalPart = s.split('.')[1]
+        if (fractionalPart.length > 10) {
+            const parsedVal = parseFloat(s).toFixed(10)
+            let indicator = parsedVal.length - 1
+            while (parsedVal.substring(indicator, indicator + 1) == '0') {
+                indicator -= 1
+            }
+            console.log(s, parsedVal.substring(0, indicator + 1))
+            return parsedVal.substring(0, indicator + 1)
+        }
+    }
+
+    return s
+}

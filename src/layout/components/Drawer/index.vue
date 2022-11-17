@@ -7,10 +7,16 @@
     </div>
     <el-drawer v-model="drawer" size="20%" :with-header="false">
       <div class="router-column">
-        <p>Click to go to ...</p>
+        <p>Melodie Router</p>
         <el-button @click="$router.push('/')">Composite Workspace</el-button>
         <el-button @click="$router.push('/full-page-visualizer')">Full page visualizer</el-button>
         <el-button @click="$router.push('/home')">Home</el-button>
+        <el-form>
+          <el-form-item label="Dev Mode">
+            <el-switch :model-value="store.state.status.developmentMode"
+              @update:modelValue="store.commit('SET_DEVELOPMENT_MODE', $event)"></el-switch>
+          </el-form-item>
+        </el-form>
       </div>
     </el-drawer>
   </div>
@@ -20,6 +26,7 @@ import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useTheme } from "@/composition/useThemeApi";
 import { Setting } from "@element-plus/icons-vue"
+import store from "@/store"
 export default {
   setup() {
     let drawer = ref(false);
@@ -57,6 +64,7 @@ export default {
       themeType,
       logout,
       Setting,
+      store
     };
   },
 };

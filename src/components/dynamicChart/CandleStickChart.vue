@@ -10,7 +10,6 @@
 }
 </style>
 <template>
-  <!-- <div class="linechartIncremental" ref="chart-container"> -->
   <drag-container class="linechartIncremental" @container-changed="onLayoutChanged"
     :slotComponentID="'chart-' + chartName">
     <chart-config @config-modified="onChartConfigModified" @delete-saved-option="onOptionDelete"
@@ -29,12 +28,11 @@ import { nanoid, random } from "nanoid";
 import {
   ChartPolicies,
   CHART_TYPES,
-  generateLineSeriesGeneralOption,
   SeriesConfig,
   SingleSeriesConfig,
   getChartPosTop,
 } from "./chartutils";
-import { createLinechartDefaultData } from "./defaultoptions";
+import { createCandleStickChartDefaultData } from "./defaultoptions";
 import * as echarts from "echarts";
 import "echarts-gl";
 
@@ -45,9 +43,6 @@ import {
   setChartInitialOptions,
 } from "@/api/chart";
 import DragContainer from "@/components/basic/DragContainer.vue";
-interface LineChartSeriesOption extends echarts.LineSeriesOption {
-  data: Array<Array<number>>;
-}
 
 export default defineComponent({
   emits: ["initialized"],
@@ -67,19 +62,25 @@ export default defineComponent({
     externalConfig: Object as PropType<any>,
   },
   data() {
-    const defaultOptions = createLinechartDefaultData(this.seriesConfig);
+    const defaultOptions = createCandleStickChartDefaultData();
     return {
       selectionItems: {} as any,
       unchangeableItems: {} as any,
       chartDOMID: nanoid(),
       currentStep: 0,
-      simulationData: defaultOptions.simulationData as {
-        series: echarts.LineSeriesOption[];
+      simulationData: {
+        xAxis: { data: [] },
+        series: [{ data: [] }]
+      } as {
+        xAxis: {
+          data: number[]
+        },
+        series: [{ data: number[][] }]
       },
       timer: undefined as number | undefined,
       needsRender: false,
       configDialogShow: false,
-      chartOption: defaultOptions.genericOption,
+      chartOption: defaultOptions as echarts.EChartsCoreOption,
     };
   },
   mounted() {
@@ -98,23 +99,18 @@ export default defineComponent({
           this.chartOption = chartNewOption;
         }
 
-        const simulationData: { series: echarts.LineSeriesOption[] } = {
-          series: [],
+        const simulationData: typeof this.simulationData = {
+          xAxis: { data: [] },
+          series: [{ data: [] }],
         };
-        this.seriesConfig.map((singleSeries: SingleSeriesConfig) => {
-          const newSeries: echarts.LineSeriesOption = {
-            data: [],
-            type: "line",
-            name: singleSeries.seriesName,
-          };
-          // initialize series data
-          for (let i = 0; i < singleSeries.data.length; i++) {
-            newSeries.data!.push([i + 1, (singleSeries.data as number[])[i]]);
-          }
-          simulationData.series.push(newSeries);
-        });
-
-        this.simulationData = simulationData;
+        const singleSeries = this.seriesConfig[0]
+        console.log('single-series', singleSeries)
+        for (let i = 0; i < singleSeries.data.length; i++) {
+          simulationData.xAxis.data.push(i + 1)
+          simulationData.series[0].data.push((singleSeries.data as number[][])[i])
+        }
+        // });
+        this.simulationData = simulationData
         this.needsRender = true;
         this.initChart();
         this.$chart.setOption(this.chartOption);
@@ -123,7 +119,7 @@ export default defineComponent({
           if (this.needsRender && !this.immediateRender) {
             this.renderChart();
           }
-        }, 300);
+        }, 500);
       }
     );
   },
@@ -141,46 +137,39 @@ export default defineComponent({
     async onOptionDelete(): Promise<void> {
       await deleteChartOptions(this.chartName);
 
-      const defaultOptions = createLinechartDefaultData(this.seriesConfig);
-      this.chartOption = defaultOptions.genericOption;
+      const defaultOptions = createCandleStickChartDefaultData();
+      this.chartOption = defaultOptions;
       this.$chart.setOption(this.chartOption);
-      this.$chart.setOption(this.simulationData);
+      // this.$chart.setOption(this.simulationData);
     },
     async addData(
       step: number,
-      values: { name: string; value: number }[]
+      values: { name: string; value: number[] }[]
     ): Promise<void> {
-      if (this.simulationData === undefined) {
-        console.error("this.simulationData undefined!");
-        return;
+      if (step == 0) {
+        return
       }
-      if (this.simulationData.series === undefined) {
-        console.error("series undefined!");
-        return;
-      }
-      if (this.simulationData.series.length <= 0) {
-        console.error("series length 0");
-        return;
-      }
-      for (let i = 0; i < values.length; i++) {
-        for (let j in values) {
-          if (values[j].name == this.simulationData.series[i].name) {
-            this.simulationData.series[i].data!.push([step, values[i].value]);
-          }
-        }
-      }
+      console.log('stepping!', step, values)
+      this.simulationData.xAxis.data.push(step)
+      this.simulationData.series[0].data.push(values[0].value);
+
       this.needsRender = true;
       this.currentStep += 1;
       console.log("data updated!");
     },
     clear() {
-      for (let i in this.simulationData.series) {
-        this.simulationData.series[i].data = [];
+      this.simulationData = {
+        xAxis: { data: [] },
+        series: [{ data: [] }]
       }
       this.currentStep = 0;
       this.needsRender = true;
+
     },
     renderChart() {
+      // this.$chart.clear();
+      console.log('pppppp', this.simulationData)
+      // this.$chart.setOption(this.chartOption);
       this.$chart.setOption(this.simulationData);
       this.$chart.setOption({
         toolbox: {

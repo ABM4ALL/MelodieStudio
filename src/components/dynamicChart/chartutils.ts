@@ -19,7 +19,7 @@ export interface ChartPolicies {
 
 export interface SingleSeriesConfig {
     seriesName: string;
-    data: number[];
+    data: number[] | number[][];
     latest_data: number;
     type: "line" | "pie" | "bar"
 }

@@ -1,9 +1,23 @@
 <template>
     <div class="dynamic-form-item">
         <div class="dynamic-form-content">
-            <span class="form-item-label">{{ label }}</span>
+            <div class="form-item-header">
+                <span class="form-item-label">{{ label }}</span>
+                <el-popover :show-after="500">
+                    <template #reference>
+                        <el-button :icon="Search" />
+                    </template>
+                    <div class="form-item-help">
+                        <span v-if="componentModel.description">Description: {{ componentModel.description }}</span>
+                        <span v-if="isNumericValue">Range: {{ numericValueRange }}</span>
+                    </div>
 
-            <el-input class="form-item-input" :model-value="modelValue" @update:model-value="onValueChange($event)">
+                </el-popover>
+            </div>
+
+            <el-input class="form-item-input" :model-value="formattedModelValue"
+                @update:model-value="onValueChange($event)">
+
             </el-input>
         </div>
         <div v-if="numericValueErrorMsg != ''" class="form-error-label">
@@ -14,9 +28,11 @@
 
 </template>
 <script lang="ts" setup>
+import { eliminateFloatRoundoffError } from "@/utils/utils"
 import { defineProps, PropType, defineEmits, computed } from "vue"
 import { ParamType } from "./DynamicForm.vue";
-import { ParamsType } from "./models";
+import { FloatParamType, IntParamType, ParamsType } from "./models";
+import { Search } from "@element-plus/icons-vue"
 const props = defineProps({
     label: {
         type: String,
@@ -37,6 +53,33 @@ const onValueChange = (evt: any) => {
 
     emits('update:model-value', evt)
 }
+
+// If the model value was float, float round off error might happen.
+// This method helps to eliminate the round off errors.
+const formattedModelValue = computed((): string => {
+    if (props.componentModel.type == 'float') {
+        const s = `${props.modelValue}`
+        return eliminateFloatRoundoffError(s)
+    } else {
+        return props.modelValue
+    }
+})
+
+const isNumericValue = computed((): boolean => {
+    return props.componentModel.type == 'float' || props.componentModel.type == 'int'
+})
+
+const numericValueRange = computed((): string => {
+    if (isNumericValue.value) {
+
+        const min = (props.componentModel as FloatParamType | IntParamType).min
+        const max = (props.componentModel as FloatParamType | IntParamType).max
+        return `[${min}, ${max}]`
+    } else {
+        return ''
+    }
+})
+
 const numericValueErrorMsg = computed((): string => {
     if (props.componentModel.type == "float" || props.componentModel.type == "int") {
         if (props.componentModel.min <= props.modelValue && props.modelValue <= props.componentModel.max) {
@@ -65,8 +108,20 @@ dynamic-form-content {
     min-width: var(--label-width);
 }
 
+.form-item-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 .form-item-input {
     margin-top: 4px;
+}
+
+.form-item-help {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .form-error-label {

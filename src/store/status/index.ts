@@ -4,17 +4,21 @@ export default {
         languageService: {
             busy: false,
             hint: LANGUAGE_SERVICE_IDLE
-        }
-
+        },
+        developmentMode: true
     },
     mutations: {
         SET_LANGUAGE_SERVICE_BUSY(state, jobdesc: string) {
             state.languageService.busy = true
             state.languageService.hint = jobdesc
         },
-        SET_LANGUAGE_SERVICE_IDLE(state){
-            state.languageService = {busy: false, hint: LANGUAGE_SERVICE_IDLE}
+        SET_LANGUAGE_SERVICE_IDLE(state) {
+            state.languageService = { busy: false, hint: LANGUAGE_SERVICE_IDLE }
+        },
+        SET_DEVELOPMENT_MODE(state, mode: boolean) {
+            state.developmentMode = mode
         }
+
     },
     actions: {
     },

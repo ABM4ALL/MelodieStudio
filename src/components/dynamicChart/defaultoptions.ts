@@ -62,6 +62,45 @@ export const createLinechartDefaultData = (seriesNames: SingleSeriesConfig[]): {
     return { genericOption: option, simulationData: simulationData };
 };
 
+
+export const createCandleStickChartDefaultData = () => {
+    return {
+        forceUpdate: false,
+        updatedAt: new Date(),
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            top: "10%",
+            containLabel: true
+        },
+        title: {
+            text: "Line Chart",
+            subtext: "",
+        },
+        xAxis: {
+            data: []
+        },
+        yAxis: {},
+        series: [
+            {
+                type: 'candlestick',
+                data: [
+                ]
+            }
+        ],
+        legend: {
+            data: null,
+            orient: "horizontal",
+            show: true,
+        },
+        textStyle: {
+            color: "#000000",
+        },
+
+    }
+}
+
 export const createBarChartDefaultData = () => {
     return {
         title: {

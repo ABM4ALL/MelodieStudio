@@ -16,7 +16,8 @@ export interface ParamType {
     type: PyTypes;
     label: string;
     component: string;
-    readonly: boolean
+    readonly: boolean;
+    description: string
 }
 
 export interface IntParamType extends ParamType {
