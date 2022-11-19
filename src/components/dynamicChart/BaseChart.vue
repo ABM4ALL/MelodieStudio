@@ -1,5 +1,4 @@
 <script lang="ts">
-import ChartConfig from "./ChartConfig.vue";
 import { defineComponent, PropType } from "vue";
 import { nanoid } from "nanoid";
 import {
@@ -17,10 +16,6 @@ import {
     getChartPolicies,
     setChartInitialOptions,
 } from "@/api/chart";
-import DragContainer from "@/components/basic/DragContainer.vue";
-interface LineChartSeriesOption extends echarts.LineSeriesOption {
-    data: Array<Array<number>>;
-}
 
 export default defineComponent({
     emits: ["initialized"],

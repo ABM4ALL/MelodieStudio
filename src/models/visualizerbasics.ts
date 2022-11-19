@@ -1,8 +1,7 @@
-import DynamicForm, {
-    ParamType,
+import  {
     ParamsData,
     InitialParams
-} from "@/components/dynamicform/DynamicForm.vue";
+} from "@/components/dynamicform/models";
 import { SeriesModel } from "echarts";
 import { IncrementalData, SeriesConfig } from "../components/dynamicChart/chartutils";
 import { GridItem } from "./agents";

@@ -1,6 +1,7 @@
 <template>
   <div style="height: 100vh; width: 100vw">
-    <router-view v-if="$route.path === '/studio-main' || $route.path === '/full-page-visualizer' || $route.path === '/'">
+    <router-view
+      v-if="$route.path === '/studio-main' || $route.path === '/full-page-visualizer' || $route.path === '/' || $route.path === '/welcome'">
     </router-view>
     <layout v-else></layout>
     <Drawer></Drawer>

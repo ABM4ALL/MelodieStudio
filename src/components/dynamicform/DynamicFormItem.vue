@@ -3,7 +3,7 @@
         <div class="dynamic-form-content">
             <div class="form-item-header">
                 
-                <el-popover :show-after="500">
+                <el-popover :show-after="500" :width="300">
                     <template #reference>
                         <span class="form-item-label">{{ label }}</span>
                     </template>
@@ -31,10 +31,8 @@
 </template>
 <script lang="ts" setup>
 import { eliminateFloatRoundoffError } from "@/utils/utils"
-import { defineProps, PropType, defineEmits, computed, watch, onBeforeMount, ref, defineExpose } from "vue"
-import { ParamType } from "./DynamicForm.vue";
+import { defineProps, PropType, defineEmits, computed, onBeforeMount, ref, defineExpose } from "vue"
 import { FloatParamType, IntParamType, ParamsType } from "./models";
-import { Search } from "@element-plus/icons-vue"
 const props = defineProps({
     label: {
         type: String,
@@ -82,6 +80,7 @@ const numericValueRange = computed((): string => {
     }
 })
 
+// Check range for numeric values (int and float).
 const numericValueErrorMsg = computed((): string => {
     if (props.componentModel.type == "float" || props.componentModel.type == "int") {
         if (props.componentModel.min <= props.modelValue && props.modelValue <= props.componentModel.max) {

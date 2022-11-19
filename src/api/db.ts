@@ -3,7 +3,7 @@ import { ElMessage } from "element-plus";
 import { DataResponse, QueriedData } from "@/models/data_mani"
 export interface DBMeta {
     type: "sqlite"
-    sql?: string // sql to execute
+    sql?: string
 }
 
 export interface SQLiteMeta extends DBMeta {

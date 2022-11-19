@@ -11,6 +11,7 @@ import time
 from flask import Blueprint, request
 from .messages import Response
 from ..utils.config_manager import get_workdir
+
 file_system = Blueprint("fs", __name__)
 
 
@@ -32,8 +33,7 @@ def get_all_file_items(directory: str, one_layer=False):
                 )
             for file in files:
                 got_files.append(
-                    {"name": file, "type": "file",
-                        "absPath": os.path.join(root, file)}
+                    {"name": file, "type": "file", "absPath": os.path.join(root, file)}
                 )
         got_dirs.sort(key=lambda item: item["name"])
         got_files.sort(key=lambda item: item["name"])
@@ -83,8 +83,7 @@ def go_to_parent():
         directory = os.path.join(os.path.expanduser("~"), "Desktop")
     directory = os.path.dirname(directory)
     return Response.ok(
-        {"currentDirectory": directory,
-            "fsItemsList": get_all_file_items(directory)}
+        {"currentDirectory": directory, "fsItemsList": get_all_file_items(directory)}
     )
 
 
@@ -96,8 +95,7 @@ def go_to_sub():
         directory = os.path.join(os.path.expanduser("~"), "Desktop")
     directory = os.path.join(directory, subdir)
     return Response.ok(
-        {"currentDirectory": directory,
-            "fsItemsList": get_all_file_items(directory)}
+        {"currentDirectory": directory, "fsItemsList": get_all_file_items(directory)}
     )
 
 

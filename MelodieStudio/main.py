@@ -89,5 +89,4 @@ def studio_main(config: "Config" = None):
     else:
         start_watch_fs(get_workdir(), create_runner)
     register_websocket_handlers(app)
-    # chart_handler_main()
     app.run(host="0.0.0.0", port=8089)

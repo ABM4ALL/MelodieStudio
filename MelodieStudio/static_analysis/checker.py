@@ -9,13 +9,13 @@ from typing import Optional, cast
 
 
 class ComponentTypes(Enum):
-    Agent = 'Agent'
-    Environment = 'Environment'
-    Scenario = 'Scenario'
+    Agent = "Agent"
+    Environment = "Environment"
+    Scenario = "Scenario"
 
 
 def find_class(name: str, file: str) -> tree.Class:
-    with open(file, 'r', encoding='utf-8', errors='replace') as f:
+    with open(file, "r", encoding="utf-8", errors="replace") as f:
         content = f.read()
         module = parso.parse(content)
         classdef: tree.Class
@@ -30,21 +30,25 @@ def find_class(name: str, file: str) -> tree.Class:
 class ParsoTreeVisitor:
     @staticmethod
     def visittype_simple_stmt(node: tree.PythonNode):
-        print('simple_stmt_visited', node)
+        print("simple_stmt_visited", node)
 
     @staticmethod
-    def visitcls_ExprStmt(node:tree.ExprStmt):
-        print('exprstmt', node, [ name.get_previous_sibling() for name in node.get_defined_names()])
+    def visitcls_ExprStmt(node: tree.ExprStmt):
+        print(
+            "exprstmt",
+            node,
+            [name.get_previous_sibling() for name in node.get_defined_names()],
+        )
 
     @staticmethod
     def visit(node: BaseNode):
         for child in node.children:
 
             cls_name = child.__class__.__name__
-            if hasattr(ParsoTreeVisitor, 'visittype_'+child.type):
-                getattr(ParsoTreeVisitor, 'visittype_'+child.type)(child)
-            elif hasattr(ParsoTreeVisitor, 'visitcls_'+cls_name):
-                getattr(ParsoTreeVisitor, 'visitcls_'+cls_name)(child)
+            if hasattr(ParsoTreeVisitor, "visittype_" + child.type):
+                getattr(ParsoTreeVisitor, "visittype_" + child.type)(child)
+            elif hasattr(ParsoTreeVisitor, "visitcls_" + cls_name):
+                getattr(ParsoTreeVisitor, "visitcls_" + cls_name)(child)
             if isinstance(child, Leaf):
                 continue
             else:

@@ -19,17 +19,29 @@
   <div
     style="position: relative; height: 100%; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box;">
     <toolbar @reset="reset" @step="step" @loop="loop" @pause="pause" @fps-limit-change="fpsLimit = $event"
-      :currentStep="currentStep" :connected="connected"></toolbar>
-    <div style="position: relative; flex-grow: 1; display: flex; flex-direction: row;">
-      <div class="params-area">
+      :currentStep="currentStep" :connected="connected">
+      <template v-slot:left-items>
         <params-selector @load-params="onLoadParams" @export-database="onDownloadDatabase" @save-params="onSaveParams"
           @save-database="onSaveDatabase" :param-sets="interactiveParams.allParamSetNames">
         </params-selector>
+      </template>
+      <template v-slot:right-items>
+        <div>
+          Intro Page
+          <el-switch v-model="showHelpDoc"></el-switch>
+        </div>
+      </template>
+    </toolbar>
+
+    <div style="position: relative; flex-grow: 1; display: flex; flex-direction: row;">
+      <div class="params-area">
+
         <dynamic-form ref="dynamic-form"></dynamic-form>
       </div>
+
       <div class="widgets-area">
-        <markdown-viewer style="width:100%; height:100%" v-show="currentStep == 0"></markdown-viewer>
-        <div v-show="currentStep > 0" style="width:100%; height:100%">
+        <markdown-viewer style="width:100%; height:100%" v-show="showHelpDoc"></markdown-viewer>
+        <div style="width:100%; height:100%" v-show="!showHelpDoc">
           <grid-component :ref="`grid-visualizer-new-${i}`" v-for="(_item, i) in visualizers" :key="i"
             :name="_item.name" :visualizerIndex="i" :visualizerData="visualizerData[_item.name]" :desiredFPS="fpsLimit"
             :columns="_item.columns" :rows="_item.rows">
@@ -50,7 +62,7 @@ import { defineComponent, nextTick } from "vue";
 import * as echarts from "echarts";
 import "echarts-gl";
 
-import DynamicForm from "@/components/dynamicform/DynamicFormNew.vue";
+import DynamicForm from "@/components/dynamicform/DynamicForm.vue";
 
 import { getContainersLayout } from "@/components/basic/dragcontainers";
 import BaseVisualizer from "../components/visualizer/BaseVisualizerComponent.vue";
@@ -61,8 +73,8 @@ import GridComponent from "@/components/visualizer/GridComponent.vue";
 import { GridItem } from "@/models/agents";
 import { COMMANDS, NewVisualizerData } from "@/models/visualizerbasics";
 import ParamsSelector from "@/components/visualizer/ParamsSelector.vue"
-import { ElNotification } from "element-plus";
 import MarkdownViewer from "@/components/markdown-viewer/MarkdownViewer.vue"
+import { ElNotification } from "element-plus";
 export default defineComponent({
   extends: BaseVisualizer,
   components: {
@@ -76,6 +88,7 @@ export default defineComponent({
   name: "hello",
   data() {
     return {
+      showHelpDoc: true,
       visualizerData: {} as {
         [key: string]: {
           agents: GridItem[];
@@ -95,6 +108,9 @@ export default defineComponent({
     this.connect();
   },
   methods: {
+    onStep() {
+      this.showHelpDoc = false
+    },
     getVisualizer(index: number): typeof GridVisualizer {
       const visualizers: any = this.$refs[`grid-visualizer-${index}`];
       if (visualizers == null) {
@@ -113,6 +129,7 @@ export default defineComponent({
     },
 
     async updateData(data: NewVisualizerData): Promise<void> {
+
       const t0 = Date.now();
       // if (this.visualizerData[data.name] == null) {
       this.visualizerData[data.name] = data;

@@ -45,3 +45,13 @@ export type BasicParamTypes = FloatParamType | IntParamType | ArrayParamsType
 
 export type ParamsType = BasicParamTypes
 export type ParamValuesType = Array<ParamValue>
+
+export interface InitialParams {
+    [key: string]: { value: number | string | boolean };
+}
+
+export interface ParamsData {
+    paramModels: ParamsType;
+    initialParams: InitialParams;
+    allParamSetNames: string[]
+}

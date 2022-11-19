@@ -1,6 +1,5 @@
 import { ElMessage } from "element-plus";
 import request from "@/request"
-import { MelodieNetwork } from "@/models/data_mani";
 
 export interface  NetworkMeta {
     path: string,

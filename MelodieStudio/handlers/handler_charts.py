@@ -5,6 +5,7 @@
 # @File: handler_charts.py
 import json
 import os.path
+from typing import Any, Dict, Tuple, Union
 
 from flask import Blueprint, request
 from ..utils.file_manager import JSONManager
@@ -17,9 +18,9 @@ charts = Blueprint("charts", __name__)
 @charts.route("getChartPolicies")
 def chart_policies():
     chart_type: str = request.args.get("chartType")
-    policies, err = JSONManager.from_file(
-        get_config_manager().chart_policies_file(), dict
-    )
+    t: Any = JSONManager.from_file(get_config_manager().chart_policies_file(), dict)
+    policies: Dict
+    policies, err = t
     if err is not None:
         return Response.error(err)
     if chart_type not in policies.keys():
@@ -31,9 +32,9 @@ def chart_policies():
 @charts.route("chartOptions")
 def chart_option():
     chart_name = request.args.get("chartName")
-    options, err = JSONManager.from_file(
-        get_config_manager().chart_style_config_file(), dict
-    )
+    t: Any = JSONManager.from_file(get_config_manager().chart_style_config_file(), dict)
+    options: Dict
+    options, err = t
     if err is not None:
         return Response.error(err)
     chart_options = options.get(chart_name)
@@ -45,9 +46,10 @@ def chart_option():
 
 @charts.route("deleteChartOptions", methods=["post"])
 def delete_chart_options():
-    options, err = JSONManager.from_file(
-        get_config_manager().chart_style_config_file(), dict
-    )
+
+    t: Any = JSONManager.from_file(get_config_manager().chart_style_config_file(), dict)
+    options: Dict
+    options, err = t
     if err is not None:
         return Response.error(err)
     data = json.loads(request.data)
@@ -73,8 +75,10 @@ def set_chart_option():
     :return:
     """
     style_config_file = get_config_manager().chart_style_config_file()
+    options: Dict
     if os.path.exists(style_config_file):
-        options, err = JSONManager.from_file(style_config_file, dict)
+        t: Any = JSONManager.from_file(style_config_file, dict)
+        options, err = t
         if err is not None:
             return Response.error(err)
     else:

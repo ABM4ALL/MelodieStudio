@@ -2,7 +2,7 @@
 import {
   InitialParams,
   ParamsData,
-} from "@/components/dynamicform/DynamicForm.vue";
+} from "@/components/dynamicform/models";
 import Vue, { defineComponent } from "vue";
 import {
   CommandParams,
@@ -23,7 +23,7 @@ import {
 } from "@/components/dynamicChart/chartutils";
 import { GridItem } from "@/models/agents";
 import { ElNotification } from "element-plus";
-import { downloadFile, downloadFileByBase64 } from "@/utils/file";
+import { downloadFileByBase64 } from "@/utils/file";
 export default defineComponent({
   data() {
     return {
@@ -77,6 +77,9 @@ export default defineComponent({
         }, 2000);
       }
     },
+    onStep() {
+      return
+    },
     connect() {
       this.$ws = new WebSocket("ws://127.0.0.1:8765");
       this.$ws.onopen = () => {
@@ -107,6 +110,7 @@ export default defineComponent({
           downloadFileByBase64(f.name, f.content)
           // console.log(file)
         } else if (data.type === "initOption") {
+
           const visualizerIDs: VisualizeViewInitialOption[] = [];
           for (let i in data.data) {
             visualizerIDs.push(data.data[i]);
@@ -124,7 +128,11 @@ export default defineComponent({
         } else if (data.type === "initPlotSeries") {
           this.seriesConfig = (data.data as any).charts as SeriesConfig;
         } else {
+
           this.currentStep = data.period;
+          if (this.currentStep > 0) {
+            this.onStep()
+          }
           // If status is OK, show data;
           // else show alert message!
           if (data.status === 0) {

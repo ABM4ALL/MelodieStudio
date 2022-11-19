@@ -11,7 +11,7 @@
         </table-viewer>
         <network-viewer v-as-editor v-if="file.type == 'network'" @unsaved="setUnsaved(file.absPath, $event)"
           :path="file.absPath"></network-viewer>
-        <grid-show v-if="file.type == 'visualizer'"></grid-show>
+        <visualizer v-if="file.type == 'visualizer'"></visualizer>
         <!-- <network-viewer
           v-as-editor
           v-if="file.type == 'network'"
@@ -28,7 +28,7 @@ import CythonEditor from "./CythonEditor2.vue";
 import DatabaseBrowser from "@/components/dbbrowser/DatabaseBrowser.vue";
 import TableViewer from "@/components/tableviewer/TableViewer.vue";
 import NetworkViewer from "@/components/network/NetworkViewerNew.vue";
-import GridShow from "@/views/GridShow.vue";
+import Visualizer from "@/views/Visualizer.vue";
 import { defineComponent, ref, defineExpose } from "vue";
 import { ElNotification } from "element-plus";
 import { baseName, getExt } from "@/utils/file";

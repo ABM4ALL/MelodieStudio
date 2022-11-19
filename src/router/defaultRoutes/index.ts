@@ -18,7 +18,14 @@ const defaultRoutes: any = [
   },{
     path: "/full-page-visualizer",
     name: "full-page-visualizer",
-    component:  () => import('@/views/GridShow.vue'),
+    component:  () => import('@/views/Visualizer.vue'),
+    // meta: {
+    //   activePath: '/'  // 打开非Menu页面选择当前激活menu
+    // }
+  },{
+    path: "/welcome",
+    name: "welcome",
+    component:  () => import('@/views/Welcome.vue'),
     // meta: {
     //   activePath: '/'  // 打开非Menu页面选择当前激活menu
     // }

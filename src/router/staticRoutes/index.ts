@@ -28,6 +28,7 @@ export const staticRoutes = [
     },
     redirect: "/studio-main"
   },
+ 
   {
     path: '/home',
     name: 'Home',
@@ -41,12 +42,12 @@ export const staticRoutes = [
   {
     path: '/visualizer',
     name: 'Visualizer',
-    component: () => import("@/views/GridShow.vue"),
+    component: () => import("@/views/Visualizer.vue"),
     children: [],
     meta: {
       icon: 'view'
     }
-  },
+  }, 
   {
     path: '/network',
     name: 'Network',
@@ -88,7 +89,7 @@ export const staticRoutes = [
         name: 'Form demo',
         // eslint-disable-next-line
         // @ts-ignore
-        component: () => import("@/components/dynamicform/DynamicFormNew.vue"),
+        component: () => import("@/components/dynamicform/DynamicForm.vue"),
         children: [],
         meta: {
           icon: 'coin',

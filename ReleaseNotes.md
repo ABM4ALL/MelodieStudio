@@ -9,6 +9,7 @@
 - Search key strings inside xlsx files
 - Grep the data structure and format the `DataFrameInfo` of table. Besides, some checks could be performed.
 - Automatically add environment properties to visualizer.
+- Echarts server-side configurable items
 
 ## Version 0.4.0
 - Feature: Complexed tree parameters

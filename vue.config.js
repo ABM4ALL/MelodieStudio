@@ -29,8 +29,47 @@ module.exports = {
         module: {
         },
         plugins: [
-        //   new BundleAnalyzerPlugin()
-        ]
+            //   new BundleAnalyzerPlugin()
+        ],
+        // entry: {
+        //     // 把公共代码放到 common 里
+        //     common: [`@/utils/index.js`],
+        //     main: `@/index.js`,
+        // },
+
+        
+        // optimization: {
+        //     // splitChunks 配置
+        //     splitChunks: {
+        //         cacheGroups: {
+        //             default: {
+        //                 name: 'vendor',
+        //                 // 把第三方库放到 vendor 里，包括 vue, vue-router, vuex 等
+        //                 // 因为他们都是从 node_modules 里加载的，这里直接正则匹配
+        //                 test: /[\\/]node_modules[\\/]/,
+        //                 chunks: 'initial',
+        //                 // 调整优先级，优先处理
+        //                 priority: 10,
+        //             },
+        //             // common: {
+        //             //     chunks: 'all',
+        //             //     name: 'common',
+        //             //     // 匹配 entry 里的 common 配置
+        //             //     test: 'common',
+        //             // },
+        //         },
+        //     },
+        //     // runtime 代码放在 runtime 文件中
+        //     runtimeChunk: {
+        //         name: 'runtime',
+        //     },
+        // }, 
+
+
+        // output: {
+        //     filename: 'static/[name].[chunkhash:8].bundle.js',
+        //     chunkFilename: 'static/[name].[chunkhash:8].bundle.js',
+        // },
     },
     css: {
         extract: false

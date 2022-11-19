@@ -1,5 +1,7 @@
 import parso
-module = parso.parse("""
+
+module = parso.parse(
+    """
 from Melodie import Agent
 
 class A(Agent):
@@ -10,7 +12,9 @@ class A(Agent):
     def find_agent(self):
         pass
 
-""", version="3.9")
+""",
+    version="3.9",
+)
 print(module.children[1])
 print(module.children[1].children)
 print(module.children[1].children[6].children[1].children)
@@ -20,4 +24,3 @@ print(list(module.iter_classdefs())[0].name)
 print(list(module.iter_classdefs())[0].type)
 
 print(list(classes[0].iter_funcdefs()))
-

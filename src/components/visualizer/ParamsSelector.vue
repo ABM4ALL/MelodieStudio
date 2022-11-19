@@ -5,26 +5,26 @@
     flex-direction: column;
 }
 
-.popover-buttonlist :deep(.el-button){
-    margin-left: 0px!important;
+.popover-buttonlist :deep(.el-button) {
+    margin-left: 0px !important;
     width: 200px;
 }
 </style>
 <template>
-    <div>
-        <el-popover trigger="click" width="160">
-            <template #reference>
-                <el-button>Scenario...</el-button>
-            </template>
-            <div class="popover-buttonlist">
-                <el-button @click="onSaveParams">Save</el-button>
-                <el-button @click="loadParamSetDialogShow = true">Load</el-button>
-                <!-- <el-button @click="onSaveData">Save simulation data as...</el-button> -->
-                <!-- <el-button @click="onDownloadDatabase">Export</el-button> -->
-            </div>
-        </el-popover>
+    <!-- <div> -->
+    <el-popover trigger="click" width="160">
+        <template #reference>
+            <el-button>Scenario...</el-button>
+        </template>
+        <div class="popover-buttonlist">
+            <el-button @click="onSaveParams">Save</el-button>
+            <el-button @click="loadParamSetDialogShow = true">Load</el-button>
+            <!-- <el-button @click="onSaveData">Save simulation data as...</el-button> -->
+            <!-- <el-button @click="onDownloadDatabase">Export</el-button> -->
+        </div>
+    </el-popover>
 
-    </div>
+    <!-- </div> -->
     <el-dialog v-model="loadParamSetDialogShow" :append-to-body="true" width="30vw">
         <div>
             <div v-for="paramSetName in paramSets" :key="paramSetName" style="display: flex; margin-top: 12px">

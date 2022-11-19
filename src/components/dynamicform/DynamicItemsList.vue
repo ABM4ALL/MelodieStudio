@@ -7,7 +7,7 @@
 
                     <p class="sub-form-title" v-if="paramsModel.label !== ''">{{ paramsModel.label }}</p>
                 </template>
-                Description: {{ paramsModel.description }}
+                <span v-if="paramsModel.description != ''">Description: {{ paramsModel.description }}</span>
                 <el-button @click="resetParams">Reset parameters</el-button>
             </el-popover>
 
@@ -75,7 +75,6 @@ const props = defineProps({
     }
 })
 
-const formItemRef = ref(null)
 const itemRefs = [];
 const setItemRef = (el: HTMLDivElement) => {
     itemRefs.push(el)
@@ -104,7 +103,6 @@ const onUpdateSingleItem = (index: number, evt: any) => {
 }
 
 const panelModeSelectorValue = ref("")
-const originalValues = []
 
 const resetParams = () => {
     for (const item of itemRefs) {
@@ -133,6 +131,7 @@ onBeforeMount(() => {
     margin-top: 0px;
     margin-bottom: 0px;
     min-width: var(--label-width);
-    max-width: var(--label-width);
+    /* max-width: var(--label-width); */
+    flex-grow: 1;
 }
 </style>

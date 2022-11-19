@@ -51,7 +51,6 @@ export const getLayout = async (): Promise<LayoutManager> => {
     if (resp.status === 0) {
         return resp.data as LayoutManager;
     } else {
-        // console.error("get policies failed!");
         return {};
     }
 };

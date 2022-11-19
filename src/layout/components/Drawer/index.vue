@@ -6,18 +6,20 @@
       </el-icon>
     </div>
     <el-drawer v-model="drawer" size="20%" :with-header="false">
-      <div class="router-column">
-        <p>Melodie Router</p>
+      <div class="router-column" v-show="store.state.status.developmentMode">
+        <p>MelodieStudio Router</p>
         <el-button @click="$router.push('/')">Composite Workspace</el-button>
+        <el-button @click="$router.push('/welcome')">Introduction</el-button>
         <el-button @click="$router.push('/full-page-visualizer')">Full page visualizer</el-button>
         <el-button @click="$router.push('/home')">Home</el-button>
-        <el-form>
-          <el-form-item label="Dev Mode">
-            <el-switch :model-value="store.state.status.developmentMode"
-              @update:modelValue="store.commit('SET_DEVELOPMENT_MODE', $event)"></el-switch>
-          </el-form-item>
-        </el-form>
+
       </div>
+      <el-form>
+        <el-form-item label="Dev Mode">
+          <el-switch :model-value="store.state.status.developmentMode"
+            @update:modelValue="store.commit('SET_DEVELOPMENT_MODE', $event)"></el-switch>
+        </el-form-item>
+      </el-form>
     </el-drawer>
   </div>
 </template>

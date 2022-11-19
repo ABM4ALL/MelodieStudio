@@ -79,6 +79,6 @@ def handle_get_cwd():
             "cwd": get_workdir(),
             "executable": sys.executable,
             "os": platform.system().lower(),
-            "programcwd": os.getcwd()
+            "programcwd": os.getcwd(),
         }
     )
