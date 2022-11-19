@@ -22,13 +22,11 @@ let topPointer = 0;
 let leftPointer = 0;
 export const updateContainerLayout = (containerName: string, layout: ContainerLayout) => {
     containerLayout[containerName] = layout;
-    console.log(containerLayout);
     needSave = true;
 };
 
 export const getContainersLayout = async () => {
     containerLayout = await getLayout();
-    console.log(containerLayout);
 };
 
 const newLayout = (containerName: string): ContainerLayout => {

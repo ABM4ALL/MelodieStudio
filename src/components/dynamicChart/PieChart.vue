@@ -79,7 +79,6 @@ export default defineComponent({
         };
     },
     mounted() {
-        console.log('pie-chart used!')
         getChartPolicies(CHART_TYPES.LINE_CHART).then((resp: ChartPolicies) => {
             this.selectionItems = resp.selectionItems;
             this.unchangeableItems = resp.unChangeableItems;
@@ -112,7 +111,6 @@ export default defineComponent({
                 // });
 
                 // this.simulationData = simulationData;
-                console.log('resp', resp)
                 this.needsRender = true;
                 this.initChart();
                 this.$chart.setOption(this.chartOption);
@@ -132,7 +130,6 @@ export default defineComponent({
             width: number;
             height: number;
         }) {
-            console.log("pos-changed");
             this.needsRender = true;
             this.$chart.resize({ width: evt.width, height: evt.height });
         },
@@ -148,11 +145,9 @@ export default defineComponent({
             step: number,
             values: { name: string; value: number }[]
         ): Promise<void> {
-            console.log('pie-chart update!', step, values)
             this.simulationData = { series: [{ data: values as any }] }
             this.needsRender = true;
             this.currentStep += 1;
-            console.log("data updated!");
         },
         clear() {
             for (let i in this.simulationData.series) {
@@ -162,7 +157,6 @@ export default defineComponent({
             this.needsRender = true;
         },
         renderChart() {
-            console.log(this.simulationData)
             this.$chart.setOption(this.simulationData);
             this.$chart.setOption({
                 toolbox: {
@@ -199,7 +193,7 @@ export default defineComponent({
             this.$chart.setOption(this.chartOption);
             this.needsRender = true;
             setChartInitialOptions(this.chartName, this.chartOption).then((resp) => {
-                console.log(resp);
+                console.debug(resp);
             });
         },
     },

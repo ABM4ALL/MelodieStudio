@@ -69,9 +69,7 @@ export default {
         });
     }
     function deleteRow(index, row){
-        // console.log(index, row, 'params');
         deleteItem({id:row.id}).then((data) => {
-            console.log(data, 'delete');
             if(data.err === "") {
                 getList();
             }

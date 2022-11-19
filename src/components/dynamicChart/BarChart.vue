@@ -72,7 +72,6 @@ export default defineComponent({
             step: number,
             values: { name: string; value: number }[]
         ): Promise<void> {
-            console.log('bar-chart update!', step, values)
             const xLabels: string[] = []
             const barValues: number[] = []
             for (const item of values) {
@@ -93,7 +92,6 @@ export default defineComponent({
             }
             this.needsRender = true;
             this.currentStep += 1;
-            console.log("data updated!");
         },
         clear() {
             for (let i in this.simulationData.series) {

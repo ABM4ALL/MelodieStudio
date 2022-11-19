@@ -46,7 +46,6 @@ const wsOnClose = function () {
     return
 }
 window.setInterval(() => {
-    console.log(ws.readyState)
     if (ws.readyState !== ws.OPEN) {
         ws = createWS()
     }

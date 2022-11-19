@@ -1,5 +1,5 @@
 <template>
-  
+
   <el-tabs v-model="activeName" class="editor-tabs" @tab-click="handleClick" closable @tab-remove="removeTab">
     <el-tab-pane :label="file.unsaved ? file.name + ' *' : file.name" :name="file.absPath" v-for="file in openedFiles"
       :key="file.absPath">
@@ -122,7 +122,7 @@ const setUnsaved = (fileName: string, unsaved: boolean) => {
 defineExpose({ openFile });
 
 const onKeyDown = (evt) => {
-  console.log(evt);
+  console.debug('key down!', evt);
 };
 </script>
 

@@ -7,13 +7,11 @@ export interface CompletionItem {
     boost: number
 
 }
-console.log(builtinWords)
 
 class CompletionHandler {
     builtins: CompletionItem[];
     constructor() {
         const words: string[] = builtinWords;
-        console.log(this)
         this.builtins = []
         for (let i = 0; i < words.length; i++) {
             this.builtins.push({
@@ -22,11 +20,9 @@ class CompletionHandler {
                 boost: 0
             })
         }
-        console.log(words)
     }
 
     public getCompletion(word: string, line: number, col: number): CompletionItem[] {
-        console.log(word, line, col)
         return this.builtins
     }
 }

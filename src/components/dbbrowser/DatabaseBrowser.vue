@@ -125,7 +125,6 @@ export default defineComponent({
       this.queryTable();
     },
     handleScroll(evt) {
-      console.log(evt);
       return;
     },
     onSQLChange() {
@@ -134,7 +133,6 @@ export default defineComponent({
         ast = parser.parse(this.queryForm.sql);
       } catch (err) {
         console.error(err, typeof err);
-        console.log(err);
         ElMessage.warning((err as any).message as string);
         return;
       }
@@ -153,7 +151,6 @@ export default defineComponent({
         path: this.sqlitePath as string,
         sql: this.queryForm.sql as string,
       });
-      console.log(data);
       this.columns = data.schema.fields;
       this.tableData = data.data;
       this.getAllTableNames();

@@ -76,14 +76,6 @@ export default defineComponent({
           console.error("series undefined!");
           return;
         }
-        console.log(
-          chartName,
-          step,
-          series,
-          chart,
-          chart.addData,
-          chart.initChart
-        );
         chart.addData(step, series);
       }
     },

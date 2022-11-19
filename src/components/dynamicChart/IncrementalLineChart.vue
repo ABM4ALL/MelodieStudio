@@ -134,7 +134,6 @@ export default defineComponent({
       width: number;
       height: number;
     }) {
-      console.log("pos-changed");
       this.needsRender = true;
       this.$chart.resize({ width: evt.width, height: evt.height });
     },
@@ -171,7 +170,6 @@ export default defineComponent({
       }
       this.needsRender = true;
       this.currentStep += 1;
-      console.log("data updated!");
     },
     clear() {
       for (let i in this.simulationData.series) {

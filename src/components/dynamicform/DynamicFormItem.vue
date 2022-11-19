@@ -2,14 +2,16 @@
     <div class="dynamic-form-item">
         <div class="dynamic-form-content">
             <div class="form-item-header">
-                <span class="form-item-label">{{ label }}</span>
+                
                 <el-popover :show-after="500">
                     <template #reference>
-                        <el-button :icon="Search" />
+                        <span class="form-item-label">{{ label }}</span>
                     </template>
                     <div class="form-item-help">
                         <span v-if="componentModel.description">Description: {{ componentModel.description }}</span>
                         <span v-if="isNumericValue">Range: {{ numericValueRange }}</span>
+                        <el-button @click="resetToOriginal">Reset to: {{ originalValue }}
+                        </el-button>
                     </div>
 
                 </el-popover>
@@ -29,7 +31,7 @@
 </template>
 <script lang="ts" setup>
 import { eliminateFloatRoundoffError } from "@/utils/utils"
-import { defineProps, PropType, defineEmits, computed } from "vue"
+import { defineProps, PropType, defineEmits, computed, watch, onBeforeMount, ref, defineExpose } from "vue"
 import { ParamType } from "./DynamicForm.vue";
 import { FloatParamType, IntParamType, ParamsType } from "./models";
 import { Search } from "@element-plus/icons-vue"
@@ -91,6 +93,21 @@ const numericValueErrorMsg = computed((): string => {
     }
     return ""
 })
+
+const originalValue = ref(null)
+
+const resetToOriginal = () => {
+    if (props.modelValue != originalValue.value) {
+        onValueChange(originalValue)
+    } else {
+        return
+    }
+}
+onBeforeMount(() => {
+    originalValue.value = props.modelValue
+})
+
+defineExpose({ resetToOriginal })
 </script>
 <style scoped>
 .dynamic-form-item {
@@ -104,7 +121,8 @@ dynamic-form-content {
 }
 
 .dynamic-form-item .form-item-label {
-    max-width: var(--label-width);
+    /* flex-grow: 1; */
+    /* max-width: var(--label-width); */
     min-width: var(--label-width);
 }
 

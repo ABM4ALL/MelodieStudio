@@ -93,7 +93,6 @@ export default defineComponent({
         this.top = layout.top;
         this.width = layout.width;
         this.height = layout.height;
-        console.log(this.slotComponentID, this.left, this.top);
       }
       this.$emit("container-changed", layout);
     }, 500);
@@ -128,7 +127,6 @@ export default defineComponent({
           if (direc.indexOf("n") !== -1) {
             this.height += -evt.movementY;
             this.top += evt.movementY;
-            console.log(evt.movementY);
           }
           // 鼠标按下的位置在底部，修改高度
           if (direc.indexOf("s") !== -1) {
@@ -167,7 +165,6 @@ export default defineComponent({
       const { offsetX, offsetY } = getEventLocation(ev, container);
       xP = offsetX;
       yP = offsetY;
-      console.log(xP, yP);
       offset = 10;
 
       if (yP < offset) dir += "n";

@@ -104,7 +104,6 @@ export default defineComponent({
           series: [{ data: [] }],
         };
         const singleSeries = this.seriesConfig[0]
-        console.log('single-series', singleSeries)
         for (let i = 0; i < singleSeries.data.length; i++) {
           simulationData.xAxis.data.push(i + 1)
           simulationData.series[0].data.push((singleSeries.data as number[][])[i])
@@ -130,7 +129,6 @@ export default defineComponent({
       width: number;
       height: number;
     }) {
-      console.log("pos-changed");
       this.needsRender = true;
       this.$chart.resize({ width: evt.width, height: evt.height });
     },
@@ -149,13 +147,11 @@ export default defineComponent({
       if (step == 0) {
         return
       }
-      console.log('stepping!', step, values)
       this.simulationData.xAxis.data.push(step)
       this.simulationData.series[0].data.push(values[0].value);
 
       this.needsRender = true;
       this.currentStep += 1;
-      console.log("data updated!");
     },
     clear() {
       this.simulationData = {
@@ -167,8 +163,6 @@ export default defineComponent({
 
     },
     renderChart() {
-      // this.$chart.clear();
-      console.log('pppppp', this.simulationData)
       // this.$chart.setOption(this.chartOption);
       this.$chart.setOption(this.simulationData);
       this.$chart.setOption({

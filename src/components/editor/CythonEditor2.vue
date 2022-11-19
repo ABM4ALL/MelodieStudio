@@ -166,37 +166,13 @@ class CovidDataLoader(DataLoader):
       console.log(evt);
     },
     onKeyDown(evt: KeyboardEvent) {
-      // console.log(evt);
       if (evt.key == "s" && (evt.metaKey || evt.ctrlKey)) {
-        console.log("save!")
         this.onSave()
         evt.preventDefault();
       }
     },
     handleReady({ view, state, container }) {
       this.editor = view;
-      console.log(view, state, container);
-      console.log(this.editor);
-      // view.dispatch({
-      //   effects: StateEffect.reconfigure.of(
-      //     keymap.of([
-      //       {
-      //         key: "K",
-      //         preventDefault: true,
-      //         run() {
-      //           console.log("aaaaaaaaaa");
-      //           return true;
-      //         },
-      //       },
-      //     ])
-      //   ),
-      // });
-      // const map = {
-      //   "Ctrl+K": function (cm) {
-      //     console.log("cm", cm);
-      //   },
-      // };
-      // view.addKeyMap(map);
     },
   },
   mounted() {
@@ -221,8 +197,6 @@ class CovidDataLoader(DataLoader):
       if (word.from == word.to && !context.explicit) return null;
 
       const lastChar = word.text.at(-1)
-      console.log(lastChar, wordToMatch, compStatus,
-        lastChar != null, /[\w]*/.test(lastChar!), wordToMatch != null, wordToMatch!.text.startsWith(compStatus.lastWordToPull));
       if (lastChar != null && /\w/.test(lastChar) && wordToMatch != null && wordToMatch.text.startsWith(compStatus.lastWordToPull)
         && compStatus.lastPullPos <= context.pos
       ) {
@@ -232,7 +206,6 @@ class CovidDataLoader(DataLoader):
             l.push(comp)
           }
         }
-        console.log(l)
         return {
           from: wordToMatch?.from,
           options: l,

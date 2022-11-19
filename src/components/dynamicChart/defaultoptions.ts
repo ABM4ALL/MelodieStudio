@@ -18,9 +18,13 @@ const linechartDefaultOptions: echarts.EChartsCoreOption = {
     xAxis: {
         type: "value",
         scale: true,
+        name: "",
+        nameLocation: "end"
     },
     yAxis: {
         type: "value",
+        name: "",
+        nameLocation: "end"
     },
     tooltip: {
         trigger: "axis",
@@ -79,9 +83,14 @@ export const createCandleStickChartDefaultData = () => {
             subtext: "",
         },
         xAxis: {
-            data: []
+            data: [],
+            name: "",
+            nameLocation: "end"
         },
-        yAxis: {},
+        yAxis: {
+            name: "",
+            nameLocation: "end"
+        },
         series: [
             {
                 type: 'candlestick',
@@ -129,12 +138,16 @@ export const createBarChartDefaultData = () => {
                 axisLabel: {
                     rotate: 30,
                     interval: 0,
-                }
+                },
+                name: "",
+                nameLocation: "end"
             }
         ],
         yAxis: [
             {
-                type: 'value'
+                type: 'value',
+                name: "",
+                nameLocation: "end"
             }
         ],
         series: [

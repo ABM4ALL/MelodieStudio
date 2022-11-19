@@ -10,7 +10,7 @@ import shutil
 import time
 from flask import Blueprint, request
 from .messages import Response
-
+from ..utils.config_manager import get_workdir
 file_system = Blueprint("fs", __name__)
 
 
@@ -32,7 +32,8 @@ def get_all_file_items(directory: str, one_layer=False):
                 )
             for file in files:
                 got_files.append(
-                    {"name": file, "type": "file", "absPath": os.path.join(root, file)}
+                    {"name": file, "type": "file",
+                        "absPath": os.path.join(root, file)}
                 )
         got_dirs.sort(key=lambda item: item["name"])
         got_files.sort(key=lambda item: item["name"])
@@ -82,7 +83,8 @@ def go_to_parent():
         directory = os.path.join(os.path.expanduser("~"), "Desktop")
     directory = os.path.dirname(directory)
     return Response.ok(
-        {"currentDirectory": directory, "fsItemsList": get_all_file_items(directory)}
+        {"currentDirectory": directory,
+            "fsItemsList": get_all_file_items(directory)}
     )
 
 
@@ -94,7 +96,8 @@ def go_to_sub():
         directory = os.path.join(os.path.expanduser("~"), "Desktop")
     directory = os.path.join(directory, subdir)
     return Response.ok(
-        {"currentDirectory": directory, "fsItemsList": get_all_file_items(directory)}
+        {"currentDirectory": directory,
+            "fsItemsList": get_all_file_items(directory)}
     )
 
 
@@ -128,6 +131,8 @@ def copy_fs_item_to():
 @file_system.route("getFile", methods=["GET"])
 def get_file():
     file_abs_path: str = request.args.get("fileName")
+    if not os.path.isabs(file_abs_path):
+        file_abs_path = os.path.join(get_workdir(), file_abs_path)
     if not (os.path.isfile(file_abs_path) and os.path.exists(file_abs_path)):
         return Response.error(
             f"Filename {file_abs_path} invalid. It may not exist or not a file."

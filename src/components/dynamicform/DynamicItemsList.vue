@@ -2,7 +2,16 @@
     <div class="form-container">
         <div v-if="paramsModel.component == 'panel'"
             style="display: flex; align-items: center; background-color: azure; margin-bottom: 12px;margin-top: 12px;">
-            <p class="sub-form-title" v-if="paramsModel.label !== ''">{{ paramsModel.label }}</p>
+            <el-popover>
+                <template #reference>
+
+                    <p class="sub-form-title" v-if="paramsModel.label !== ''">{{ paramsModel.label }}</p>
+                </template>
+                Description: {{ paramsModel.description }}
+                <el-button @click="resetParams">Reset parameters</el-button>
+            </el-popover>
+
+
             <el-select v-model="panelModeSelectorValue">
                 <el-option :label="param.name" :value="param.name" v-for="param of paramsModel.children"
                     :key="param.name">
@@ -12,6 +21,8 @@
         <div v-else>
             <p class="sub-form-title" v-if="paramsModel.label !== ''">{{ paramsModel.label }}</p>
         </div>
+
+
         <div v-for="(item, index) in paramsModel.children" :key="index">
             <div
                 v-if="paramsModel.component == 'auto' || (paramsModel.component == 'panel' && item.name == panelModeSelectorValue)">
@@ -20,7 +31,8 @@
                         <span v-if="debug">@{{ depth }}</span>
                         <dynamic-form-item class="dynamic-form-item" :label="item.label || item.name"
                             :model-value="paramValues.value[index].value" :component-model="item"
-                            @update:model-value="onUpdateSingleItem(index, $event)"></dynamic-form-item>
+                            @update:model-value="onUpdateSingleItem(index, $event)" :ref="setItemRef">
+                        </dynamic-form-item>
                     </div>
                     <dynamic-items-list v-else :depth="depth + 1" :paramsModel="item"
                         :paramValues="paramValues.value[index]" @update-value="onUpdateArrayItems(index, $event)">
@@ -42,7 +54,7 @@
 
 <script lang="ts" setup>
 import { deepCopy } from "@/utils/utils";
-import { defineProps, PropType, defineEmits, ref, onBeforeMount } from "vue"
+import { defineProps, PropType, defineEmits, ref, onBeforeMount, watch, computed } from "vue"
 import { ArrayParamsType, ArrayParamsValue, ParamsType, ParamValue } from "./models"
 import DynamicFormItem from "./DynamicFormItem.vue";
 const props = defineProps({
@@ -54,7 +66,6 @@ const props = defineProps({
         type: Object as PropType<ParamValue>,
         required: true
     },
-    // name:string,
     type: {
         type: String as PropType<'auto' | 'panel'>
     },
@@ -64,6 +75,21 @@ const props = defineProps({
     }
 })
 
+const formItemRef = ref(null)
+const itemRefs = [];
+const setItemRef = (el: HTMLDivElement) => {
+    itemRefs.push(el)
+}
+
+const children = computed(() => {
+    let childrenCount = 0
+    for (const paramModel of props.paramsModel.children) {
+        if (paramModel.type != 'array') {
+            childrenCount += 1
+        }
+    }
+    return childrenCount
+})
 const emits = defineEmits(['update-value'])
 const debug = false
 const onUpdateArrayItems = (index: number, evt: ArrayParamsValue) => {
@@ -78,12 +104,23 @@ const onUpdateSingleItem = (index: number, evt: any) => {
 }
 
 const panelModeSelectorValue = ref("")
+const originalValues = []
+
+const resetParams = () => {
+    for (const item of itemRefs) {
+        const f = (item as any).resetToOriginal
+        if (f != null) {
+            f()
+        }
+    }
+}
 onBeforeMount(() => {
-    console.log('aaaaaaa', props.paramsModel, props.paramsModel.name, props.paramsModel.children)
     if (props.paramsModel.children.length > 0) {
         panelModeSelectorValue.value = props.paramsModel.children[0].name
     }
 })
+
+
 </script>
 
 <style scoped>

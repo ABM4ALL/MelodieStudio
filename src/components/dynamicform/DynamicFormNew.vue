@@ -27,7 +27,6 @@ const paramsModel = ref<ParamsType[]>([])
 const paramValues = ref<ParamValuesType>([])
 const paramsModified = ref(false)
 const onUpdate = (index: number, evt) => {
-    console.log(paramValues.value, index, evt)
     paramValues.value[index] = evt
     updated()
 }
@@ -39,7 +38,7 @@ const onUpdateSingleItem = (index: number, evt) => {
 }
 
 const updated = () => {
-    console.log(JSON.stringify(paramValues.value))
+    // console.log(JSON.stringify(paramValues.value))
     paramsModified.value = true
 }
 

@@ -28,13 +28,17 @@
         <dynamic-form ref="dynamic-form"></dynamic-form>
       </div>
       <div class="widgets-area">
-        <grid-component :ref="`grid-visualizer-new-${i}`" v-for="(_item, i) in visualizers" :key="i" :name="_item.name"
-          :visualizerIndex="i" :visualizerData="visualizerData[_item.name]" :desiredFPS="fpsLimit"
-          :columns="_item.columns" :rows="_item.rows">
-        </grid-component>
-        <!-- </el-row> -->
-        <chart-list :seriesConfig="seriesConfig" ref="chartList" :style="{ position: 'absolute' }"></chart-list>
+        <markdown-viewer style="width:100%; height:100%" v-show="currentStep == 0"></markdown-viewer>
+        <div v-show="currentStep > 0" style="width:100%; height:100%">
+          <grid-component :ref="`grid-visualizer-new-${i}`" v-for="(_item, i) in visualizers" :key="i"
+            :name="_item.name" :visualizerIndex="i" :visualizerData="visualizerData[_item.name]" :desiredFPS="fpsLimit"
+            :columns="_item.columns" :rows="_item.rows">
+          </grid-component>
+          <chart-list :seriesConfig="seriesConfig" ref="chartList" :style="{ position: 'absolute' }"></chart-list>
+        </div>
+
       </div>
+
       <!-- <el-row> -->
 
     </div>
@@ -58,6 +62,7 @@ import { GridItem } from "@/models/agents";
 import { COMMANDS, NewVisualizerData } from "@/models/visualizerbasics";
 import ParamsSelector from "@/components/visualizer/ParamsSelector.vue"
 import { ElNotification } from "element-plus";
+import MarkdownViewer from "@/components/markdown-viewer/MarkdownViewer.vue"
 export default defineComponent({
   extends: BaseVisualizer,
   components: {
@@ -65,7 +70,8 @@ export default defineComponent({
     ChartList,
     Toolbar,
     GridComponent,
-    ParamsSelector
+    ParamsSelector,
+    MarkdownViewer
   },
   name: "hello",
   data() {

@@ -41,7 +41,6 @@ export const query = async (dbMeta: SQLiteMeta): Promise<QueriedData> => {
 export const readTableFile = async (meta: TableDataMeta): Promise<DataResponse> => {
     const resp = await request.get("/api/dbBrowser/table_file_read", meta);
     if (resp.status === 0) {
-        console.log(resp.data)
         return resp.data as DataResponse;
     } else {
         ElMessage.error("Failed to execute command");

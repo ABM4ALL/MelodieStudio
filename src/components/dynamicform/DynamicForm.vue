@@ -111,7 +111,6 @@ export default defineComponent({
   },
   methods: {
     onSliderMove(v) {
-      // console.log(this.inputValues.a.value, this.inputValues.b.value, v);
       this.getValues();
     },
     getValues() {

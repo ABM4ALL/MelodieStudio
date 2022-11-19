@@ -35,21 +35,12 @@ import store from "@/store";
 const codeEditor = ref(null);
 const terminalsShown = ref(true);
 const onOpenFile = (absPath: string) => {
-  console.log(absPath, codeEditor.value);
   if (codeEditor.value != null) {
     (codeEditor.value as any).openFile(absPath);
   }
 };
 const id = Math.random();
-onActivated(() => {
-  console.log("activated!!!!!!!!", id);
-});
-onDeactivated(() => {
-  console.log("deactivated!!!!!!!!", id);
-});
-onUnmounted(() => {
-  console.log("unmounted!!!", id);
-});
+
 </script>
 
 <style scoped>

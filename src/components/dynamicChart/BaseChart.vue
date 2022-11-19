@@ -78,9 +78,6 @@ export default defineComponent({
                 if (resp !== null) {
                     this.chartOption = this.formatInitialOption(resp);
                 }
-
-
-                console.log('resp', resp)
                 this.needsRender = true;
                 this.initChart();
                 this.$chart.setOption(this.chartOption);
@@ -103,7 +100,6 @@ export default defineComponent({
             width: number;
             height: number;
         }) {
-            console.log("pos-changed");
             this.needsRender = true;
             this.$chart.resize({ width: evt.width, height: evt.height });
         },
@@ -115,33 +111,6 @@ export default defineComponent({
             this.$chart.setOption(this.chartOption);
             this.$chart.setOption(this.simulationData);
         },
-        // async addData(
-        //     step: number,
-        //     values: { name: string; value: number }[]
-        // ): Promise<void> {
-        //     console.log('bar-chart update!', step, values)
-        //     const xLabels: string[] = []
-        //     const barValues: number[] = []
-        //     for (const item of values) {
-        //         xLabels.push(item.name)
-        //         barValues.push(item.value)
-        //     }
-        //     this.simulationData = {
-        //         xAxis: [
-        //             {
-        //                 type: 'category',
-        //                 data: xLabels,
-        //                 axisTick: {
-        //                     alignWithLabel: true
-        //                 }
-        //             }
-        //         ],
-        //         series: [{ name: 'Direct', type: 'bar', data: barValues as any }]
-        //     }
-        //     this.needsRender = true;
-        //     this.currentStep += 1;
-        //     console.log("data updated!");
-        // },
         clear() {
             for (let i in this.simulationData.series) {
                 this.simulationData.series[i].data = [];
@@ -150,7 +119,6 @@ export default defineComponent({
             this.needsRender = true;
         },
         renderChart() {
-            console.log(this.simulationData)
             this.$chart.setOption(this.simulationData);
             this.$chart.setOption({
                 toolbox: {
