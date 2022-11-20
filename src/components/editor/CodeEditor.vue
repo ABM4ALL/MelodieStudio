@@ -27,7 +27,7 @@ import {
 } from "vue";
 import FileTree from "./FileTree.vue";
 import EditorTabs from "./EditorTabs.vue";
-import FloatLabel from "@/components/float-label/FloatLabel.vue"
+import FloatLabel from "@/components/editor/FloatLabel.vue"
 import TerminalTabs from "@/components/terminal/TerminalTabs.vue";
 import { requestRunCommand } from "@/components/terminal/terminal_events";
 import store from "@/store";

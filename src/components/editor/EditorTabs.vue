@@ -29,10 +29,9 @@ import DatabaseBrowser from "@/components/dbbrowser/DatabaseBrowser.vue";
 import TableViewer from "@/components/tableviewer/TableViewer.vue";
 import NetworkViewer from "@/components/network/NetworkViewerNew.vue";
 import Visualizer from "@/views/Visualizer.vue";
-import { defineComponent, ref, defineExpose } from "vue";
+import { ref, defineExpose } from "vue";
 import { ElNotification } from "element-plus";
 import { baseName, getExt } from "@/utils/file";
-import { fa } from "element-plus/es/locale";
 import { setOnOpenVisualizer } from "../events/globalevents";
 
 const activeName = ref("");

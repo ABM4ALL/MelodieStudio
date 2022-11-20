@@ -9,17 +9,12 @@
             <el-input :readonly="true" v-model="config.directory"></el-input>
           </el-col>
           <el-col :span="2">
-            <directory-selector
-              @select-directory="directorySelected"
-            ></directory-selector>
+            <directory-selector @select-directory="directorySelected"></directory-selector>
           </el-col>
         </el-row>
       </el-form-item>
       <el-form-item label="Project Name">
-        <el-input
-          v-model="config.projectName"
-          @change="onProjectNameChange"
-        ></el-input>
+        <el-input v-model="config.projectName" @change="onProjectNameChange"></el-input>
       </el-form-item>
       <el-form-item label="Project Alias">
         <el-input v-model="config.projectNameAlias"></el-input>
@@ -34,7 +29,7 @@
     </p>
     <p>
       {{ config.projectNameAlias }}Agent\{{
-        config.projectNameAlias
+          config.projectNameAlias
       }}Environment\{{ config.projectNameAlias }}Model
     </p>
     <el-divider />
@@ -50,10 +45,6 @@ import { defineComponent } from "vue";
 import DirectorySelector from "./DirectorySelector.vue";
 import { createNewProject } from "@/api/tools";
 import { ElMessage } from "element-plus";
-interface FSItem {
-  name: string;
-  type: string;
-}
 
 export default defineComponent({
   components: { DirectorySelector },
@@ -78,20 +69,8 @@ export default defineComponent({
       }
     },
     async create() {
-      const resp = await createNewProject(this.config);
-
-      if (resp.status === 0) {
-        ElMessage.success(resp.data);
-      } else {
-        ElMessage.error(resp.msg);
-      }
+      await createNewProject(this.config);
     },
   },
 });
 </script>
-
-<style>
-/* .project-creator .el-form-item__content{
-    display: flex;
-} */
-</style>

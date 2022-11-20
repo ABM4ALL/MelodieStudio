@@ -1,4 +1,9 @@
 export type TableTypes = "excel" | "csv"
+export interface FSItem {
+    name: string;
+    type: string;
+}
+
 export interface QueriedData {
     data: { [key: string]: number | string }[];
     schema: {

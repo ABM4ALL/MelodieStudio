@@ -2,18 +2,23 @@
     <div class="form-container">
         <div v-if="paramsModel.component == 'panel'"
             style="display: flex; align-items: center; background-color: azure; margin-bottom: 12px;margin-top: 12px;">
-            <el-popover>
+            <el-popover :width="300" :show-after="500">
                 <template #reference>
 
                     <p class="sub-form-title" v-if="paramsModel.label !== ''">{{ paramsModel.label }}</p>
                 </template>
-                <span v-if="paramsModel.description != ''">Description: {{ paramsModel.description }}</span>
-                <el-button @click="resetParams">Reset parameters</el-button>
+                <div>
+                    <div v-if="paramsModel.description != ''" style="text-align: left">Description: {{
+                            paramsModel.description
+                    }}</div>
+                    <el-button @click="resetParams">Reset parameters</el-button>
+                </div>
+
             </el-popover>
 
 
             <el-select v-model="panelModeSelectorValue">
-                <el-option :label="param.name" :value="param.name" v-for="param of paramsModel.children"
+                <el-option :label="param.name" :value="param.name" v-for="param in paramsModel.children"
                     :key="param.name">
                 </el-option>
             </el-select>
@@ -23,7 +28,7 @@
         </div>
 
 
-        <div v-for="(item, index) in paramsModel.children" :key="index">
+        <div v-for="(item, index) in paramsModel.children" :key="item.name">
             <div
                 v-if="paramsModel.component == 'auto' || (paramsModel.component == 'panel' && item.name == panelModeSelectorValue)">
                 <div v-if="paramValues.value[index] != null">
@@ -34,7 +39,7 @@
                             @update:model-value="onUpdateSingleItem(index, $event)" :ref="setItemRef">
                         </dynamic-form-item>
                     </div>
-                    <dynamic-items-list v-else :depth="depth + 1" :paramsModel="item"
+                    <dynamic-items-list v-else :depth="depth + 1" :paramsModel="item" :ref="setItemRef"
                         :paramValues="paramValues.value[index]" @update-value="onUpdateArrayItems(index, $event)">
                     </dynamic-items-list>
                 </div>
@@ -42,7 +47,7 @@
                     paramValues.value:{{ paramValues.value }}, <br />
                     index {{ index }}: paramValues.value[index] was null</div>
             </div>
-            <div v-else v-show="debug">v-else triggered for{{ JSON.stringify(item) }}</div>
+            <div v-show="debug">v-else triggered for{{ JSON.stringify(item) }}</div>
 
         </div>
 
@@ -54,7 +59,7 @@
 
 <script lang="ts" setup>
 import { deepCopy } from "@/utils/utils";
-import { defineProps, PropType, defineEmits, ref, onBeforeMount, watch, computed } from "vue"
+import { defineProps, PropType, defineEmits, ref, onBeforeMount, watch, computed, defineExpose } from "vue"
 import { ArrayParamsType, ArrayParamsValue, ParamsType, ParamValue } from "./models"
 import DynamicFormItem from "./DynamicFormItem.vue";
 const props = defineProps({
@@ -103,21 +108,31 @@ const onUpdateSingleItem = (index: number, evt: any) => {
 }
 
 const panelModeSelectorValue = ref("")
-
+const originalValue: { value: ParamValue } = { value: {} as ParamValue }
 const resetParams = () => {
-    for (const item of itemRefs) {
-        const f = (item as any).resetToOriginal
-        if (f != null) {
-            f()
-        }
-    }
+    console.log('reset params!')
+    emits('update-value', originalValue.value)
+    // for (const item of itemRefs) {
+    //     if (item == null) {
+    //         continue
+    //     }
+    //     const f = (item as any).resetToOriginal
+    //     if (f != null) {
+    //         f()
+    //     }
+    // }
 }
 onBeforeMount(() => {
     if (props.paramsModel.children.length > 0) {
         panelModeSelectorValue.value = props.paramsModel.children[0].name
     }
+    originalValue.value = props.paramValues
+    console.log('originalValue', originalValue.value)
 })
 
+defineExpose({
+    resetToOriginal: resetParams
+})
 
 </script>
 

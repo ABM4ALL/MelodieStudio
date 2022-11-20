@@ -86,7 +86,11 @@ def browse_sqlite():
     conn_meta = {}
     db_type = request.args.get("type")
     if db_type == "sqlite":
-        conn_meta = {"path": request.args.get("path")}
+        path = request.args.get("path")
+        if path is None:
+            return Response.error(f"Argument of SQLite type db query request missing 'path'.")
+        conn_meta = {"path": path}
+        
         if not os.path.exists(conn_meta["path"]):
             return Response.error(f"SQLite file {conn_meta['db_path']} not found!")
     else:

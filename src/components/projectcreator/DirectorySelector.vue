@@ -33,11 +33,6 @@ import { Folder, Document } from "@element-plus/icons-vue";
 import { defineComponent } from "vue";
 import { getFSItems, gotoSubDir, gotoParentDir } from "@/api/fs";
 
-interface FSItem {
-  name: string;
-  type: string;
-}
-
 export default defineComponent({
   emits: ["select-directory"],
   data() {

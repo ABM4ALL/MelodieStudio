@@ -23,17 +23,19 @@ export const getProjectMeta = async (): Promise<{ cwd: string, executable: strin
     return (await request.get("/api/tools/projectMeta")).data;
 }
 
-export const deleteFSItem = async (itemName: string): Promise<boolean> => {
-    return (await request.post("/api/fs/delete", { itemName })).msg;
+export const deleteFSItem = async (itemName: string): Promise<void> => {
+    await request.post("/api/fs/delete", { itemName })
+    // resp.msg
 }
 
 /*target could be file name or directory name.*/
-export const moveFSItem = async (src: string, target: string): Promise<boolean> => {
-    return (await request.post("/api/fs/move_to", { src, target })).msg;
+export const moveFSItem = async (src: string, target: string): Promise<void> => {
+    await request.post("/api/fs/move_to", { src, target })
+    //.msg;
 }
 
-export const copyFSItem = async (src: string, target: string): Promise<boolean> => {
-    return (await request.post("/api/fs/copy_to", { src, target })).msg;
+export const copyFSItem = async (src: string, target: string): Promise<void> => {
+    await request.post("/api/fs/copy_to", { src, target })
 }
 
 
@@ -41,6 +43,6 @@ export const getFile = async (fileName: string): Promise<string> => {
     return (await request.get("/api/fs/getFile", { fileName })).data.content
 }
 
-export const writeFile = async (fileName: string, content: string): Promise<boolean> => {
-    return (await request.post("/api/fs/writeFile", { fileName, content }))
+export const writeFile = async (fileName: string, content: string): Promise<void> => {
+    await request.post("/api/fs/writeFile", { fileName, content })
 }

@@ -21,7 +21,7 @@
               'selected-tree-node': data.absPath == selected,
             }" @contextmenu.stop="() => false" @dblclick="onNodeDoubleClick(data)" @click="onNodeClick(data)">
               <span v-if="data.absPath !== ''">{{
-              baseName(data.absPath)
+                  baseName(data.absPath)
               }}</span>
               <div style="flex-grow: 1"></div>
               <file-tree-buttons :absPath="data.absPath"></file-tree-buttons>
@@ -66,21 +66,16 @@
 </template>
 
 <script lang="ts" setup>
-import { defineEmits, onMounted, ref, watch } from "vue";
+import { defineEmits, ref, watch } from "vue";
 import type Node from "element-plus/es/components/tree/src/model/node";
 import { UploadInstance } from "element-plus";
 import { copyFSItem, deleteFSItem, listDir } from "@/api/fs";
 import { ElNotification } from "element-plus";
-import { baseName, downloadFile, getDirName } from "@/utils/file";
-import { Search, Upload, Download } from "@element-plus/icons-vue";
+import { baseName } from "@/utils/file";
+import { Search } from "@element-plus/icons-vue";
 import store from "@/store";
 import { addOnMessageHandler } from "@/api/ws";
-import {
-  FILETREE_ITEMTYPES,
-  loadItemActions,
-} from "./filetree-utils/filetree-items";
 import FileTreeButtons from "./filetree-utils/FileTreeButtons.vue"
-import { setOnOpenVisualizer } from "../events/globalevents";
 const dialogShow = ref(false);
 const fileList = ref<{ name: string }[]>([]);
 const absPathToUpload = ref("");
@@ -91,12 +86,7 @@ const fileToCopyOrCut = ref<{ absPath: string; operation: "copy" | "cut" }>({
 });
 let parentNodeToUpload = "";
 
-export interface FileTreeItem {
-  // ContentType: string,
-  // etag: string,
-  // filepath: string,
-  // modtime: string,
-  // size: number,
+interface FileTreeItem {
   type: "file" | "directory";
   name: string;
   absPath: string;
@@ -226,30 +216,22 @@ const updateTree = (nodeName: string, dirName: string) => {
         node.expand();
       }
     }
-    // const node = treeRef.value.getNode(nodeName);
-    // treeRef.value.remove(node);
   }
 };
 
 const onSuccess = () => {
   dialogShow.value = false;
   ElNotification.success("上传成功！");
-  // window.setTimeout(() => {
-  //   const node = treeRef.value.getNode(parentNodeToUpload);
-  //   node.loaded = false;
-  //   if (node.data.absPath != "") {
-  //     node.expand();
-  //   }
-  // }, 200);
   updateTree(absPathToUpload.value, parentNodeToUpload);
 };
 
-const expandTreeTo = async (path: string) => {
-  const node = treeRef.value.getNode(path);
-  if (!node.data.leaf) {
-    node.expand();
-  }
-};
+// Unused this function!
+// const expandTreeTo = async (path: string) => {
+//   const node = treeRef.value.getNode(path);
+//   if (!node.data.leaf) {
+//     node.expand();
+//   }
+// };
 
 const onDelete = async (file: string) => {
   await deleteFSItem(file);

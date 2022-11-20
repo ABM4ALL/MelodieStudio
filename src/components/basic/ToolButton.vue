@@ -5,7 +5,6 @@
     :disabled="disabled"
   >
     <el-icon v-if="icon != null">
-      <!-- <component :is="icon"> </component> -->
       <svg-icon :svgIconName="icon"></svg-icon>
     </el-icon>
     {{ text }}</el-button

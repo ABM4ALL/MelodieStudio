@@ -41,7 +41,6 @@
 import path from "path";
 import { useStore } from "vuex";
 import variables from "@/style/variable.less";
-import Component from "@/views/Component.vue";
 export default {
   name: "sidebar",
   props: {

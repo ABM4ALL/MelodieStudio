@@ -33,7 +33,7 @@ import variable from "@/style/variable.less";
 import { useRouter } from "vue-router";
 import { useTheme } from "@/composition/useThemeApi";
 
-import request from "@/request/index.js";
+import request from "@/request/index";
 export default {
   setup() {
     const themeApi = useTheme();
@@ -46,12 +46,6 @@ export default {
         path: `/${path}`,
       });
     }
-    function loadData() {
-      request.get("http://localhost:3001/api/wans").then((data: any) => {
-        console.log(data, "ddasd");
-        mockData.data = data.result;
-      });
-    }
     provide("obj", envName); // 向子孙组件传递参数
 
     return {
@@ -59,7 +53,6 @@ export default {
       variables,
       themeApi,
       jumpToInner,
-      loadData,
       mockData,
     };
   },

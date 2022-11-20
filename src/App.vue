@@ -13,8 +13,10 @@ import layout from "@/layout/index.vue";
 import { getProjectMeta } from "@/api/fs";
 import store from "./store";
 import { registerEvents } from "@/components/events/globalevents";
+import defaultRoutes from "./router/defaultRoutes";
+import { defineComponent } from "vue";
 registerEvents();
-export default {
+export default defineComponent({
   setup() {
     getProjectMeta().then((meta) => {
       store.commit("SET_PROJECT_META", meta);
@@ -25,7 +27,14 @@ export default {
     layout,
     Drawer
   },
-};
+  computed: {
+    // Tell if the route is on root.
+    // The route root occupies the whole page.
+    isRootRoute() {
+      return defaultRoutes.findIndex((route) => route.path == this.$route.path) != -1
+    }
+  }
+});
 </script>
 <style>
 #app {

@@ -29,6 +29,7 @@ export const getContainersLayout = async () => {
     containerLayout = await getLayout();
 };
 
+// Arrange layout items in order.
 const newLayout = (containerName: string): ContainerLayout => {
     if (containerName.indexOf("visualizer") != -1) {
 

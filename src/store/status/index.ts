@@ -5,7 +5,7 @@ export default {
             busy: false,
             hint: LANGUAGE_SERVICE_IDLE
         },
-        developmentMode: true
+        developmentMode: false
     },
     mutations: {
         SET_LANGUAGE_SERVICE_BUSY(state, jobdesc: string) {

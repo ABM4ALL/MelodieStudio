@@ -20,50 +20,25 @@ export interface TableDataMeta {
 
 export const getTableNames = async (dbMeta: SQLiteMeta): Promise<string[]> => {
     const resp = await request.get("/api/dbBrowser/tableNames", dbMeta);
-    if (resp.status === 0) {
-        return resp.data;
-    } else {
-        console.error(resp.msg);
-        return [];
-    }
+    return resp.data;
 };
 
 export const query = async (dbMeta: SQLiteMeta): Promise<QueriedData> => {
     const resp = await request.get("/api/dbBrowser/query", dbMeta);
-    if (resp.status === 0) {
-        return resp.data as QueriedData;
-    } else {
-        ElMessage.error("Failed to execute command");
-        throw Error;
-    }
+    return resp.data as QueriedData;
 };
 
 export const readTableFile = async (meta: TableDataMeta): Promise<DataResponse> => {
     const resp = await request.get("/api/dbBrowser/table_file_read", meta);
-    if (resp.status === 0) {
-        return resp.data as DataResponse;
-    } else {
-        ElMessage.error("Failed to execute command");
-        throw Error;
-    }
+    return resp.data as DataResponse;
 };
 
 export const writeTableFile = async (meta: TableDataMeta): Promise<boolean> => {
     const resp = await request.post("/api/dbBrowser/table_file_write", meta);
-    if (resp.status === 0) {
-        return resp.data as boolean;
-    } else {
-        ElMessage.error("Failed to execute command");
-        throw Error;
-    }
+    return resp.data as boolean;
 };
 
 export const tableToLatex = async (meta: TableDataMeta): Promise<string> => {
     const resp = await request.post("/api/dbBrowser/table_to_latex", meta);
-    if (resp.status === 0) {
-        return resp.data as string;
-    } else {
-        ElMessage.error("Failed to execute command");
-        throw Error;
-    }
+    return resp.data as string;
 }

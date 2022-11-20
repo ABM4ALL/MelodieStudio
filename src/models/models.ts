@@ -1,6 +1,12 @@
 // Generated using py-ts-interfaces.
 // See https://github.com/cs-cordero/py-ts-interfaces
 
+export interface HTTPResponse {
+    data: any,
+    msg: string,
+    status: number
+}
+
 export interface WSMessage {
     type: string;
     payload: any | Array<any>;

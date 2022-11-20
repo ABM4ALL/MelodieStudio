@@ -25,7 +25,6 @@
 </template>
 
 <script lang="ts" setup>
-import Image from "@/views/Image.vue";
 import { computed, defineProps, PropType } from "vue";
 const props = defineProps({
   agentStyle: {

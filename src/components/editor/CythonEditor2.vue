@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import { Codemirror } from "vue-codemirror";
-// import { python } from "./python";
 import { StreamLanguage } from "@codemirror/language";
 import { lua } from "@codemirror/legacy-modes/mode/lua";
 import { python, cython } from "@codemirror/legacy-modes/mode/python";
