@@ -7,7 +7,7 @@
 import json
 import os.path
 import tempfile
-from typing import Dict, List
+from typing import Any, Dict, List, Union, cast
 
 from flask import Blueprint, request
 import pandas as pd
@@ -16,8 +16,8 @@ from MelodieStudio.manipulators.network_manipulator import NetworkManipulator
 from MelodieStudio.manipulators.table_manipulator import ExcelManipulator
 
 from .._config import get_studio_config
-from .messages import Response
-
+from ..models import Response
+from .utils import args_not_none
 try:
     from Melodie.db import create_db_conn, DBConn
 except ImportError:
@@ -68,11 +68,12 @@ def get_table_names(db_type: str, conn_params: Dict) -> List[str]:
 
 
 @db_browser.route("/query")
+@args_not_none(['path'])
 def db_browser_query():
     db_type = request.args.get("type")
     sql = request.args.get("sql")
     if db_type == "sqlite":
-        conn_meta = {"path": request.args.get("path")}
+        conn_meta = {"path": request.args["path"]}
         if not os.path.exists(conn_meta["path"]):
             return Response.error(f"SQLite file {conn_meta['db_path']} not found!")
     else:
@@ -90,7 +91,7 @@ def browse_sqlite():
         if path is None:
             return Response.error(f"Argument of SQLite type db query request missing 'path'.")
         conn_meta = {"path": path}
-        
+
         if not os.path.exists(conn_meta["path"]):
             return Response.error(f"SQLite file {conn_meta['db_path']} not found!")
     else:
@@ -99,16 +100,18 @@ def browse_sqlite():
 
 
 @db_browser.route("/table_file_read")
+@args_not_none(['path'])
 def df_read():
-    path = request.args.get("path")
+    path = request.args["path"]
     _, ext = os.path.splitext(path)
     ext = ext[1:]
     if ext in {"xls", "xlsx"}:
         # res = pd.read_excel(path)
         em = ExcelManipulator(path)
-        sheets = em.get_sheet_names()
-        currentSheet = (
-            request.args.get("sheet") if request.args.get("sheet") else sheets[0]
+        sheets: List[str] = cast(Any, em.get_sheet_names())
+        currentSheet: str = (
+            request.args["sheet"] if request.args.get(
+                "sheet") else sheets[0]
         )
         res = em.read_sheet(currentSheet)
         return Response.ok(
@@ -163,8 +166,9 @@ def table_to_latex():
 
 
 @db_browser.route("/read_network", methods=["GET"])
+@args_not_none(['path'])
 def read_network():
-    path = request.args.get("path")
+    path = request.args["path"]
     return Response.ok(NetworkManipulator(path).read_gexf_file())
 
 

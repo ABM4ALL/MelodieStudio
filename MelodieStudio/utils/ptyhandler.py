@@ -7,9 +7,10 @@ import sys
 import threading
 import time
 
-from typing import Callable, NamedTuple
+from typing import Callable, NamedTuple, Optional
 from .machine import is_windows
 from .config_manager import get_workdir
+from ..models import PTYMetaDict
 
 NixProc = NamedTuple("NixProc", [("fd", TextIOWrapper), ("child_pid", int)])
 
@@ -31,7 +32,7 @@ class MelodiePTY:
         self,
         term_id: str,
         command: str,
-        on_output: Callable[[str], None],
+        on_output: Callable[[str, str], None],
         on_close: Callable[[str], None],
         name,
     ) -> None:
@@ -39,19 +40,21 @@ class MelodiePTY:
         self._on_output = on_output
         self._on_close = on_close
         self._command = command
-        self._thread: threading.Thread = None
+        self._thread: Optional[threading.Thread] = None
         self.term_id: str = term_id
         self._win_proc: "PTY" = None
 
-        self._nix_proc: NixProc = None
+        self._nix_proc: Optional[NixProc] = None
         if is_windows():
             self.create_on_windows()
         else:
             self.create_on_nix()
         if isinstance(command, str) and command in {"cmd", "bash"}:
             if is_windows():
-                cwd_disk_sym = os.getcwd().lower().replace("\\", "/").split("/")[0]
-                wd_disk_sym = get_workdir().lower().replace("\\", "/").split("/")[0]
+                cwd_disk_sym = os.getcwd().lower().replace(
+                    "\\", "/").split("/")[0]
+                wd_disk_sym = get_workdir().lower().replace(
+                    "\\", "/").split("/")[0]
                 print(cwd_disk_sym, wd_disk_sym)
                 if cwd_disk_sym != wd_disk_sym:
                     self.write(f"cd /d {get_workdir()} \r\n")
@@ -61,7 +64,7 @@ class MelodiePTY:
                     return
             self.write(f"cd {get_workdir()}\n")
 
-    def to_dict(self):
+    def to_dict(self) -> 'PTYMetaDict':
         return {
             "id": self.term_id,
             "name": self.name,
@@ -161,7 +164,6 @@ class MelodiePTY:
         pass
 
     def soft_close(self):
-
         """
         Close Terminal
 

@@ -1,6 +1,5 @@
 import json
 import logging
-from os import error, stat
 from typing import Any
 
 logger = logging.getLogger(__file__)
@@ -15,15 +14,15 @@ class Response:
         assert status in {Response.OK, Response.ERROR}
         try:
             resp = json.dumps({"status": status, "msg": message, "data": data})
+            if status == Response.ERROR:
+                logger.info(resp)
+            return resp
         except TypeError:
             import traceback
 
             traceback.print_exc()
             logger.error(str(data))
-            # return
-        if status == Response.ERROR:
-            logger.info(resp)
-        return resp
+            return 'Internal error occurred in MelodieStudio'
 
     @staticmethod
     def ok(data: Any) -> str:

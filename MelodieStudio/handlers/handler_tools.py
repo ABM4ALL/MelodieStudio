@@ -8,7 +8,7 @@ from flask import Blueprint, request
 
 from MelodieStudio.utils.config_manager import get_workdir
 
-from .messages import Response
+from ..models import Response
 
 try:
     from Melodie.templates.create_template import (

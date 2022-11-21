@@ -4,20 +4,19 @@
 # @Email: 1295752786@qq.com
 # @File: handler_charts.py
 import json
-import os.path
-from typing import Any, Dict, Tuple, Union
+import os
+from typing import Any, Dict
 
 from flask import Blueprint, request
 from ..utils.file_manager import JSONManager
-from .messages import Response
 from ..utils.config_manager import get_config_manager
-
+from ..models import Response
 charts = Blueprint("charts", __name__)
 
 
 @charts.route("getChartPolicies")
 def chart_policies():
-    chart_type: str = request.args.get("chartType")
+    chart_type = request.args.get("chartType")
     t: Any = JSONManager.from_file(get_config_manager().chart_policies_file(), dict)
     policies: Dict
     policies, err = t
@@ -39,7 +38,7 @@ def chart_option():
         return Response.error(err)
     chart_options = options.get(chart_name)
     if chart_options is None:
-        return Response.error(f"chart option for '{chart_name}' not defined")
+        return Response.error(f"Chart option for '{chart_name}' not defined")
     else:
         return Response.ok(chart_options)
 
@@ -110,7 +109,6 @@ def get_layout():
 def save_layout():
     data = json.loads(request.data)
     layout_file = get_config_manager().layout_file()
-    print(data, layout_file)
     layout_data = data["layout"]
     err = JSONManager.to_file(layout_data, layout_file)
     if err is not None:

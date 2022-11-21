@@ -3,18 +3,18 @@ import json
 import os
 import select
 import time
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 import queue
 import uuid
 from flask import Blueprint, Flask, request
 from flask_sock import Sock
 import psutil
-from ..models.models import WSMessage, WSToServerMessage
+from ..models import WSMessage, WSMessageTypes, WSToServerMessage, PTYMetaDict
 import threading
 import platform
 from ..utils.ptyhandler import MelodiePTY, MelodiePTYError
 from ..utils.machine import is_windows
-from .messages import Response
+from ..models import Response
 
 if platform.system().lower().find("windows") != -1:
     from winpty import PtyProcess, PTY
@@ -54,7 +54,7 @@ class WSHandlerCell:
             self.handle(msg["payload"])
         else:
             if self._next_cell is not None:
-                self._next_cell.handle()
+                self._next_cell.handle(msg)
             else:
                 raise NotImplementedError("Nextcell was none!")
 
@@ -71,7 +71,7 @@ class PTYHandleCell(WSHandlerCell):
         # Get all active ptys
         return [pty_id for pty_id in self.ptys]
 
-    def all_active_ptys(self) -> List[str]:
+    def all_active_ptys(self) -> List[PTYMetaDict]:
         return [self.ptys[pty_id].to_dict() for pty_id in self.ptys]
 
     def on_pty_close(self, pty_id: str):
@@ -103,7 +103,7 @@ class PTYHandleCell(WSHandlerCell):
         else:
             self.ptys[termID].write(cmd)
 
-    def create_pty(self, termID: str, cmd: str, name: str) -> MelodiePTY:
+    def create_pty(self, termID: str, cmd: str, name: str) ->Optional[ MelodiePTY]:
         if termID not in self.ptys:
             self.ptys[termID] = MelodiePTY(
                 termID, cmd, send_pty_output, self.on_pty_close, name
@@ -168,9 +168,8 @@ def register_websocket_handlers(app: Flask):
 
 def send_pty_output(term_id: str, content: str):
     if content == "":
-        # print('empty output pty', term_id)
         return
-    send_queue.put(WSMessage("pty-output", {"output": content, "termID": term_id}))
+    send_queue.put(WSMessage(WSMessageTypes.PTY_OUTPUT, {"output": content, "termID": term_id}))
 
 
 def send_pty_status(term_id: str, status: str):
@@ -180,19 +179,19 @@ def send_pty_status(term_id: str, status: str):
     """
     assert status in {"closed", "opened"}, status
     send_queue.put(
-        WSMessage("pty-status-change", {"termID": term_id, "status": status})
+        WSMessage(WSMessageTypes.PTY_STATUS_CHANGE, {"termID": term_id, "status": status})
     )
 
 
 def send_subprocess_output(type: str, content: str):
     assert type in {"stderr", "stdout"}, "Invalid type" + type
-    send_queue.put(WSMessage("subprocess-output", {"type": type, "content": content}))
+    send_queue.put(WSMessage(WSMessageTypes.SUBPROCESS_OUTPUT, {"type": type, "content": content}))
 
 
 def emit_removed_fsitem_evt(fsitem_name: str):
     send_queue.put(
         WSMessage(
-            "fs-event",
+            WSMessageTypes.FS_EVENT,
             {
                 "type": "removed",
                 "parent": os.path.dirname(fsitem_name),
@@ -205,7 +204,7 @@ def emit_removed_fsitem_evt(fsitem_name: str):
 def emit_added_fsitem_evt(abs_path: str):
     send_queue.put(
         WSMessage(
-            "fs-event",
+            WSMessageTypes.FS_EVENT,
             {
                 "type": "added",
                 "parent": os.path.dirname(abs_path),

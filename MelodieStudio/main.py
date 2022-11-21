@@ -3,6 +3,7 @@ import os
 import time
 from typing import TYPE_CHECKING
 import argparse
+from threading import current_thread
 from flask import Flask, redirect, g as app_ctx, current_app, request
 from ._config import set_studio_config
 from .handlers import (
@@ -49,7 +50,7 @@ def logging_after(response):
     time_in_ms = int(total_time * 1000)
     # Log the time taken for the endpoint
     current_app.logger.info(
-        "%s ms %s %s %s", time_in_ms, request.method, request.path, dict(request.args)
+        "%s ms %s %s %s %s", time_in_ms, request.method, request.path, dict(request.args), current_thread()
     )
     return response
 
