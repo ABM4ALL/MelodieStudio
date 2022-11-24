@@ -1,6 +1,7 @@
 import { ChartPolicies } from "@/components/dynamicChart/chartutils";
 import { LayoutManager } from "@/components/basic/dragcontainers";
 import request from "@/request";
+import axios from "axios";
 export const getChartInitialOptions = async (chartName: string): Promise<echarts.EChartsOption | null> => {
     const resp = await request.get("/api/charts/chartOptions", { chartName });
     return resp.data as echarts.EChartsOption;
@@ -30,3 +31,9 @@ export const getLayout = async (): Promise<LayoutManager> => {
     const resp = await request.get("/api/charts/getLayout", {});
     return resp.data as LayoutManager;
 };
+
+axios.get('http://localhost:8765/env').then((resp) => {
+    console.log(resp)
+}).catch((err) => {
+    console.error(err)
+})

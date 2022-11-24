@@ -3,18 +3,17 @@
 # @Author: Zhanyi Hou
 # @Email: 1295752786@qq.com
 # @File: _config.py
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
-if TYPE_CHECKING:
-    from Melodie import Config
+from MelodieInfra import Config
 
-_studio_config: Optional["Config"] = None
+_studio_config: Optional[Config] = None
 
 
-def set_studio_config(config: "Config"):
+def set_studio_config(config: Config):
     global _studio_config
     _studio_config = config
 
 
-def get_studio_config() -> "Config":
+def get_studio_config() -> Optional[Config]:
     return _studio_config

@@ -10,15 +10,10 @@ from MelodieStudio.utils.config_manager import get_workdir
 
 from ..models import Response
 
-try:
-    from Melodie.templates.create_template import (
-        create_project,
-        new_project_config_default,
-    )
-except:
-    import traceback
-
-    traceback.print_exc()
+from MelodieInfra.templates.create_template import (
+    create_project,
+    new_project_config_default,
+)
 
 tools = Blueprint("tools", __name__)
 

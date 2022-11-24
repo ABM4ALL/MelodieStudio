@@ -6,17 +6,18 @@ import subprocess
 import sys
 import threading
 import time
-from typing import Callable, Optional, TYPE_CHECKING
+from typing import Callable, Optional
 
 from watchdog.events import (
     FileSystemEventHandler,
-    FileSystemEvent,
     FileMovedEvent,
     FileDeletedEvent,
 )
 from watchdog.observers import Observer
 
-from MelodieStudio.handlers.handler_ws import (
+from MelodieInfra import Config
+
+from MelodieStudio.routes.ws import (
     emit_added_fsitem_evt,
     emit_removed_fsitem_evt,
 )
@@ -24,9 +25,6 @@ from MelodieStudio.handlers.handler_ws import (
 logger = logging.getLogger(__name__)
 observer: Optional[Observer] = None
 _current_runner = None
-
-if TYPE_CHECKING:
-    from Melodie import Config
 
 
 class FileMonitorHandler(FileSystemEventHandler):

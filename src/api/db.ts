@@ -29,16 +29,16 @@ export const query = async (dbMeta: SQLiteMeta): Promise<QueriedData> => {
 };
 
 export const readTableFile = async (meta: TableDataMeta): Promise<DataResponse> => {
-    const resp = await request.get("/api/dbBrowser/table_file_read", meta);
+    const resp = await request.get("/api/files/tableFiles/excel/read", meta);
     return resp.data as DataResponse;
 };
 
 export const writeTableFile = async (meta: TableDataMeta): Promise<boolean> => {
-    const resp = await request.post("/api/dbBrowser/table_file_write", meta);
+    const resp = await request.post("/api/files/tableFiles/excel/writeSheet", meta);
     return resp.data as boolean;
 };
 
 export const tableToLatex = async (meta: TableDataMeta): Promise<string> => {
-    const resp = await request.post("/api/dbBrowser/table_to_latex", meta);
+    const resp = await request.post("/api/files/tableFiles/conversions/toLatex", meta);
     return resp.data as string;
 }

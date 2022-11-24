@@ -388,12 +388,12 @@ const cellRenderer = ({ rowData, column, rowIndex, columnIndex }) => {
       selection.value.startColIndex,
       selection.value.endColIndex
     );
-    console.log(
-      [rowLess, rowGreater],
-      [colLess, colGreater],
-      columnIndex,
-      rowIndex
-    );
+    // console.log(
+    //   [rowLess, rowGreater],
+    //   [colLess, colGreater],
+    //   columnIndex,
+    //   rowIndex
+    // );
     if (
       colLess <= columnIndex &&
       columnIndex <= colGreater &&
@@ -492,7 +492,6 @@ const calcTableDataNew = () =>
       {
       }
     );
-    console.log("val", val);
     return val;
   });
 

@@ -1,6 +1,6 @@
 import os.path
 from config import resources_path
-from MelodieStudio.handlers.handler_filesystem import get_all_file_items
+from MelodieStudio.routes.filesystem import get_all_file_items
 from MelodieStudio.manipulators.textfile_manipulator import TextfileManipulator
 
 

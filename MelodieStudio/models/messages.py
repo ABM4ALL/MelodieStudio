@@ -1,7 +1,7 @@
 import json
 import logging
 from typing import Any
-
+from MelodieInfra import DataServiceStatus
 logger = logging.getLogger(__file__)
 
 
@@ -35,3 +35,7 @@ class Response:
     @staticmethod
     def error(msg: str) -> str:
         return Response._create_response(Response.ERROR, msg, None)
+
+    @staticmethod
+    def resp_json_from_data_service_status(ds_status: DataServiceStatus):
+        return ds_status.to_json()

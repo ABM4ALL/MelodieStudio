@@ -11,33 +11,17 @@ from typing import Any, Dict, List, Union, cast
 
 from flask import Blueprint, request
 import pandas as pd
-from MelodieStudio.manipulators.network_manipulator import NetworkManipulator
 
+from MelodieStudio.manipulators.network_manipulator import NetworkManipulator
 from MelodieStudio.manipulators.table_manipulator import ExcelManipulator
 
 from .._config import get_studio_config
 from ..models import Response
 from .utils import args_not_none
-try:
-    from Melodie.db import create_db_conn, DBConn
-except ImportError:
-    import traceback
 
-    traceback.print_exc()
+from MelodieInfra import DBConn, ExcelWriteRequest, ExcelDataService, DataServiceState, ExcelReadSheetRequest
 
 db_browser = Blueprint("dbBrowser", __name__)
-
-
-def df_to_json(df: pd.DataFrame):
-    with tempfile.NamedTemporaryFile(delete=False) as tf:
-        df.to_json(tf.name, orient="table", indent=4, index=False)
-        data = tf.read()
-        tf.close()
-    data = json.loads(data)
-    for item in data["schema"]["fields"]:
-        if item["type"] == "integer":
-            item["type"] = "number"
-    return data
 
 
 def read_sql(db_type, meta, sql) -> dict:
@@ -97,73 +81,7 @@ def browse_sqlite():
     else:
         return Response.error(f"Database type {request.args.get('type')} unsupported!")
     return Response.ok(get_table_names(db_type, conn_meta))
-
-
-@db_browser.route("/table_file_read")
-@args_not_none(['path'])
-def df_read():
-    path = request.args["path"]
-    _, ext = os.path.splitext(path)
-    ext = ext[1:]
-    if ext in {"xls", "xlsx"}:
-        # res = pd.read_excel(path)
-        em = ExcelManipulator(path)
-        sheets: List[str] = cast(Any, em.get_sheet_names())
-        currentSheet: str = (
-            request.args["sheet"] if request.args.get(
-                "sheet") else sheets[0]
-        )
-        res = em.read_sheet(currentSheet)
-        return Response.ok(
-            {
-                "payload": df_to_json(res),
-                "meta": {
-                    "widget": "table",
-                    "type": "excel",
-                    "sheetNames": sheets,
-                    "currentSheet": currentSheet,
-                },
-            }
-        )
-    else:
-        raise NotImplementedError(f"Ext type {ext} unsupported!")
-
-
-@db_browser.route("/table_file_write", methods=["POST"])
-def df_write():
-    print(request.data)
-    data = json.loads(request.data)
-
-    path = data["path"]
-    table_data = data["data"]
-
-    _, ext = os.path.splitext(path)
-    ext = ext[1:]
-    if ext in {"xls", "xlsx"}:
-
-        df = pd.DataFrame(table_data)
-        sheet_name = data["sheet"]
-        try:
-            # res.to_excel(path, index=False)
-            if sheet_name is not None:
-                em = ExcelManipulator(path)
-                em.write_to_sheet(df, sheet_name)
-            else:
-                df.to_excel(path, index=False)
-            return Response.ok("Succeeded saved table file!")
-        except Exception as e:
-            return Response.ok(f"{e}")
-    else:
-        raise NotImplementedError(f"Ext type {ext} unsupported!")
-
-
-@db_browser.route("/table_to_latex", methods=["POST"])
-def table_to_latex():
-    data = json.loads(request.data)
-    table_data = data["data"]
-    df = pd.DataFrame(table_data)
-    return Response.ok(df.to_latex())
-
+    
 
 @db_browser.route("/read_network", methods=["GET"])
 @args_not_none(['path'])

@@ -1,24 +1,27 @@
+import argparse
 import logging
 import os
 import time
-from typing import TYPE_CHECKING
-import argparse
+
+from typing import TYPE_CHECKING, Optional
 from threading import current_thread
+
 from flask import Flask, redirect, g as app_ctx, current_app, request
+
+from MelodieInfra import Config
+
 from ._config import set_studio_config
-from .handlers import (
+from .routes import (
     db_browser,
     file_system,
     tools,
     register_websocket_handlers,
     charts,
     pty_mgr,
+    files_blueprint
 )
 from .utils.config_manager import init_config_manager, get_workdir, set_workdir
 from .hotupdate import start_watch_fs, create_runner
-
-if TYPE_CHECKING:
-    from Melodie import Config
 
 args_parser = argparse.ArgumentParser(description="Melodie Studio")
 args_parser.add_argument("--workdir", help="The workdir where MelodieStudio serve")
@@ -33,7 +36,7 @@ app.register_blueprint(db_browser, url_prefix="/api/dbBrowser")
 app.register_blueprint(file_system, url_prefix="/api/fs")
 app.register_blueprint(tools, url_prefix="/api/tools")
 app.register_blueprint(pty_mgr, url_prefix="/api/pty")
-
+app.register_blueprint(files_blueprint, url_prefix="/api/files")
 logger = logging.getLogger(__name__)
 
 
@@ -60,7 +63,7 @@ def handle_root():
     return redirect("http://localhost:8089/index.html", code=301)
 
 
-def studio_main(config: "Config" = None):
+def studio_main(config: Optional[Config] = None):
     """
     Main function for studio server.
 

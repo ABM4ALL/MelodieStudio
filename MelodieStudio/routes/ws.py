@@ -103,7 +103,7 @@ class PTYHandleCell(WSHandlerCell):
         else:
             self.ptys[termID].write(cmd)
 
-    def create_pty(self, termID: str, cmd: str, name: str) ->Optional[ MelodiePTY]:
+    def create_pty(self, termID: str, cmd: str, name: str) -> Optional[MelodiePTY]:
         if termID not in self.ptys:
             self.ptys[termID] = MelodiePTY(
                 termID, cmd, send_pty_output, self.on_pty_close, name
@@ -169,7 +169,8 @@ def register_websocket_handlers(app: Flask):
 def send_pty_output(term_id: str, content: str):
     if content == "":
         return
-    send_queue.put(WSMessage(WSMessageTypes.PTY_OUTPUT, {"output": content, "termID": term_id}))
+    send_queue.put(WSMessage(WSMessageTypes.PTY_OUTPUT, {
+                   "output": content, "termID": term_id}))
 
 
 def send_pty_status(term_id: str, status: str):
@@ -179,13 +180,15 @@ def send_pty_status(term_id: str, status: str):
     """
     assert status in {"closed", "opened"}, status
     send_queue.put(
-        WSMessage(WSMessageTypes.PTY_STATUS_CHANGE, {"termID": term_id, "status": status})
+        WSMessage(WSMessageTypes.PTY_STATUS_CHANGE, {
+                  "termID": term_id, "status": status})
     )
 
 
 def send_subprocess_output(type: str, content: str):
     assert type in {"stderr", "stdout"}, "Invalid type" + type
-    send_queue.put(WSMessage(WSMessageTypes.SUBPROCESS_OUTPUT, {"type": type, "content": content}))
+    send_queue.put(WSMessage(WSMessageTypes.SUBPROCESS_OUTPUT,
+                             {"type": type, "content": content}))
 
 
 def emit_removed_fsitem_evt(fsitem_name: str):
@@ -226,7 +229,10 @@ def new_terminal():
     name = data["name"]
     new_terminal_id = str(uuid.uuid1())
     try:
-        new_term = pty_handle_cell.create_pty(new_terminal_id, cmd, name)
+        new_term = pty_handle_cell.create_pty(
+            new_terminal_id, cmd, name)
+        if new_term is None:
+            return Response.error("No pty created")
         print(psutil.Process().children(recursive=True))
         return Response.ok(new_term.to_dict())
     except MelodiePTYError as e:

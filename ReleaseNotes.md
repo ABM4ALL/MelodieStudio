@@ -10,6 +10,7 @@
 - Grep the data structure and format the `DataFrameInfo` of table. Besides, some checks could be performed.
 - Automatically add environment properties to visualizer.
 - Echarts server-side configurable items
+- Configure connections to different types of databases by connection string, and get data by sqlalchemy.
 
 ## Version 0.4.0
 - Feature: Complexed tree parameters

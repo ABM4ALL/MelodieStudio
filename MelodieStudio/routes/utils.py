@@ -5,6 +5,7 @@ from flask import request
 
 from ..models import Response
 
+
 def args_not_none(args_to_verify: List[str]):
     def wrapper(func2):
         @wraps(func2) # Wraps could eliminate the side effect of decorator.

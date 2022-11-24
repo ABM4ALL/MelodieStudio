@@ -8,7 +8,7 @@ import os
 from typing import Any, Dict
 
 from flask import Blueprint, request
-from ..utils.file_manager import JSONManager
+from ..services.json_config import JSONManager
 from ..utils.config_manager import get_config_manager
 from ..models import Response
 charts = Blueprint("charts", __name__)

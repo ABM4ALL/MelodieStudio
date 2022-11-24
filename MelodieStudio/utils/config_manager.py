@@ -3,15 +3,16 @@
 # @Author: Zhanyi Hou
 # @Email: 1295752786@qq.com
 # @File: configure_manager.py
-import os.path
+import os
 from typing import Optional
 
-from .file_manager import JSONManager
+from ..services.json_config import JSONManager
 
 COMPULSORY_CONFIGS_DIR = os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "compulsory_configs"
 )
-CHART_POLICIES_FILE = os.path.join(COMPULSORY_CONFIGS_DIR, "chart_policies.json")
+CHART_POLICIES_FILE = os.path.join(
+    COMPULSORY_CONFIGS_DIR, "chart_policies.json")
 
 _workdir = ""
 
