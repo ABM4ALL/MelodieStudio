@@ -1,6 +1,6 @@
 import request from "@/request";
-import { ElMessage } from "element-plus";
 import { DataResponse, QueriedData } from "@/models/data_mani"
+import { DatabaseBasicRequest, DatabaseQueryRequest } from "@/models/data";
 export interface DBMeta {
     type: "sqlite"
     sql?: string
@@ -18,12 +18,12 @@ export interface TableDataMeta {
     sheet?: any
 }
 
-export const getTableNames = async (dbMeta: SQLiteMeta): Promise<string[]> => {
+export const getTableNames = async (dbMeta: DatabaseBasicRequest): Promise<string[]> => {
     const resp = await request.get("/api/dbBrowser/tableNames", dbMeta);
     return resp.data;
 };
 
-export const query = async (dbMeta: SQLiteMeta): Promise<QueriedData> => {
+export const query = async (dbMeta: DatabaseQueryRequest): Promise<QueriedData> => {
     const resp = await request.get("/api/dbBrowser/query", dbMeta);
     return resp.data as QueriedData;
 };
