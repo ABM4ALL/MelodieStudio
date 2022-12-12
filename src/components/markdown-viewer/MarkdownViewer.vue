@@ -50,7 +50,7 @@ export default {
             highlight: function (code) {
                 return hljs.highlightAuto(code).value;
             },
-            baseUrl: "docs/",
+            baseUrl: "http://127.0.0.1:8765/fs/",
             pedantic: false,
             gfm: true,
             tables: true,
@@ -98,6 +98,7 @@ export default {
 .context {
     text-align: left;
     padding: 20px;
+    font-size: 1.4em;
 }
 
 .context :deep(pre) {

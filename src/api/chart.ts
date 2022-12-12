@@ -17,8 +17,9 @@ export const deleteChartOptions = async (chartName: string): Promise<void> => {
 };
 
 export const getChartPolicies = async (chartType: string): Promise<ChartPolicies> => {
-    const resp = await request.get("/api/charts/getChartPolicies", { chartType });
-    return resp.data as ChartPolicies;
+    // const resp = await request.get("/api/charts/getChartPolicies", { chartType });
+    // return resp.data as ChartPolicies;
+    return { selectionItems: {}, unChangeableItems: {} };
 };
 
 export const saveLayout = async (layout: any): Promise<any> => {
@@ -31,9 +32,3 @@ export const getLayout = async (): Promise<LayoutManager> => {
     const resp = await request.get("/api/charts/getLayout", {});
     return resp.data as LayoutManager;
 };
-
-axios.get('http://localhost:8765/env').then((resp) => {
-    console.log(resp)
-}).catch((err) => {
-    console.error(err)
-})

@@ -10,6 +10,7 @@
                     <div class="form-item-help">
                         <span v-if="componentModel.description">Description: {{ componentModel.description }}</span>
                         <span v-if="isNumericValue">Range: {{ numericValueRange }}</span>
+                        <span v-if="componentModel.readonly">Readonly</span>
                         <el-button @click="resetToOriginal">Reset to: {{ originalValue }}
                         </el-button>
                     </div>
@@ -18,7 +19,9 @@
             </div>
 
             <el-input class="form-item-input" :model-value="formattedModelValue"
-                @update:model-value="onValueChange($event)">
+                @update:model-value="onValueChange($event)"
+                :disabled="componentModel.readonly"
+                >
 
             </el-input>
         </div>

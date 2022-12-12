@@ -4,7 +4,7 @@ import json
 from typing import List, Type
 
 from flask import request
-from jsonobject import JsonObject
+from MelodieInfra.jsonobject import JsonObject
 from MelodieStudio.models.messages import Response
 
 """

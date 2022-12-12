@@ -1,9 +1,10 @@
-import  {
+import {
     ParamsData,
     InitialParams
 } from "@/components/dynamicform/models";
 import { SeriesModel } from "echarts";
 import { IncrementalData, SeriesConfig } from "../components/dynamicChart/chartutils";
+import { Operation, OperationTypes } from "./action";
 import { GridItem } from "./agents";
 export enum STATES {
     UNCONFIGURED = 0,
@@ -92,11 +93,17 @@ export type VisualizeViewInitialOption = GridVisComponentViewInitialOptions
 export interface VisData {
     type: string;
     period: number;
-    data: VisualizerData | ParamsData | SeriesConfig | NotificationModel | FileModel;
+    data: VisualizerData | ParamsData | SeriesConfig | NotificationModel | FileModel | Action[];
     modelState: ModelStateType;
     status: StatusType;
 }
 
 export interface CommandParams {
     params?: InitialParams;
+}
+
+export interface Action {
+    key: string
+    text: string,
+    operation: OperationTypes
 }

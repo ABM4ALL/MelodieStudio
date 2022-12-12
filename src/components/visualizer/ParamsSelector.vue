@@ -10,6 +10,12 @@
     width: 200px;
 }
 </style>
+<style>
+.load-param-dlg .el-dialog__body {
+    overflow-y: auto;
+    height: 50vh;
+}
+</style>
 <template>
     <!-- <div> -->
     <el-popover trigger="click" width="160">
@@ -19,30 +25,45 @@
         <div class="popover-buttonlist">
             <el-button @click="onSaveParams">Save</el-button>
             <el-button @click="loadParamSetDialogShow = true">Load</el-button>
+            <el-button @click="emitAction(action.key, action)" v-for="action of actions" :key="action.key">{{
+                    action.text
+            }}</el-button>
+            <!-- <el-popover>
+                <template #reference>
+                    <el-button>Export</el-button>
+                </template>
+                <el-button>ETS Market Price
+                </el-button>
+                <el-button>ETS Trading Volume</el-button>
+            </el-popover> -->
+
             <!-- <el-button @click="onSaveData">Save simulation data as...</el-button> -->
             <!-- <el-button @click="onDownloadDatabase">Export</el-button> -->
         </div>
     </el-popover>
 
     <!-- </div> -->
-    <el-dialog v-model="loadParamSetDialogShow" :append-to-body="true" width="30vw">
-        <div>
-            <div v-for="paramSetName in paramSets" :key="paramSetName" style="display: flex; margin-top: 12px">
-                <span> {{ paramSetName }}</span>
-                <div style="flex-grow: 1"></div>
-                <el-button @click="onLoadParams(paramSetName)" type="primary">Load</el-button>
-            </div>
+    <el-dialog v-model="loadParamSetDialogShow" :append-to-body="true" width="30vw" custom-class="load-param-dlg">
+        <div v-for="paramSetName in paramSets" :key="paramSetName" style="display: flex; margin-top: 12px">
+            <span> {{ paramSetName }}</span>
+            <div style="flex-grow: 1"></div>
+            <el-button @click="onLoadParams(paramSetName)" type="primary">Load</el-button>
         </div>
     </el-dialog>
 </template>
 <script setup lang="ts">
 import { defineEmits, defineProps, PropType, ref } from "vue"
 import { ElMessageBox, ElNotification } from "element-plus";
-
+import { Action } from "@/models/visualizerbasics";
+import request from "@/request";
+import axios from "axios";
+import { downloadFile } from "@/utils/file";
+import { OperationEvaluator } from "@/service/operation_evaluator/opeval"
 const emits = defineEmits(["save-params", "load-params", "save-database", "export-database"])
 const loadParamSetDialogShow = ref(false)
 defineProps({
     paramSets: Array as PropType<string[]>,
+    actions: Array as PropType<Action[]>
     // type:
 })
 // 页面加载的时候，需要一并加载。
@@ -81,4 +102,26 @@ const onDownloadDatabase = async () => {
         ElNotification.error("Failed to export database, error:" + err)
     }
 }
+
+const newAxios = axios.create()
+const emitAction = (key: string, action: Action) => {
+
+    newAxios.get("http://127.0.0.1:8765/action/" + key, { responseType: 'blob' }).then((resp) => {
+        try {
+            const evaluator = new OperationEvaluator()
+            evaluator.evaluate(resp, action.operation)
+        } catch (err) {
+            console.error(err)
+        }
+    }).catch((err) => {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const content = reader.result;//内容就在这里
+            ElNotification.error(`${content}`)
+        };
+        reader.readAsText(err.response.data)
+        console.error(err)
+    })
+}
+
 </script>

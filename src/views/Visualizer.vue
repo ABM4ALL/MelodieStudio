@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   max-width: calc(var(--form-width) + 1vw);
+  min-width: calc(var(--form-width) + 1vw);
   --form-width: 22vw;
   --label-width: 12vw;
 }
@@ -13,6 +14,7 @@
   position: relative;
   flex-grow: 1;
   overflow: scroll;
+  height: calc(100vh - 60px);
 }
 </style>
 <template>
@@ -22,7 +24,8 @@
       :currentStep="currentStep" :connected="connected">
       <template v-slot:left-items>
         <params-selector @load-params="onLoadParams" @export-database="onDownloadDatabase" @save-params="onSaveParams"
-          @save-database="onSaveDatabase" :param-sets="interactiveParams.allParamSetNames">
+          @save-database="onSaveDatabase" :param-sets="interactiveParams.allParamSetNames"
+          :actions="actions">
         </params-selector>
       </template>
       <template v-slot:right-items>

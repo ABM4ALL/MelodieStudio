@@ -24,6 +24,7 @@ import {
 import { GridItem } from "@/models/agents";
 import { ElNotification } from "element-plus";
 import { downloadFileByBase64 } from "@/utils/file";
+import { Action } from "@/models/visualizerbasics"
 export default defineComponent({
   data() {
     return {
@@ -43,6 +44,7 @@ export default defineComponent({
 
       seriesConfig: {} as SeriesConfig,
       visualizerData: {},
+      actions: [] as Action[],
       unMounted: false,
     };
   },
@@ -102,6 +104,10 @@ export default defineComponent({
         } else if (data.type == "notification") {
           const notification = data.data as NotificationModel
           ElNotification({ ...notification })
+          return
+        } else if (data.type == 'actions') {
+          console.log("actions", data)
+          this.actions = data.data as Action[]
           return
         } else if (data.type == "file") {
           const f = data.data as FileModel

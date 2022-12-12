@@ -127,7 +127,6 @@ onBeforeMount(() => {
         panelModeSelectorValue.value = props.paramsModel.children[0].name
     }
     originalValue.value = props.paramValues
-    console.log('originalValue', originalValue.value)
 })
 
 defineExpose({
