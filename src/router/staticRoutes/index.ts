@@ -28,7 +28,7 @@ export const staticRoutes = [
     },
     redirect: "/studio-main"
   },
- 
+
   {
     path: '/home',
     name: 'Home',
@@ -47,11 +47,27 @@ export const staticRoutes = [
     meta: {
       icon: 'view'
     }
-  }, 
+  },
   {
     path: '/network',
     name: 'Network',
     component: () => import('@/components/network/NetworkViewerNew.vue'),
+    children: [],
+    meta: {
+      icon: 'el-icon-s-home'
+    }
+  }, {
+    path: '/visual-programming',
+    name: 'VisualProgramming',
+    component: () => import('@/components/visual_programming/VisualProgramming.vue'),
+    children: [],
+    meta: {
+      icon: 'el-icon-s-home'
+    }
+  }, {
+    path: '/blockly-canvas',
+    name: 'BlocklyCanvas',
+    component: () => import('@/components/blockly/BlocklyCanvas.vue'),
     children: [],
     meta: {
       icon: 'el-icon-s-home'
@@ -83,7 +99,7 @@ export const staticRoutes = [
           icon: 'coin',
           keepAlive: true
         }
-      }, 
+      },
       {
         path: 'form-demo',
         name: 'Form demo',

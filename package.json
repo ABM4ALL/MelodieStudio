@@ -20,6 +20,7 @@
     "@types/crypto-js": "^4.1.1",
     "@vue/cli-plugin-babel": "^5.0.8",
     "axios": "^0.27.2",
+    "blockly": "^9.1.1",
     "codemirror": "^6.0.1",
     "crypto-js": "^4.1.1",
     "echarts": "^5.3.3",
