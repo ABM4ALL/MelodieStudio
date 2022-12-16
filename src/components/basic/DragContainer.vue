@@ -1,8 +1,9 @@
 <style >
 .container {
   position: absolute;
-  background-color: white;
+  /* background-color: aqua; */
   padding: 10px;
+  border: 1px solid #bbbbbb;
 }
 </style>
 <template>

@@ -24,7 +24,8 @@ from .utils.config_manager import init_config_manager, get_workdir, set_workdir
 from .hotupdate import start_watch_fs, create_runner
 
 args_parser = argparse.ArgumentParser(description="Melodie Studio")
-args_parser.add_argument("--workdir", help="The workdir where MelodieStudio serve")
+args_parser.add_argument(
+    "--workdir", help="The workdir where MelodieStudio serve")
 
 app = Flask(
     __name__,
@@ -53,7 +54,8 @@ def logging_after(response):
     time_in_ms = int(total_time * 1000)
     # Log the time taken for the endpoint
     current_app.logger.info(
-        "%s ms %s %s %s %s", time_in_ms, request.method, request.path, dict(request.args), current_thread()
+        "%s ms %s %s %s %s", time_in_ms, request.method, request.path, dict(
+            request.args), current_thread()
     )
     return response
 
@@ -77,12 +79,13 @@ def studio_main(config: Optional[Config] = None):
     else:
         wd = args.workdir
         wd = os.path.abspath(wd)
-        assert os.path.exists(wd), FileNotFoundError(f"Workdir {wd} not found!")
+        assert os.path.exists(wd), FileNotFoundError(
+            f"Workdir {wd} not found!")
     set_workdir(wd)
     if config is None:
-        conf_folder = os.path.join(wd, ".melodiestudio")
+        conf_folder = os.path.join(wd, ".melodie", 'studio')
     else:
-        conf_folder = os.path.join(config.project_root, ".melodiestudio")
+        conf_folder = os.path.join(config.project_root, ".melodie", "studio")
     init_config_manager(conf_folder)
     if config is not None:
         if os.path.exists(config.visualizer_entry):

@@ -96,7 +96,9 @@ export default defineComponent({
             height: number;
         }) {
             this.needsRender = true;
-            this.$chart.resize({ width: evt.width, height: evt.height });
+            if (this.$chart != null) {
+                this.$chart.resize({ width: evt.width, height: evt.height });
+            }
         },
         async onOptionDelete(): Promise<void> {
             await deleteChartOptions(this.chartName);

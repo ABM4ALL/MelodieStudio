@@ -3,8 +3,13 @@ import { LayoutManager } from "@/components/basic/dragcontainers";
 import request from "@/request";
 import axios from "axios";
 export const getChartInitialOptions = async (chartName: string): Promise<echarts.EChartsOption | null> => {
-    const resp = await request.get("/api/charts/chartOptions", { chartName });
-    return resp.data as echarts.EChartsOption;
+    try {
+        const resp = await request.get("/api/charts/chartOptions", { chartName });
+        return resp.data as echarts.EChartsOption;
+    } catch (err) {
+        console.error(err)
+        return null
+    }
 };
 
 export const setChartInitialOptions = async (chartName: string, chartOptions: echarts.EChartsCoreOption): Promise<any> => {

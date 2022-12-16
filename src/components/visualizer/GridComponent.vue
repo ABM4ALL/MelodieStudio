@@ -20,7 +20,7 @@
           :key="agent.data.id"
           role="agent"
           :agent-style="{
-            backgroundColor: agent.style.backgroundColor,
+            backgroundColor: agent.style.color,
             left: (agent.data.x * width) / columns,
             top: (agent.data.y * height) / rows,
             width: width / columns,
@@ -130,6 +130,7 @@ const transitionTime = computed(() => {
 });
 
 const spots = computed(() => {
+  console.log("spots", props.visualizerData)
   return props.visualizerData?.spots;
 });
 const agents = computed(() => {

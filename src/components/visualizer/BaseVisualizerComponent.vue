@@ -58,11 +58,6 @@ export default defineComponent({
         this.paramsModified = false;
       });
     },
-    // paramChanged(params: InitialParams) {
-    //   this.paramValues = params;
-    //   this.paramsModified = true;
-    //   // this.$refs['dynamic-form'].paramValues = 
-    // },
     sendCommand(cmd: COMMANDS, data: CommandParams | any): void {
       this.$ws.send(JSON.stringify({ cmd: cmd, data: data }));
     },
@@ -106,30 +101,19 @@ export default defineComponent({
           ElNotification({ ...notification })
           return
         } else if (data.type == 'actions') {
-          console.log("actions", data)
           this.actions = data.data as Action[]
           return
         } else if (data.type == "file") {
           const f = data.data as FileModel
-          // const file = new File()
-          // file.arrayBuffer
           downloadFileByBase64(f.name, f.content)
-          // console.log(file)
         } else if (data.type === "initOption") {
-
           const visualizerIDs: VisualizeViewInitialOption[] = [];
           for (let i in data.data) {
-            visualizerIDs.push(data.data[i]);
+            const initData: VisualizeViewInitialOption = data.data[i]
+            visualizerIDs.push(initData);
+            this.visualizerData[initData.name] = (initData as any).graph
           }
           this.visualizers = visualizerIDs;
-          this.$nextTick(() => {
-            for (let i in data.data) {
-              (this.$refs[`grid-visualizer-${i}`] as any)[0].setOption(
-                data.data[i] as echarts.EChartsOption
-              );
-            }
-          });
-
           return;
         } else if (data.type === "initPlotSeries") {
           this.seriesConfig = (data.data as any).charts as SeriesConfig;
@@ -143,10 +127,7 @@ export default defineComponent({
           // else show alert message!
           if (data.status === 0) {
             const visualizerData = data.data as VisualizerData;
-            console.log(visualizerData.visualizers);
             for (let i = 0; i < visualizerData.visualizers.length; i++) {
-              // this.setData((data.data as VisualizerData).visualizers[0].data);
-              this.setData(i, visualizerData.visualizers[i].data);
               this.updateData(visualizerData.visualizers[i] as any);
             }
 
@@ -168,7 +149,6 @@ export default defineComponent({
 
               let interval = 0;
               let minTimeGap = 1000 / this.fpsLimit;
-              console.log(gap, minTimeGap);
               if (gap < minTimeGap) {
                 interval = minTimeGap - gap;
               } else {

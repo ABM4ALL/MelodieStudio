@@ -29,6 +29,7 @@ INSTALL_REQUIRES = [
     "flask_cors",
     "astunparse",
     "pprintast",
+    "psutil",
     "watchdog",
     "flask_sock",
     "py_ts_interfaces",
@@ -36,11 +37,15 @@ INSTALL_REQUIRES = [
     "rpyc",
     "pywinpty; os_name=='nt'",
 ]
+
+with open('README.md', encoding='utf8', errors='replace') as f:
+    long_description = f.read()
+
 setuptools.setup(
     name="MelodieStudio",
-    version="0.4.0",
-    description="A web-based toolbox for Melodie package.",
-    long_description="",
+    version="0.5.0",
+    description="A web-based toolbox for Melodie ABM package.",
+    long_description=long_description,
     long_description_content_type="text/markdown",
     # url='https://github.com/SongminYu/Melodie',
     author="ABM4ALL",

@@ -37,6 +37,11 @@ const linechartDefaultOptions: echarts.EChartsCoreOption = {
         data: null,
         orient: "horizontal",
         show: true,
+        type: "plain",
+        left: 'auto',
+        right: "auto",
+        top: 'auto',
+        bottom: 'auto'
     },
     textStyle: {
         color: "#000000",

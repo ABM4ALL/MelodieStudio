@@ -24,8 +24,7 @@
       :currentStep="currentStep" :connected="connected">
       <template v-slot:left-items>
         <params-selector @load-params="onLoadParams" @export-database="onDownloadDatabase" @save-params="onSaveParams"
-          @save-database="onSaveDatabase" :param-sets="interactiveParams.allParamSetNames"
-          :actions="actions">
+          @save-database="onSaveDatabase" :param-sets="interactiveParams.allParamSetNames" :actions="actions">
         </params-selector>
       </template>
       <template v-slot:right-items>
@@ -45,10 +44,15 @@
       <div class="widgets-area">
         <markdown-viewer style="width:100%; height:100%" v-show="showHelpDoc"></markdown-viewer>
         <div style="width:100%; height:100%" v-show="!showHelpDoc">
-          <grid-component :ref="`grid-visualizer-new-${i}`" v-for="(_item, i) in visualizers" :key="i"
-            :name="_item.name" :visualizerIndex="i" :visualizerData="visualizerData[_item.name]" :desiredFPS="fpsLimit"
-            :columns="_item.columns" :rows="_item.rows">
-          </grid-component>
+          <template v-for="(_item, i) in visualizers" :key="_item.name">
+            <grid-component :ref="`grid-visualizer-new-${i}`" v-if="_item.type == 'grid'" :name="_item.name"
+              :visualizerIndex="i" :visualizerData="visualizerData[_item.name]" :desiredFPS="fpsLimit"
+              :columns="_item.columns" :rows="_item.rows">
+            </grid-component>
+            <network-component v-else-if="_item.type == 'network'" :options="visualizerData[_item.name]"
+              :name="'network-visualizer-' + _item.name"></network-component>
+          </template>
+
           <chart-list :seriesConfig="seriesConfig" ref="chartList" :style="{ position: 'absolute' }"></chart-list>
         </div>
 
@@ -73,6 +77,7 @@ import ChartList from "@/components/dynamicChart/ChartList.vue";
 import GridVisualizer from "@/components/visualizer/GridVisualizer.vue";
 import Toolbar from "@/components/visualizer/Toolbar.vue";
 import GridComponent from "@/components/visualizer/GridComponent.vue";
+import NetworkComponent from "@/components/visualizer/NetworkViewer.vue";
 import { GridItem } from "@/models/agents";
 import { COMMANDS, NewVisualizerData } from "@/models/visualizerbasics";
 import ParamsSelector from "@/components/visualizer/ParamsSelector.vue"
@@ -86,7 +91,8 @@ export default defineComponent({
     Toolbar,
     GridComponent,
     ParamsSelector,
-    MarkdownViewer
+    MarkdownViewer,
+    NetworkComponent
   },
   name: "hello",
   data() {
@@ -132,16 +138,11 @@ export default defineComponent({
     },
 
     async updateData(data: NewVisualizerData): Promise<void> {
-
+      
       const t0 = Date.now();
-      // if (this.visualizerData[data.name] == null) {
       this.visualizerData[data.name] = data;
-      // }else{
-      //   this.visualizerData[data.name].agents = data.agents;
-      // }
       await nextTick();
       const t1 = Date.now();
-      console.log(t1 - t0);
     },
 
     sendCommand(cmd: number, data: any): void {

@@ -26,7 +26,8 @@ export const staticRoutes = [
       icon: 'home-filled',
       title: "Melody Studio"
     },
-    redirect: "/studio-main"
+    // redirect: "/studio-main"
+    redirect: "/full-page-visualizer"
   },
 
   {
@@ -64,15 +65,16 @@ export const staticRoutes = [
     meta: {
       icon: 'el-icon-s-home'
     }
-  }, {
-    path: '/blockly-canvas',
-    name: 'BlocklyCanvas',
-    component: () => import('@/components/blockly/BlocklyCanvas.vue'),
-    children: [],
-    meta: {
-      icon: 'el-icon-s-home'
-    }
-  },
+  }, 
+  // {
+  //   path: '/blockly-canvas',
+  //   name: 'BlocklyCanvas',
+  //   component: () => import('@/components/blockly/BlocklyCanvas.vue'),
+  //   children: [],
+  //   meta: {
+  //     icon: 'el-icon-s-home'
+  //   }
+  // },
   // {
   //   path: '/chartList',
   //   name: 'ChartListView',

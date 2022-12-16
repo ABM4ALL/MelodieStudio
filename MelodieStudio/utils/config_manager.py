@@ -115,7 +115,7 @@ class BasicConfig(ConfigureCategory):
 class ConfigureManager:
     def __init__(self, conf_folder: str):
         if not os.path.exists(conf_folder):
-            os.mkdir(conf_folder)
+            os.makedirs(conf_folder)
         elif os.path.isfile(conf_folder):
             raise FileExistsError(
                 f"Config folder '{conf_folder}' is a file, not a folder"

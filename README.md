@@ -1,17 +1,37 @@
 # Melodie Studio
-The Frontend of Melodie
+The Frontend of Melodie, mainly implemented Visualizer page
 
-## Credit
+![Visualizer Page](docs/pics/visualizer-screenshot.jpg)
 
-This project is based on this project: **Vue-Onepiece-Admin**
+The visualizer page can be divided into three parts: 
+![Functional Areas](docs/pics/function-areas.jpg)
+- Toolbar
+    - Toolbar has several components controlling the simulation, saving and loading custom parameter set.
+- Parameters Area
+    - Listing parameters that affect the model.
+    - Customizable in the custom subclass of `Melodie.Visualizer`.
+- Canvas
+    - Web-based visualization component for `Grid` and `Network`
+    - Web-based chart including Line chart, Bar chart.
+    - Customize visualization component and graph to show in the custom subclass of `Melodie.Visualizer`.
+    <!--
+        - Layout of visualization components and charts, together with chart styles, can be  configured by webpage, not coding. [Unstable]
+    -->
 
-The documentation is [here](https://element-plus.gitee.io/#/zh-CN)
 
-The source code: [https://github.com/Mstian/Vue-Onepiece-Admin](https://github.com/Mstian/Vue-Onepiece-Admin)
+## User Installation
+### PIP installation
+```sh
+pip install MelodieStudio
+```
+### Run MelodieStudio
+```sh
+python -m MelodieStudio
+```
+If you are running a visualizer, please start the MelodieStudio in the root path of your ABM project.
 
-
-
-## Project setup
+## Developer Installation
+### Project setup
 ```
 npm install
 ```
@@ -26,18 +46,15 @@ npm run serve
 npm run build
 ```
 
-## Functions List
-
-### Grid Visualizer
-
-### Network Visualizer
-
-### Visual Chart Editor
-
-### Database Browser
-
-Dist wheel with building webpage:
+### Dist wheel with building webpage:
 ```sh
-python build_web.py
-python setup.py bdist_wheel
+python build_web.py # build webpage
+python setup.py bdist_wheel # build wheel, and include the webpage.
 ```
+
+
+## Technical Introduction
+
+This project is based on Vue, Element-Plus and Echarts. Besides, the structure of project is based on [Vue-Onepiece-Admin](https://github.com/Mstian/Vue-Onepiece-Admin).
+
+

@@ -69,11 +69,18 @@ export interface NewVisualizersData {
 
 interface VisComponentViewInitialOptions {
     name: string
+    type: string
 }
 
 export interface GridVisComponentViewInitialOptions extends VisComponentViewInitialOptions {
+    type: "grid"
     columns: number
     rows: number
+}
+
+export interface NetworkVisComponentViewInitialOptions extends VisComponentViewInitialOptions {
+    type: "network"
+    graph: any
 }
 
 export interface NotificationModel {
@@ -88,7 +95,7 @@ export interface FileModel {
     // data: any
 }
 
-export type VisualizeViewInitialOption = GridVisComponentViewInitialOptions
+export type VisualizeViewInitialOption = GridVisComponentViewInitialOptions | NetworkVisComponentViewInitialOptions
 
 export interface VisData {
     type: string;
