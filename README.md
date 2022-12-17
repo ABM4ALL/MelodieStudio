@@ -44,23 +44,19 @@ If you are running a visualizer, please start the MelodieStudio in the root path
 ```
 npm install
 ```
-
 ### Compiles and hot-reloads for development
 ```
 npm run serve
 ```
-
 ### Compiles and minifies for production
 ```
 npm run build
 ```
-
 ### Dist wheel with building webpage:
 ```sh
 python build_web.py # build webpage
 python setup.py bdist_wheel # build wheel, and include the webpage.
 ```
-
 
 ## Technical Introduction
 
