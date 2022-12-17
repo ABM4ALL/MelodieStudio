@@ -41,15 +41,15 @@ If you are running a visualizer, please start the MelodieStudio in the root path
 
 ## Developer Installation
 ### Project setup
-```
+```sh
 npm install
 ```
 ### Compiles and hot-reloads for development
-```
+```sh
 npm run serve
 ```
 ### Compiles and minifies for production
-```
+```sh
 npm run build
 ```
 ### Dist wheel with building webpage:
