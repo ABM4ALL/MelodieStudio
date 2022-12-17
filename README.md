@@ -1,22 +1,31 @@
-# Melodie Studio
-The Frontend of Melodie, mainly implemented Visualizer page
+# MelodieStudio
 
-![Visualizer Page](docs/pics/visualizer-screenshot.jpg)
+## Introduction 
 
-The visualizer page can be divided into three parts: 
-![Functional Areas](docs/pics/function-areas.jpg)
+`MelodieStudio` is a package developed in parallel with `Melodie`, 
+which interacts with the `Melodie.Visualizer` module and visualizes the simulation results in the browser.
+
+![Functional Areas](docs/pics/function-areas.png)
+
+As shown, the visualizer page includes three parts: 
+
 - Toolbar
-    - Toolbar has several components controlling the simulation, saving and loading custom parameter set.
-- Parameters Area
+    - Including several components controlling the simulation, saving and loading custom parameter set.
+- Parameter Space
     - Listing parameters that affect the model.
-    - Customizable in the custom subclass of `Melodie.Visualizer`.
+    - Customizable in the model-specific `visualizer.py` file.
 - Canvas
-    - Web-based visualization component for `Grid` and `Network`
-    - Web-based chart including Line chart, Bar chart.
-    - Customize visualization component and graph to show in the custom subclass of `Melodie.Visualizer`.
+    - Web-based visualization components for `Grid` and `Network`.
+    - Web-based charts, including line chart, bar chart, etc.
+    - Customizable in the model-specific `visualizer.py` file.
     <!--
-        - Layout of visualization components and charts, together with chart styles, can be  configured by webpage, not coding. [Unstable]
+        - Layout of visualization components and charts, together with chart styles, can be configured by webpage, not coding. [Unstable]
     -->
+
+You can find two examples - [CovidGridContagionVisual](https://github.com/ABM4ALL/CovidGridContagionVisual) and 
+[CovidNetworkContagionVisual](https://github.com/ABM4ALL/CovidNetworkContagionVisual) - 
+using the `MelodieStudio` package, and they are explained in this 
+[document](https://abm4all.github.io/Melodie/html/gallery/covid_contagion_visual.html).
 
 
 ## User Installation
