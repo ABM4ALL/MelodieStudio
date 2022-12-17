@@ -22,7 +22,7 @@ As shown, the visualizer page includes three parts:
         - Layout of visualization components and charts, together with chart styles, can be configured by webpage, not coding. [Unstable]
     -->
 
-You can find two examples - [CovidGridContagionVisual](https://github.com/ABM4ALL/CovidGridContagionVisual) and 
+Here are two examples - [CovidGridContagionVisual](https://github.com/ABM4ALL/CovidGridContagionVisual) and 
 [CovidNetworkContagionVisual](https://github.com/ABM4ALL/CovidNetworkContagionVisual) - 
 using the `MelodieStudio` package, and they are explained in this 
 [document](https://abm4all.github.io/Melodie/html/gallery/covid_contagion_visual.html).
