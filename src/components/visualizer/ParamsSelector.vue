@@ -55,15 +55,15 @@
 import { defineEmits, defineProps, PropType, ref } from "vue"
 import { ElMessageBox, ElNotification } from "element-plus";
 import { Action } from "@/models/visualizerbasics";
-import request from "@/request";
 import axios from "axios";
 import { downloadFile } from "@/utils/file";
 import { OperationEvaluator } from "@/service/operation_evaluator/opeval"
 const emits = defineEmits(["save-params", "load-params", "save-database", "export-database"])
 const loadParamSetDialogShow = ref(false)
-defineProps({
+const props = defineProps({
     paramSets: Array as PropType<string[]>,
-    actions: Array as PropType<Action[]>
+    actions: Array as PropType<Action[]>,
+    wsHost: String
     // type:
 })
 // 页面加载的时候，需要一并加载。
@@ -106,7 +106,7 @@ const onDownloadDatabase = async () => {
 const newAxios = axios.create()
 const emitAction = (key: string, action: Action) => {
 
-    newAxios.get("http://127.0.0.1:8765/action/" + key, { responseType: 'blob' }).then((resp) => {
+    newAxios.get(`http://${props.wsHost}/action/` + key, { responseType: 'blob' }).then((resp) => {
         try {
             const evaluator = new OperationEvaluator()
             evaluator.evaluate(resp, action.operation)

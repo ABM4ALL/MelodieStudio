@@ -41,11 +41,11 @@ export default defineComponent({
       lastLoopRequest: 0 as number,
       fpsLimit: 10 as number,
       visualizers: [] as VisualizeViewInitialOption[],
-
       seriesConfig: {} as SeriesConfig,
       visualizerData: {},
       actions: [] as Action[],
       unMounted: false,
+      currentWSHost: "127.0.0.1:8765"
     };
   },
   methods: {
@@ -78,7 +78,7 @@ export default defineComponent({
       return
     },
     connect() {
-      this.$ws = new WebSocket("ws://127.0.0.1:8765");
+      this.$ws = new WebSocket(`ws://${this.currentWSHost}`);
       this.$ws.onopen = () => {
         console.log("websocket ready!");
 

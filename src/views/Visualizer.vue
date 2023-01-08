@@ -21,10 +21,11 @@
   <div
     style="position: relative; height: 100%; display: flex; flex-direction: column; padding: 10px; box-sizing: border-box;">
     <toolbar @reset="reset" @step="step" @loop="loop" @pause="pause" @fps-limit-change="fpsLimit = $event"
-      :currentStep="currentStep" :connected="connected">
+      :currentStep="currentStep" :connected="connected" :ws-host="currentWSHost" @ws-host-change="onWSHostChange">
       <template v-slot:left-items>
         <params-selector @load-params="onLoadParams" @export-database="onDownloadDatabase" @save-params="onSaveParams"
-          @save-database="onSaveDatabase" :param-sets="interactiveParams.allParamSetNames" :actions="actions">
+          :ws-host="currentWSHost" @save-database="onSaveDatabase" :param-sets="interactiveParams.allParamSetNames"
+          :actions="actions">
         </params-selector>
       </template>
       <template v-slot:right-items>
@@ -42,7 +43,8 @@
       </div>
 
       <div class="widgets-area">
-        <markdown-viewer style="width:100%; height:100%" v-show="showHelpDoc"></markdown-viewer>
+        <markdown-viewer style="width:100%; height:100%" v-show="showHelpDoc"
+          :ws-host="currentWSHost"></markdown-viewer>
         <div style="width:100%; height:100%" v-show="!showHelpDoc">
           <template v-for="(_item, i) in visualizers" :key="_item.name">
             <grid-component :ref="`grid-visualizer-new-${i}`" v-if="_item.type == 'grid'" :name="_item.name"
@@ -70,7 +72,7 @@ import * as echarts from "echarts";
 import "echarts-gl";
 
 import DynamicForm from "@/components/dynamicform/DynamicForm.vue";
-
+import { setVisualizerHost, getCurrentVisualizerHost } from "@/api/visualizer"
 import { getContainersLayout } from "@/components/basic/dragcontainers";
 import BaseVisualizer from "../components/visualizer/BaseVisualizerComponent.vue";
 import ChartList from "@/components/dynamicChart/ChartList.vue";
@@ -97,7 +99,7 @@ export default defineComponent({
   name: "hello",
   data() {
     return {
-      showHelpDoc: true,
+      showHelpDoc: false,
       visualizerData: {} as {
         [key: string]: {
           agents: GridItem[];
@@ -114,11 +116,19 @@ export default defineComponent({
     this.$ws.close();
   },
   mounted() {
-    this.connect();
+    getCurrentVisualizerHost().then((host: string) => {
+      this.currentWSHost = host;
+      this.connect();
+    })
   },
   methods: {
     onStep() {
       this.showHelpDoc = false
+    },
+    onWSHostChange(newWSHost: string) {
+      this.currentWSHost = newWSHost
+      this.$ws.close()
+      setVisualizerHost(this.currentWSHost)
     },
     getVisualizer(index: number): typeof GridVisualizer {
       const visualizers: any = this.$refs[`grid-visualizer-${index}`];
@@ -138,7 +148,7 @@ export default defineComponent({
     },
 
     async updateData(data: NewVisualizerData): Promise<void> {
-      
+
       const t0 = Date.now();
       this.visualizerData[data.name] = data;
       await nextTick();

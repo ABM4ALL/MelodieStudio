@@ -107,6 +107,8 @@ class BasicConfig(ConfigureCategory):
     def setup(self):
         self.PORT = 8089
         self.WS_SOCKET = 8765
+        self.CURRENT_VISUALIZER_HOST = "127.0.0.1:8765"
+        self.ALL_VISUALIZER_HOSTS = ["127.0.0.1:8765"]
         # self.CHART_STYLE_CONFIG_FILE = ""
         # self.CHART_POLICIES_FILE = os.path.join(COMPULSORY_CONFIGS_DIR, "chart_policies.json")
         # self.LAYOUT_FILE = ""

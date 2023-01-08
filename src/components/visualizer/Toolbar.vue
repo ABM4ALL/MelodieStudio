@@ -42,10 +42,13 @@
     <div style="margin-left: 14px; width: 300px" v-show="store.state.status.developmentMode">
       <el-slider v-model="value" :max="20" :min="1" :step="1" />
     </div>
-    <div style="margin-left: 14px">
-      <el-tag type="success" v-if="connected">Connected</el-tag>
-      <el-tag type="danger" v-if="!connected">Disconnected</el-tag>
-    </div>
+    <el-tooltip :content="`Visualization host at ${wsHost}`">
+      <div style="margin-left: 14px" @click="connectionEditDialogShow = true">
+        <el-tag type="success" v-if="connected">Ready</el-tag>
+        <el-tag type="danger" v-if="!connected">Disconnected</el-tag>
+      </div>
+    </el-tooltip>
+
     <div style="flex-grow: 1"></div>
     <div style="margin-right: 48px" class="right-items">
       <slot name="right-items">
@@ -53,13 +56,26 @@
     </div>
 
   </el-row>
+  <el-dialog v-model="connectionEditDialogShow" title="Edit Connection to Visualization Host" width="30%" :append-to-body="true">
+    <el-autocomplete v-model="newWSHost" :fetch-suggestions="querySearchAsync" placeholder="Please input"
+      @select="handleSelect" />
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="connectionEditDialogShow = false">Cancel</el-button>
+        <el-button type="primary" @click="onWSHostChange">
+          Confirm
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/runtime-core";
 import store from "@/store"
+import { getAllVisualizerHosts } from "@/api/visualizer";
 export default defineComponent({
-  emits: ["reset", "step", "loop", "pause", "fps-limit-change"],
+  emits: ["reset", "step", "loop", "pause", "fps-limit-change", 'ws-host-change'],
   props: {
     connected: {
       type: Boolean,
@@ -69,6 +85,10 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    wsHost: {
+      type: String,
+      required: true
+    }
   },
   setup() {
     return {
@@ -78,12 +98,37 @@ export default defineComponent({
   data() {
     return {
       value: 3,
+      connectionEditDialogShow: false,
+      newWSHost: this.wsHost
     };
+  },
+  methods: {
+    onWSHostChange() {
+      this.$emit('ws-host-change', this.newWSHost)
+    },
+    async querySearchAsync(queryString: string, cb: (arg: any) => void) {
+      const data: string[] = await getAllVisualizerHosts()
+      const results = queryString
+        ? data.filter((s) => s.includes(queryString))
+        : data
+      const newResult: { value: string }[] = []
+      for (const item of results) {
+        newResult.push({
+          value: item
+        })
+      }
+      cb(newResult)
+    }, handleSelect(item) {
+      console.log(item)
+    }
   },
   watch: {
     value(this: any) {
       this.$emit("fps-limit-change", this.value);
     },
+    wsHost(this: any) {
+      this.newWSHost = this.wsHost;
+    }
   },
   mounted() {
     this.$emit("fps-limit-change", this.value);

@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import threading
 import time
 
 from typing import TYPE_CHECKING, Optional
@@ -18,11 +19,12 @@ from .routes import (
     register_websocket_handlers,
     charts,
     pty_mgr,
-    files_blueprint
+    files_blueprint,
+    visualizer_mgr
 )
-from .utils.config_manager import init_config_manager, get_workdir, set_workdir
+from .utils.config_manager import init_config_manager, get_workdir, set_workdir, get_config_manager
 from .hotupdate import start_watch_fs, create_runner
-
+from .window import show_window
 args_parser = argparse.ArgumentParser(description="Melodie Studio")
 args_parser.add_argument(
     "--workdir", help="The workdir where MelodieStudio serve")
@@ -38,6 +40,7 @@ app.register_blueprint(file_system, url_prefix="/api/fs")
 app.register_blueprint(tools, url_prefix="/api/tools")
 app.register_blueprint(pty_mgr, url_prefix="/api/pty")
 app.register_blueprint(files_blueprint, url_prefix="/api/files")
+app.register_blueprint(visualizer_mgr, url_prefix="/api/visualizer")
 logger = logging.getLogger(__name__)
 
 
@@ -62,7 +65,7 @@ def logging_after(response):
 
 @app.route("/")
 def handle_root():
-    return redirect("http://localhost:8089/index.html", code=301)
+    return redirect(f"http://{request.host}/index.html", code=301)
 
 
 def studio_main(config: Optional[Config] = None):
@@ -87,6 +90,7 @@ def studio_main(config: Optional[Config] = None):
     else:
         conf_folder = os.path.join(config.project_root, ".melodie", "studio")
     init_config_manager(conf_folder)
+    conf_manager = get_config_manager()
     if config is not None:
         if os.path.exists(config.visualizer_entry):
             create_runner(config)
@@ -96,4 +100,15 @@ def studio_main(config: Optional[Config] = None):
     else:
         start_watch_fs(get_workdir(), create_runner)
     register_websocket_handlers(app)
-    app.run(host="0.0.0.0", port=8089)
+
+    th = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=conf_manager.basic_config.PORT))
+
+    th.setDaemon(True)
+    th.start()
+    try:
+        show_window()
+    except BaseException:
+        import traceback
+        traceback.print_exc()
+        while 1:
+            time.sleep(1)

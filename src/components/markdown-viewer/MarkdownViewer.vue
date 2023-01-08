@@ -27,7 +27,9 @@ const renderer = {
 
 export default {
     name: "MarkdownViewer",
-
+    props: {
+        wsHost: { type: String, required: true }
+    },
     data() {
         return {
             articleDetail: {
@@ -50,7 +52,7 @@ export default {
             highlight: function (code) {
                 return hljs.highlightAuto(code).value;
             },
-            baseUrl: "http://127.0.0.1:8765/fs/",
+            baseUrl: `http://${this.wsHost}/fs/`,
             pedantic: false,
             gfm: true,
             tables: true,
