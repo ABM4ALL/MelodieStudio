@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div id="stage"></div>
 </template>
 
@@ -44,4 +44,4 @@ onMounted(() => {
 </script>
 
 <style>
-</style>
+</style> -->

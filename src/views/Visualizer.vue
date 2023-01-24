@@ -69,7 +69,6 @@
 <script lang="ts">
 import { defineComponent, nextTick } from "vue";
 import * as echarts from "echarts";
-import "echarts-gl";
 
 import DynamicForm from "@/components/dynamicform/DynamicForm.vue";
 import { setVisualizerHost, getCurrentVisualizerHost } from "@/api/visualizer"

@@ -10,7 +10,6 @@
 import DragContainer from "@/components/basic/DragContainer.vue";
 import { defineComponent } from "vue";
 import * as echarts from "echarts";
-import "echarts-gl";
 
 export default defineComponent({
   name: "hello",

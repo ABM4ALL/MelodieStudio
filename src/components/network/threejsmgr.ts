@@ -40,10 +40,13 @@ export class ThreeJSManager {
         this.scene = scene
         this.width = width
         this.height = height
-        const canvas = document.querySelector("#" + this.domID);
-        this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        const canvas: HTMLDivElement = document.querySelector("#" + this.domID) as HTMLDivElement;
+        this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 
         const devicePixelRatio = window.devicePixelRatio;
+        console.log('width', canvas.clientWidth, canvas.offsetWidth, canvas.scrollWidth)
+        // const canvas: HTMLDivElement = document.getElementById("threejs-canvas") as HTMLDivElement
+        this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         this.renderer.setPixelRatio(devicePixelRatio);
 
         const camera = new THREE.PerspectiveCamera(
@@ -61,15 +64,12 @@ export class ThreeJSManager {
         this.controls = new OrbitControls(camera, this.renderer.domElement); //创建控件对象
 
 
-        // window.setInterval(() => {
-        //     this.speed = this.updateTargetPosition(scene);
-        //     // updatePosition(scene);
-        // }, 1000);
 
         window.setInterval(() => {
             this.updateColor();
             // updatePosition(scene);
         }, 1000);
+
         let counter = 0
         window.setInterval(() => {
             // speed = updateTargetPosition(scene);
@@ -80,12 +80,13 @@ export class ThreeJSManager {
 
             this.updatePosition(scene, this.speed);
             counter += 1
-        }, 50);
+        }, 500);
+
         this.animate();
     }
 
     insertGeometry(scene: THREE.Scene) {
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const geometry = new THREE.BoxGeometry(1, 1, 0.1);
         const patchGeometry = new THREE.BoxGeometry(1, 1, 0.1);
         const material3 = new THREE.MeshBasicMaterial({
             color: 0xff0000,
@@ -110,7 +111,7 @@ export class ThreeJSManager {
             mesh3.position.set(
                 Math.random() * 100,
                 Math.random() * 100,
-                Math.random() * 100
+                0,//Math.random() * 100
             );
             mesh3.name = i;
             mesh3.material = material;
@@ -128,7 +129,7 @@ export class ThreeJSManager {
             speed[i.toString()] = ({
                 dx: (Math.random() * 100 - mesh3.position.x) / 20,
                 dy: (Math.random() * 100 - mesh3.position.y) / 20,
-                dz: (Math.random() * 100 - mesh3.position.z) / 20,
+                dz: 0//(0 - mesh3.position.z) / 20,
             });
         }
         const t1 = Date.now();
@@ -151,16 +152,16 @@ export class ThreeJSManager {
             mesh3.name = i;
         }
         const t1 = Date.now();
-        console.log(t1 - t0);
+        console.log('updated-target-pos', t1 - t0);
     }
 
     updateColor() {
         const t0 = Date.now();
         for (const spot of this.scene.children[0].children) {
             if (Math.random() < 0.5) {
-                spot.material = this.materialManager.getMaterial("#bbb000")
+                spot.material = this.materialManager.getMaterial("#000000")
             } else {
-                spot.material = this.materialManager.getMaterial("#bb0000")
+                spot.material = this.materialManager.getMaterial("#ffffff")
             }
         }
         console.log(this.scene.children[0].children[0].name)

@@ -6,8 +6,6 @@
 
 <script lang="ts" setup>
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-// import {} from "three/examples/js/utils"
 import { onMounted, defineProps } from "vue-demi";
 import { ThreeJSManager } from "./threejsmgr";
 const props = defineProps({

@@ -34,7 +34,6 @@ import {
 } from "./chartutils";
 import { createLinechartDefaultData, createPieChartDefaultData } from "./defaultoptions";
 import * as echarts from "echarts";
-import "echarts-gl";
 
 import {
     deleteChartOptions,

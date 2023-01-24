@@ -16,7 +16,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import * as echarts from "echarts";
-import "echarts-gl";
 import DragContainer from "@/components/basic/DragContainer.vue";
 export default defineComponent({
   name: "hello",

@@ -16,7 +16,6 @@ import {
   VisualizeViewInitialOption,
 } from "@/models/visualizerbasics";
 import * as echarts from "echarts";
-import "echarts-gl";
 import {
   IncrementalData,
   SeriesConfig,

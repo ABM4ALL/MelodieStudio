@@ -8,7 +8,6 @@ import {
 } from "./chartutils";
 import { createBarChartDefaultData } from "./defaultoptions";
 import * as echarts from "echarts";
-import "echarts-gl";
 
 import {
     deleteChartOptions,
