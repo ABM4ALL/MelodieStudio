@@ -6,10 +6,13 @@
 import json
 import os
 import shutil
-from flask import Blueprint, request
+from flask import Blueprint, request, send_file
 from ..models import Response
 from ..utils.config_manager import get_workdir
 from .utils import args_not_none
+import logging
+
+logger = logging.getLogger(__name__)
 file_system = Blueprint("fs", __name__)
 
 
@@ -156,3 +159,24 @@ def write_file():
         f.write(content)
 
     return Response.success_msg("Saved successfully!")
+
+
+bp_file_server = Blueprint('getFileByPath', __name__)
+file_system.register_blueprint(bp_file_server, url_prefix="/getFileByPath")
+file_server_baseurl = "/api/fs/getFileByPath/"
+
+
+@bp_file_server.before_app_request
+def get_file_by_path():
+    if request.path.startswith(file_server_baseurl):
+        wd = get_workdir()
+        
+        stripped_path = request.path[len(file_server_baseurl):]
+        file_abs_path = os.path.join(wd, stripped_path)
+        print('wd', wd, stripped_path, file_abs_path)
+        if not (os.path.isfile(file_abs_path) and os.path.exists(file_abs_path)):
+            return Response.error(
+                f"Filename {file_abs_path} invalid. It may not exist or not a file."
+            )
+        else:
+            return send_file(file_abs_path)

@@ -53,8 +53,11 @@ def logging_before():
 @app.after_request
 def logging_after(response):
     # Get total time in milliseconds
-    total_time = time.perf_counter() - app_ctx.start_time
-    time_in_ms = int(total_time * 1000)
+    if hasattr(app_ctx, 'start_time'):
+        total_time = time.perf_counter() - app_ctx.start_time
+        time_in_ms = int(total_time * 1000)
+    else:
+        time_in_ms = 'unknown'
     # Log the time taken for the endpoint
     current_app.logger.info(
         "%s ms %s %s %s %s", time_in_ms, request.method, request.path, dict(

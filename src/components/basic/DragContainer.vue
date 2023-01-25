@@ -7,13 +7,21 @@
 }
 </style>
 <template>
-  <div class="container" @mousemove="onMouseMove" @mouseout="onMouseOut" @mousedown="onMouseDown" @mouseup="onMouseUp"
+  <div
+    class="container"
+    @mousemove="onMouseMove"
+    @mouseout="onMouseOut"
+    @mousedown="onMouseDown"
+    @mouseup="onMouseUp"
     :style="{
       height: height + 'px',
       width: width + 'px',
       left: left + 'px',
       top: top + 'px',
-    }" :id="chartDOMID" ref="chart-container">
+    }"
+    :id="chartDOMID"
+    ref="chart-container"
+  >
     <slot></slot>
   </div>
 </template>
@@ -30,10 +38,16 @@ interface LineChartSeriesOption extends echarts.LineSeriesOption {
   data: Array<Array<number>>;
 }
 
-function getEventLocation(evt: MouseEvent, parent: HTMLElement) {
+function getEventLocation(
+  evt: MouseEvent,
+  parent: HTMLElement
+): { offsetX: number; offsetY: number } | null {
   var offsetX = evt.offsetX;
   var offsetY = evt.offsetY;
   const path = (evt as any).path as HTMLDivElement[];
+  if (path == null) {
+    return null;
+  }
   for (const elem of path) {
     if (elem == parent) {
       break;
@@ -111,13 +125,16 @@ export default defineComponent({
       let container = document.getElementById(
         this.chartDOMID
       ) as HTMLDivElement;
+      if (container == null) {
+        throw Error;
+      }
       if (direc == "") {
         this.dragMode = "move";
-        container!.style.cursor = "default";
-        container!.style.zIndex = "100"
+        container.style.cursor = "default";
+        container.style.zIndex = "100";
       } else {
         this.dragMode = "resize";
-        container!.style.cursor = direc + "-resize";
+        container.style.cursor = direc + "-resize";
         this.resizeDir = direc;
         const onMouseMove = (evt: MouseEvent) => {
           if (direc.indexOf("e") !== -1) {
@@ -151,8 +168,11 @@ export default defineComponent({
       let container = document.getElementById(
         this.chartDOMID
       ) as HTMLDivElement;
-      container!.style.cursor = "default";
-      container!.style.zIndex = ""
+      if (container == null) {
+        throw Error;
+      }
+      container.style.cursor = "default";
+      container.style.zIndex = "";
       this.dragMode = "move";
     },
     getDirection(ev: MouseEvent): string {
@@ -162,8 +182,11 @@ export default defineComponent({
       }
       let xP, yP, offset, dir;
       dir = "";
-
-      const { offsetX, offsetY } = getEventLocation(ev, container);
+      const loc = getEventLocation(ev, container);
+      if (loc == null) {
+        return "";
+      }
+      const { offsetX, offsetY } = loc;
       xP = offsetX;
       yP = offsetY;
       offset = 10;
@@ -176,18 +199,16 @@ export default defineComponent({
       return dir;
     },
     onMouseMove(evt: MouseEvent) {
-      const direc = this.getDirection(evt);
-      let container = this.$refs["chart-container"] as any;
-      if (direc != "") {
-        container!.style.cursor = direc + "-resize";
-      } else {
-        container!.style.cursor = "default";
-      }
       if (evt.buttons === 1 && (evt.ctrlKey || evt.metaKey)) {
+        const direc = this.getDirection(evt);
         let container = this.$refs["chart-container"] as any;
         if (container == null) {
-          console.error("container undefined");
-          return;
+          throw Error;
+        }
+        if (direc != "") {
+          container.style.cursor = direc + "-resize";
+        } else {
+          container.style.cursor = "default";
         }
         if (this.dragMode == "move") {
           this.top += evt.movementY;

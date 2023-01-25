@@ -11,11 +11,21 @@
 </style>
 <template>
   <!-- <div class="linechartIncremental" ref="chart-container"> -->
-  <drag-container class="linechartIncremental" @container-changed="onLayoutChanged"
-    :slotComponentID="'chart-' + chartName">
-    <chart-config @config-modified="onChartConfigModified" @delete-saved-option="onOptionDelete"
-      @drawer-close="configDialogShow = false" :initialOptions="chartOption" :selectionItems="selectionItems"
-      :unchangeableItems="unchangeableItems" :showDrawer="configDialogShow" :chartName="chartName"></chart-config>
+  <drag-container
+    class="linechartIncremental"
+    @container-changed="onLayoutChanged"
+    :slotComponentID="'chart-' + chartName"
+  >
+    <chart-config
+      @config-modified="onChartConfigModified"
+      @delete-saved-option="onOptionDelete"
+      @drawer-close="configDialogShow = false"
+      :initialOptions="chartOption"
+      :selectionItems="selectionItems"
+      :unchangeableItems="unchangeableItems"
+      :showDrawer="configDialogShow"
+      :chartName="chartName"
+    ></chart-config>
 
     <div :id="chartDOMID" :style="{ width: '100%', height: '100%' }"></div>
     <!-- </div> -->
@@ -101,16 +111,16 @@ export default defineComponent({
           series: [],
         };
         this.seriesConfig.map((singleSeries: SingleSeriesConfig) => {
-          const newSeries: echarts.LineSeriesOption = {
+          const newSeries: { data: number[][]; type: "line"; name: string } = {
             data: [],
             type: "line",
             name: singleSeries.seriesName,
           };
           // initialize series data
           for (let i = 0; i < singleSeries.data.length; i++) {
-            newSeries.data!.push([i + 1, (singleSeries.data as number[])[i]]);
+            newSeries.data.push([i + 1, (singleSeries.data as number[])[i]]);
           }
-          simulationData.series.push(newSeries);
+          simulationData.series.push(newSeries as echarts.LineSeriesOption);
         });
 
         this.simulationData = simulationData;
@@ -161,9 +171,14 @@ export default defineComponent({
         return;
       }
       for (let i = 0; i < values.length; i++) {
+        const series = this.simulationData.series[i];
         for (let j in values) {
-          if (values[j].name == this.simulationData.series[i].name) {
-            this.simulationData.series[i].data!.push([step, values[i].value]);
+          if (values[j].name == series.name) {
+            if (series.data != null) {
+              series.data.push([step, values[i].value]);
+            } else {
+              throw Error;
+            }
           }
         }
       }

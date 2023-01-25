@@ -255,7 +255,7 @@ export default defineComponent({
       <template #title>
         <h3>{{ chartName }}</h3>
 
-        <el-button @click.stop="exitEdit" size="mini" type="primary"
+        <el-button @click.stop="exitEdit" size="small" type="primary"
           >Save</el-button
         >
 
@@ -272,14 +272,14 @@ export default defineComponent({
           <p class="noBreakOut">Are you sure to reset?</p>
           <div style="text-align: right; margin: 0">
             <el-button
-              size="mini"
+              size="small"
               type="text"
               @click="this.deleteConfirmationShow = false"
               >Cancel</el-button
             >
             <el-button
               type="danger"
-              size="mini"
+              size="small"
               @click="this.deleteSavedOptions"
               >Reset</el-button
             >
@@ -288,7 +288,7 @@ export default defineComponent({
             <el-button
               @click="this.deleteConfirmationShow = true"
               type="danger"
-              size="mini"
+              size="small"
               >Reset</el-button
             >
           </template>
