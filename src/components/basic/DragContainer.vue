@@ -7,21 +7,13 @@
 }
 </style>
 <template>
-  <div
-    class="container"
-    @mousemove="onMouseMove"
-    @mouseout="onMouseOut"
-    @mousedown="onMouseDown"
-    @mouseup="onMouseUp"
+  <div class="container" @mousemove="onMouseMove" @mouseout="onMouseOut" @mousedown="onMouseDown" @mouseup="onMouseUp"
     :style="{
       height: height + 'px',
       width: width + 'px',
       left: left + 'px',
       top: top + 'px',
-    }"
-    :id="chartDOMID"
-    ref="chart-container"
-  >
+    }" :id="chartDOMID" ref="chart-container">
     <slot></slot>
   </div>
 </template>
@@ -199,17 +191,19 @@ export default defineComponent({
       return dir;
     },
     onMouseMove(evt: MouseEvent) {
+      const direc = this.getDirection(evt);
+      const container = this.$refs["chart-container"] as any;
+      if (container == null) {
+        throw Error;
+      }
+      if (direc != "") {
+        container.style.cursor = direc + "-resize";
+      } else {
+        container.style.cursor = "default";
+      }
       if (evt.buttons === 1 && (evt.ctrlKey || evt.metaKey)) {
-        const direc = this.getDirection(evt);
-        let container = this.$refs["chart-container"] as any;
-        if (container == null) {
-          throw Error;
-        }
-        if (direc != "") {
-          container.style.cursor = direc + "-resize";
-        } else {
-          container.style.cursor = "default";
-        }
+
+
         if (this.dragMode == "move") {
           this.top += evt.movementY;
           this.left += evt.movementX;

@@ -31,6 +31,7 @@ export interface FloatParamType extends ParamType {
     min: number;
     max: number;
     step: number;
+    percentage: boolean
 }
 
 

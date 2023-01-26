@@ -11,21 +11,11 @@
 </style>
 <template>
   <!-- <div class="linechartIncremental" ref="chart-container"> -->
-  <drag-container
-    class="linechartIncremental"
-    @container-changed="onLayoutChanged"
-    :slotComponentID="'chart-' + chartName"
-  >
-    <chart-config
-      @config-modified="onChartConfigModified"
-      @delete-saved-option="onOptionDelete"
-      @drawer-close="configDialogShow = false"
-      :initialOptions="chartOption"
-      :selectionItems="selectionItems"
-      :unchangeableItems="unchangeableItems"
-      :showDrawer="configDialogShow"
-      :chartName="chartName"
-    ></chart-config>
+  <drag-container class="linechartIncremental" @container-changed="onLayoutChanged"
+    :slotComponentID="'chart-' + chartName">
+    <chart-config @config-modified="onChartConfigModified" @delete-saved-option="onOptionDelete"
+      @drawer-close="configDialogShow = false" :initialOptions="chartOption" :selectionItems="selectionItems"
+      :unchangeableItems="unchangeableItems" :showDrawer="configDialogShow" :chartName="chartName"></chart-config>
 
     <div :id="chartDOMID" :style="{ width: '100%', height: '100%' }"></div>
     <!-- </div> -->
@@ -43,6 +33,7 @@ import {
   SeriesConfig,
   SingleSeriesConfig,
   getChartPosTop,
+  computeInterval,
 } from "./chartutils";
 import { createLinechartDefaultData } from "./defaultoptions";
 import * as echarts from "echarts";
@@ -89,6 +80,7 @@ export default defineComponent({
       needsRender: false,
       configDialogShow: false,
       chartOption: defaultOptions.genericOption,
+      xTickInterval: 5
     };
   },
   mounted() {
@@ -183,7 +175,8 @@ export default defineComponent({
         }
       }
       this.needsRender = true;
-      this.currentStep += 1;
+      this.currentStep = step;
+      this.xTickInterval = computeInterval(step)
     },
     clear() {
       for (let i in this.simulationData.series) {
@@ -210,6 +203,19 @@ export default defineComponent({
           },
         },
       });
+      this.$chart.setOption({
+        xAxis: {
+          // axisTick: {
+          interval: this.xTickInterval,
+          min: 0,
+          max: this.currentStep
+          // boundaryGap: ['0%', '0%'],
+          // },
+          // axisLabel: {
+          //   interval: this.xTickInterval - 1
+          // }
+        }
+      })
       this.needsRender = false;
     },
     initChart() {

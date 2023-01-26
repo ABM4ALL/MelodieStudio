@@ -70,3 +70,18 @@ export const generateLineSeriesGeneralOption = (name: string): echarts.LineSerie
 
     return series;
 };
+
+export const computeInterval = (xRange: number): number => {
+    const intervalInt = Math.floor(xRange / 5)
+    // intervalInt舍入到最接近的1000.....
+    const baseValue = Math.pow(10, Math.floor(Math.log10(intervalInt)))
+    const times = [1, 2, 5, 10]
+    for (const v of times) {
+        const newInterval = baseValue * v
+        const splits = Math.floor(xRange / newInterval)
+        if (4 <= splits && splits < 11) {
+            return newInterval
+        }
+    }
+    return baseValue * 10
+}

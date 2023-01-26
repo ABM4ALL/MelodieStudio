@@ -31,6 +31,7 @@ import {
   SeriesConfig,
   SingleSeriesConfig,
   getChartPosTop,
+  computeInterval,
 } from "./chartutils";
 import { createCandleStickChartDefaultData } from "./defaultoptions";
 import * as echarts from "echarts";
@@ -68,8 +69,8 @@ export default defineComponent({
       chartDOMID: nanoid(),
       currentStep: 0,
       simulationData: {
-        xAxis: { data: [] },
-        series: [{ data: [] }]
+        xAxis: { data: [0] },
+        series: [{ data: [[]] }]
       } as {
         xAxis: {
           data: number[]
@@ -80,6 +81,7 @@ export default defineComponent({
       needsRender: false,
       configDialogShow: false,
       chartOption: defaultOptions as echarts.EChartsCoreOption,
+      xTickInterval: 5
     };
   },
   mounted() {
@@ -99,8 +101,8 @@ export default defineComponent({
         }
 
         const simulationData: typeof this.simulationData = {
-          xAxis: { data: [] },
-          series: [{ data: [] }],
+          xAxis: { data: [0] },
+          series: [{ data: [[]] }],
         };
         const singleSeries = this.seriesConfig[0]
         for (let i = 0; i < singleSeries.data.length; i++) {
@@ -151,11 +153,12 @@ export default defineComponent({
 
       this.needsRender = true;
       this.currentStep += 1;
+      this.xTickInterval = computeInterval(step)
     },
     clear() {
       this.simulationData = {
-        xAxis: { data: [] },
-        series: [{ data: [] }]
+        xAxis: { data: [0] },
+        series: [{ data: [[]] }]
       }
       this.currentStep = 0;
       this.needsRender = true;
@@ -180,6 +183,17 @@ export default defineComponent({
           },
         },
       });
+      this.$chart.setOption({
+        xAxis: {
+          axisTick: {
+            interval: this.xTickInterval - 1
+          },
+          axisLabel: {
+            interval: this.xTickInterval - 1,
+            showMaxLabel: true
+          }
+        }
+      })
       this.needsRender = false;
     },
     initChart() {

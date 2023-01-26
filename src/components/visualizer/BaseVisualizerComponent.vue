@@ -122,6 +122,7 @@ export default defineComponent({
           if (this.currentStep > 0) {
             this.onStep()
           }
+
           // If status is OK, show data;
           // else show alert message!
           if (data.status === 0) {

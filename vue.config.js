@@ -7,46 +7,46 @@ function resolve(dir) {
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackCdnPlugin = require('webpack-cdn-plugin');
-
+const AutoImport = require('unplugin-auto-import/webpack')
+const Components = require('unplugin-vue-components/webpack')
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+const pathResolvers = [
+    AutoImport({
+        resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+        resolvers: [ElementPlusResolver()],
+    }),
+]
 const plugins = [new WebpackCdnPlugin({
     modules: [
+        // {
+        //     name: "vue",
+        //     var: "Vue",
+        //     path: "vue.global.min.js"
+        // },
+        // {
+        //     name: '@element-plus/icons-vue',
+        //     // var: "V",
+        //     prodUrl: 'https://cdn.bootcdn.net/ajax/libs/element-plus-icons-vue/:version/global.iife.js'
+        // },
         {
             name: 'echarts',
-            // var: 'ECharts',
             path: 'echarts.min.js',
         },
-        // {
-        //     name: 'echarts-gl',
-        //     var: 'gl',
-        //     path: 'echarts-gl.min.js'
-        // },
         {
             name: "three",
             var: 'THREE',
             prodUrl: "https://cdn.bootcdn.net/ajax/libs/three.js/:version/three.js"
         },
-        // {
-        //     name: "element-plus/icons-vue",
-        //     url: "https://cdn.bootcdn.net/ajax/libs/element-plus-icons-vue/2.0.10/index.iife.min.js"
-        // }
-        // {
-        //     name:"element-plus",
-        //     path: 'index.min.css',
-        //     cssOnly: true
-        // },
-        // {
-        //     name:"element-plus",
-        //     var: 'element',
-        //     path: 'index.full.min.js'
-        // }
     ],
     publicPath: '/node_modules',
-    //'https://unpkg.com/:name@:version/:path',
     devUrl: ':name/dist/:path',
     prodUrl: 'https://cdn.bootcdn.net/ajax/libs/:name/:version/:path'
 })
-] //.concat([new BundleAnalyzerPlugin()])
-// console.log(utils.)
+]
+
+
 module.exports = {
     publicPath: './',
     devServer: {
@@ -60,7 +60,9 @@ module.exports = {
         },
     },
     configureWebpack: (env) => {
-        console.log(env.production);
+        console.log(env.production, env.independent);
+        const analyzerPlugin = env.analyzer_on != null ? [new BundleAnalyzerPlugin()] : []
+        const cdnPlugin = env.independent == null ? plugins : []
         return {
             devtool: "inline-source-map",
             resolve: {
@@ -73,7 +75,7 @@ module.exports = {
             },
             module: {
             },
-            plugins,
+            plugins: [].concat(pathResolvers).concat(cdnPlugin, analyzerPlugin),
             externals: {}
         }
     },

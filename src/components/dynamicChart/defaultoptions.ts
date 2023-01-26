@@ -90,7 +90,8 @@ export const createCandleStickChartDefaultData = () => {
         xAxis: {
             data: [],
             name: "",
-            nameLocation: "end"
+            nameLocation: "end",
+            scale: true,
         },
         yAxis: {
             name: "",

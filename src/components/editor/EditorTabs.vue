@@ -9,7 +9,7 @@
         <database-browser v-if="file.type == 'sqlite'" :sqlite-path="file.absPath"></database-browser>
         <table-viewer v-if="file.type == 'table'" @unsaved="setUnsaved(file.absPath, $event)" :path="file.absPath">
         </table-viewer>
-        <network-viewer v-as-editor v-if="file.type == 'network'" @unsaved="setUnsaved(file.absPath, $event)"
+        <network-viewer v-if="file.type == 'network'" @unsaved="setUnsaved(file.absPath, $event)"
           :path="file.absPath"></network-viewer>
         <visualizer v-if="file.type == 'visualizer'"></visualizer>
         <!-- <network-viewer

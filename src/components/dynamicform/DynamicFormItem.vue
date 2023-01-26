@@ -2,7 +2,7 @@
     <div class="dynamic-form-item">
         <div class="dynamic-form-content">
             <div class="form-item-header">
-                
+
                 <el-popover :show-after="500" :width="300">
                     <template #reference>
                         <span class="form-item-label">{{ label }}</span>
@@ -18,11 +18,11 @@
                 </el-popover>
             </div>
 
-            <el-input class="form-item-input" :model-value="formattedModelValue"
-                @update:model-value="onValueChange($event)"
-                :disabled="componentModel.readonly"
-                >
-
+            <el-input class="form-item-input" :model-value="valueShown" @update:model-value="onValueChange($event)"
+                :disabled="componentModel.readonly">
+                <template #suffix v-if="props.componentModel.type == 'float' && props.componentModel.percentage">
+                    %
+                </template>
             </el-input>
         </div>
         <div v-if="numericValueErrorMsg != ''" class="form-error-label">
@@ -34,7 +34,7 @@
 </template>
 <script lang="ts" setup>
 import { eliminateFloatRoundoffError } from "@/utils/utils"
-import { defineProps, PropType, defineEmits, computed, onBeforeMount, ref, defineExpose } from "vue"
+import { defineProps, PropType, defineEmits, computed, onBeforeMount, ref, defineExpose, watch } from "vue"
 import { FloatParamType, IntParamType, ParamsType } from "./models";
 const props = defineProps({
     label: {
@@ -51,22 +51,64 @@ const props = defineProps({
     }
 })
 
-const emits = defineEmits(['update:model-value'])
-const onValueChange = (evt: any) => {
 
-    emits('update:model-value', evt)
+
+const emits = defineEmits(['update:model-value'])
+const valueShown = ref('')
+let timeout: number | null = null
+const onValueChange = (evt: any) => {
+    valueShown.value = evt
+    if (timeout == null) {
+        timeout = window.setTimeout(() => {
+            timeout = null
+            emits('update:model-value', convertValue())
+        }, 500)
+    }
+    // emits('update:model-value', evt)
+}
+
+
+watch(
+    () => props.modelValue,
+    (val, prevVal) => {
+        console.log(props.modelValue)
+        updateShownValue()
+        // valueShown.value = props.modelValue
+    }
+);
+const convertValue = () => {
+    if (props.componentModel.type == 'float') {
+        try {
+            let val = parseFloat(valueShown.value)
+            if (props.componentModel.percentage) {
+                val = val / 100
+            }
+            return val
+        } catch (err) {
+            console.error("value is not float", valueShown.value)
+        }
+    } else if (props.componentModel.type == 'int') {
+        try {
+            return parseInt(props.componentModel.type)
+        } catch (err) {
+            console.error("value is not int")
+        }
+    }
+    return valueShown.value
+}
+
+const updateShownValue = () => {
+    if (props.componentModel.type == 'float') {
+        const value = props.componentModel.percentage ? props.modelValue * 100 : props.modelValue
+        const s = `${value}`
+        valueShown.value = eliminateFloatRoundoffError(s)
+    } else {
+        valueShown.value = `${props.modelValue}`
+    }
 }
 
 // If the model value was float, float round off error might happen.
 // This method helps to eliminate the round off errors.
-const formattedModelValue = computed((): string => {
-    if (props.componentModel.type == 'float') {
-        const s = `${props.modelValue}`
-        return eliminateFloatRoundoffError(s)
-    } else {
-        return props.modelValue
-    }
-})
 
 const isNumericValue = computed((): boolean => {
     return props.componentModel.type == 'float' || props.componentModel.type == 'int'
@@ -77,7 +119,11 @@ const numericValueRange = computed((): string => {
 
         const min = (props.componentModel as FloatParamType | IntParamType).min
         const max = (props.componentModel as FloatParamType | IntParamType).max
-        return `[${min}, ${max}]`
+        if (props.componentModel.type == 'float' && props.componentModel.percentage) {
+            return `[${min * 100}%, ${max * 100}%]`
+        } else {
+            return `[${min}, ${max}]`
+        }
     } else {
         return ''
     }
@@ -96,7 +142,7 @@ const numericValueErrorMsg = computed((): string => {
     return ""
 })
 
-const originalValue = ref(null)
+const originalValue = ref<any>(null)
 
 const resetToOriginal = () => {
     if (props.modelValue != originalValue.value) {
@@ -106,7 +152,9 @@ const resetToOriginal = () => {
     }
 }
 onBeforeMount(() => {
-    originalValue.value = props.modelValue
+    updateShownValue()
+    originalValue.value = valueShown.value
+
 })
 
 defineExpose({ resetToOriginal })
