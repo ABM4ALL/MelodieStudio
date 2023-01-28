@@ -22,8 +22,6 @@ export const deleteChartOptions = async (chartName: string): Promise<void> => {
 };
 
 export const getChartPolicies = async (chartType: string): Promise<ChartPolicies> => {
-    // const resp = await request.get("/api/charts/getChartPolicies", { chartType });
-    // return resp.data as ChartPolicies;
     return { selectionItems: {}, unChangeableItems: {} };
 };
 

@@ -8,6 +8,7 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AgentComponent: typeof import('./src/components/visualizer/AgentComponent.vue')['default']
+    AgentTimeseriesView: typeof import('./src/components/visualizer/AgentTimeseriesView.vue')['default']
     AssignComponent: typeof import('./src/components/visual_programming/programming_blocks/AssignComponent.vue')['default']
     AttributeComponent: typeof import('./src/components/visual_programming/programming_blocks/AttributeComponent.vue')['default']
     BarChart: typeof import('./src/components/dynamicChart/BarChart.vue')['default']

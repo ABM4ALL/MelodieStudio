@@ -10,7 +10,11 @@ export interface ResponseOprandType extends BasicOprandType {
     type: "response"
 }
 
-export type OprandTypes = FileOprandType | ResponseOprandType
+export interface JSONOprandType extends BasicOprandType {
+    type: "json"
+}
+
+export type OprandTypes = FileOprandType | ResponseOprandType | JSONOprandType
 
 export interface Operation {
     name: string
@@ -27,8 +31,17 @@ export interface ResponseToFile extends ResponseConversionOperation {
     defaultName: string
 }
 
+export interface ResponseToJson extends ResponseConversionOperation {
+    name: "op-response-to-json"
+    rettype: JSONOprandType
+}
+
 export interface DownloadOperation extends Operation {
     name: "op-download"
 }
 
-export type OperationTypes = ResponseToFile | DownloadOperation
+export interface ShowChartWindow extends Operation {
+    name: "op-show-chart-window"
+}
+
+export type OperationTypes = ResponseToFile | DownloadOperation | ShowChartWindow

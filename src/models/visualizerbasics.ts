@@ -113,4 +113,5 @@ export interface Action {
     key: string
     text: string,
     operation: OperationTypes
+    custom_args: string[]
 }

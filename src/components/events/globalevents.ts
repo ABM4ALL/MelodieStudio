@@ -37,3 +37,11 @@ export const setOnOpenVisualizer = (callback: () => void) => {
 export const requestOpenVisualizer = () => {
     emitter.emit('open-visualizer')
 }
+
+export const showChartWindow = (options: any) => {
+    emitter.emit('show-chart-window', options)
+}
+
+export const setOnShowChartWindow = (callback: (options: any) => void) => {
+    emitter.on('show-chart-window', callback)
+}

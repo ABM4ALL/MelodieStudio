@@ -18,38 +18,22 @@
 }
 </style>
 <template>
-  <div
-    style="
+  <div style="
       position: relative;
       height: 100%;
       display: flex;
       flex-direction: column;
       padding: 10px;
       box-sizing: border-box;
-    "
-  >
-    <toolbar
-      @reset="reset"
-      @step="step"
-      @loop="loop"
-      @pause="pause"
-      @fps-limit-change="fpsLimit = $event"
-      :currentStep="currentStep"
-      :connected="connected"
-      :ws-host="currentWSHost"
-      @ws-host-change="onWSHostChange"
-    >
+    ">
+    <toolbar @reset="reset" @step="step" @loop="loop" @pause="pause" @fps-limit-change="fpsLimit = $event"
+      :currentStep="currentStep" :connected="connected" :ws-host="currentWSHost" @ws-host-change="onWSHostChange">
       <template v-slot:left-items>
-        <params-selector
-          @load-params="onLoadParams"
-          @export-database="onDownloadDatabase"
-          @save-params="onSaveParams"
-          :ws-host="currentWSHost"
-          @save-database="onSaveDatabase"
-          :param-sets="interactiveParams.allParamSetNames"
-          :actions="actions"
-        >
+        <params-selector @load-params="onLoadParams" @export-database="onDownloadDatabase" @save-params="onSaveParams"
+          :ws-host="currentWSHost" @save-database="onSaveDatabase" :param-sets="interactiveParams.allParamSetNames"
+          :actions="actions">
         </params-selector>
+        <agent-time-series-view :ws-host="currentWSHost"></agent-time-series-view>
       </template>
       <template v-slot:right-items>
         <div>
@@ -59,53 +43,34 @@
       </template>
     </toolbar>
 
-    <div
-      style="
+    <div style="
         position: relative;
         flex-grow: 1;
         display: flex;
         flex-direction: row;
-      "
-    >
+      ">
       <div class="params-area">
         <dynamic-form ref="dynamic-form"></dynamic-form>
       </div>
 
       <div class="widgets-area">
-        <markdown-viewer
-          style="width: 100%; height: 100%"
-          v-show="showHelpDoc"
-          :file="'README.md'"
-          :ws-host="currentWSHost"
-        ></markdown-viewer>
+        <markdown-viewer style="width: 100%; height: 100%" v-show="showHelpDoc" :file="'README.md'"
+          :ws-host="currentWSHost"></markdown-viewer>
         <div style="width: 100%; height: 100%" v-show="!showHelpDoc">
           <template v-for="(_item, i) in visualizers" :key="_item.name">
-            <grid-component
-              :ref="`grid-visualizer-new-${i}`"
-              v-if="_item.type == 'grid'"
-              :name="_item.name"
-              :visualizerIndex="i"
-              :visualizerData="visualizerData[_item.name]"
-              :desiredFPS="fpsLimit"
-              :columns="_item.columns"
-              :rows="_item.rows"
-            >
+            <grid-component :ref="`grid-visualizer-new-${i}`" v-if="_item.type == 'grid'" :name="_item.name"
+              :visualizerIndex="i" :visualizerData="visualizerData[_item.name]" :desiredFPS="fpsLimit"
+              :columns="_item.columns" :rows="_item.rows">
             </grid-component>
-            <network-component
-              v-else-if="_item.type == 'network'"
-              :options="visualizerData[_item.name]"
-              :name="'network-visualizer-' + _item.name"
-            ></network-component>
+            <network-component v-else-if="_item.type == 'network'" :options="visualizerData[_item.name]"
+              :name="'network-visualizer-' + _item.name"></network-component>
           </template>
 
-          <chart-list
-            :seriesConfig="seriesConfig"
-            ref="chartList"
-            :style="{ position: 'absolute' }"
-          ></chart-list>
+          <chart-list :seriesConfig="seriesConfig" ref="chartList" :style="{ position: 'absolute' }"></chart-list>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -124,6 +89,7 @@ import { GridItem } from "@/models/agents";
 import { COMMANDS, NewVisualizerData } from "@/models/visualizerbasics";
 import ParamsSelector from "@/components/visualizer/ParamsSelector.vue";
 import MarkdownViewer from "@/components/markdown-viewer/MarkdownViewer.vue";
+import AgentTimeSeriesView from "@/components/visualizer/AgentTimeseriesView.vue"
 import { ElNotification } from "element-plus";
 export default defineComponent({
   extends: BaseVisualizer,
@@ -135,6 +101,7 @@ export default defineComponent({
     ParamsSelector,
     MarkdownViewer,
     NetworkComponent,
+    AgentTimeSeriesView
   },
   name: "hello",
   data() {

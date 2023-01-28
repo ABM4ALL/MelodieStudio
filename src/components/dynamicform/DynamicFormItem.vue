@@ -8,7 +8,7 @@
                         <span class="form-item-label">{{ label }}</span>
                     </template>
                     <div class="form-item-help">
-                        <span v-if="componentModel.description">Description: {{ componentModel.description }}</span>
+                        <span v-if="componentModel.description">Description: {{ componentModel.description.replaceAll("\n", "<br/>") }}</span>
                         <span v-if="isNumericValue">Range: {{ numericValueRange }}</span>
                         <span v-if="componentModel.readonly">Readonly</span>
                         <el-button @click="resetToOriginal">Reset to: {{ originalValue }}
@@ -34,6 +34,8 @@
 </template>
 <script lang="ts" setup>
 import { eliminateFloatRoundoffError } from "@/utils/utils"
+import { ElMessage, ElNotification } from "element-plus";
+import { parse } from "path";
 import { defineProps, PropType, defineEmits, computed, onBeforeMount, ref, defineExpose, watch } from "vue"
 import { FloatParamType, IntParamType, ParamsType } from "./models";
 const props = defineProps({
@@ -64,14 +66,12 @@ const onValueChange = (evt: any) => {
             emits('update:model-value', convertValue())
         }, 500)
     }
-    // emits('update:model-value', evt)
 }
 
 
 watch(
     () => props.modelValue,
     (val, prevVal) => {
-        console.log(props.modelValue)
         updateShownValue()
         // valueShown.value = props.modelValue
     }
@@ -83,21 +83,39 @@ const convertValue = () => {
             if (props.componentModel.percentage) {
                 val = val / 100
             }
+            if (isNaN(val)) {
+                throw Error
+            }
             return val
         } catch (err) {
             console.error("value is not float", valueShown.value)
+            const errText = `Cannot convert ${valueShown.value} to float value`
+            ElNotification.error(errText)
+            throw Error(errText)
         }
     } else if (props.componentModel.type == 'int') {
         try {
-            return parseInt(props.componentModel.type)
+            const parsed = parseInt(valueShown.value)
+            if (isNaN(parsed)) {
+                throw Error
+            }
+            return parsed
         } catch (err) {
+            const errText = `Cannot convert ${valueShown.value} to int value`
+            ElNotification.error(errText)
             console.error("value is not int")
+            throw Error(errText)
         }
     }
     return valueShown.value
 }
 
 const updateShownValue = () => {
+    console.log('modelValue', props.modelValue)
+    if (props.modelValue == null) {
+        valueShown.value = ''
+        return
+    }
     if (props.componentModel.type == 'float') {
         const value = props.componentModel.percentage ? props.modelValue * 100 : props.modelValue
         const s = `${value}`

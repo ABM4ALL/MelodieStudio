@@ -24,6 +24,7 @@ import { GridItem } from "@/models/agents";
 import { ElNotification } from "element-plus";
 import { downloadFileByBase64 } from "@/utils/file";
 import { Action } from "@/models/visualizerbasics"
+import request from "@/request";
 export default defineComponent({
   data() {
     return {
@@ -48,6 +49,7 @@ export default defineComponent({
     };
   },
   methods: {
+
     updateParams(params: ParamsData) {
       this.interactiveParams = params;
       (this.$refs['dynamic-form'] as any).setupModels(params.paramModels);

@@ -1,6 +1,6 @@
 <template>
     <div class="form-container">
-        <el-alert v-if="paramsModified" type="error" :closable="false"
+        <el-alert v-if="paramsModified && showModifiedWarning" type="error" :closable="false"
             title="Warning: Parameters has changed, please reset the model.">
         </el-alert>
         <div label="名称" v-for="(item, index) in paramsModel" :key="index">
@@ -18,15 +18,22 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineExpose } from "vue"
+import {defineProps, defineExpose, ref} from "vue"
 import { ParamsType, ParamValuesType } from "./models"
 import DynamicItemsList from "./DynamicItemsList.vue";
 import DynamicFormItem from "./DynamicFormItem.vue";
 
+defineProps({
+    showModifiedWarning: {
+        type: Boolean,
+        default: true
+    }
+})
 const paramsModel = ref<ParamsType[]>([])
 const paramValues = ref<ParamValuesType>([])
 const paramsModified = ref(false)
 const onUpdate = (index: number, evt) => {
+
     paramValues.value[index] = evt
     updated()
 }

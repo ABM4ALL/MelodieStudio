@@ -205,15 +205,9 @@ export default defineComponent({
       });
       this.$chart.setOption({
         xAxis: {
-          // axisTick: {
           interval: this.xTickInterval,
           min: 0,
           max: this.currentStep
-          // boundaryGap: ['0%', '0%'],
-          // },
-          // axisLabel: {
-          //   interval: this.xTickInterval - 1
-          // }
         }
       })
       this.needsRender = false;
