@@ -106,16 +106,24 @@ const onDownloadDatabase = async () => {
 
 const newAxios = axios.create()
 const onActionClick = async (key: string, action: Action) => {
-    // console.log(action.custom_args)
-    if (action.custom_args.length == 0) {
+    if (!action.fetch_custom_args) {
         emitAction(key, action)
     } else {
         actionWithParamsConfigShow.value = true
         await nextTick();
         currentAction.value = { key, action }
         console.log(dynamicForm.value);
-        (dynamicForm.value as any).setupModels(action.custom_args);
-        (dynamicForm.value as any).setupValues(action.custom_args)
+        const url = `http://${props.wsHost}/action-params/` + key;
+
+        newAxios.get(encodeURI(url)).then((resp) => {
+            console.log('resp', resp.data);
+            (dynamicForm.value as any).setupModels(resp.data.data);
+            (dynamicForm.value as any).setupValues(resp.data.data);
+        }).catch((err) => {
+            ElNotification.error(`Fetching action parameters for action ${key} error.`)
+            console.error(err)
+        });
+
     }
 }
 

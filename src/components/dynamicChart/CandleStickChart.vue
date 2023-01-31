@@ -191,7 +191,11 @@ export default defineComponent({
           axisLabel: {
             interval: this.xTickInterval - 1,
             showMaxLabel: true
-          }
+          },
+          // splitLine: {
+          //   show: true,
+          //   interval: this.xTickInterval - 1
+          // }
         }
       })
       this.needsRender = false;

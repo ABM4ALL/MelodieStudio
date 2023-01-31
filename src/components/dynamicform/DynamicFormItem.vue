@@ -8,7 +8,9 @@
                         <span class="form-item-label">{{ label }}</span>
                     </template>
                     <div class="form-item-help">
-                        <span v-if="componentModel.description">Description: {{ componentModel.description.replaceAll("\n", "<br/>") }}</span>
+                        <span v-if="componentModel.description">Description: {{
+                            componentModel.description.replaceAll("\n", "<br />")
+                        }}</span>
                         <span v-if="isNumericValue">Range: {{ numericValueRange }}</span>
                         <span v-if="componentModel.readonly">Readonly</span>
                         <el-button @click="resetToOriginal">Reset to: {{ originalValue }}
@@ -17,9 +19,14 @@
 
                 </el-popover>
             </div>
-
-            <el-input class="form-item-input" :model-value="valueShown" @update:model-value="onValueChange($event)"
-                :disabled="componentModel.readonly">
+            <el-select v-if="props.componentModel.type == 'selection'" :model-value="valueShown" class="form-item-input"
+                filterable @update:model-value="onValueChange($event)" :disabled="componentModel.readonly">
+                <!-- <el-select v-model="value" class="m-2" placeholder="Select"> -->
+                <el-option v-for="item in props.componentModel.selections" :key="item.value" :label="item.label"
+                    :value="item.value" />
+            </el-select>
+            <el-input v-else class="form-item-input" :model-value="valueShown"
+                @update:model-value="onValueChange($event)" :disabled="componentModel.readonly">
                 <template #suffix v-if="props.componentModel.type == 'float' && props.componentModel.percentage">
                     %
                 </template>
@@ -201,6 +208,7 @@ dynamic-form-content {
 }
 
 .form-item-input {
+    width: 100%;
     margin-top: 4px;
 }
 

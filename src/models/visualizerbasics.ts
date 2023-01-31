@@ -113,5 +113,5 @@ export interface Action {
     key: string
     text: string,
     operation: OperationTypes
-    custom_args: string[]
+    fetch_custom_args: boolean
 }

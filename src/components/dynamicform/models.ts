@@ -1,4 +1,4 @@
-export type PyTypes = 'str' | 'int' | 'float' | 'bool' | "array"
+export type PyTypes = 'str' | 'int' | 'float' | 'bool' | 'selection' | "array"
 
 export interface ParamValue {
     name: string;
@@ -34,13 +34,16 @@ export interface FloatParamType extends ParamType {
     percentage: boolean
 }
 
-
+export interface SelectionParamType extends ParamType {
+    type: "selection";
+    selections: { label: string, value: string | number }[]
+}
 
 export interface ArrayParamsType extends ParamType {
     type: "array",
     children: Array<BasicParamTypes>
 }
-export type BasicParamTypes = FloatParamType | IntParamType | ArrayParamsType
+export type BasicParamTypes = FloatParamType | IntParamType | SelectionParamType | ArrayParamsType
 
 
 
