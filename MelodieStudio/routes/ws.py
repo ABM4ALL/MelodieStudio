@@ -1,3 +1,6 @@
+import asyncio
+from concurrent.futures import thread
+import logging
 import subprocess
 import json
 import os
@@ -9,12 +12,15 @@ import uuid
 from flask import Blueprint, Flask, request
 from flask_sock import Sock
 import psutil
+import websockets
 from ..models import WSMessage, WSMessageTypes, WSToServerMessage, PTYMetaDict
 import threading
 import platform
 from ..utils.ptyhandler import MelodiePTY, MelodiePTYError
 from ..utils.machine import is_windows
 from ..models import Response
+
+logger = logging.getLogger(__name__)
 
 if platform.system().lower().find("windows") != -1:
     from winpty import PtyProcess, PTY
@@ -145,6 +151,45 @@ def send_loop():
 pty_handle_cell = PTYHandleCell()
 ws_handlers = pty_handle_cell
 
+proxied_ws = WSManager()
+
+ws_target = "ws://localhost:8765"
+# studio to visualizer
+proxy_queue = asyncio.Queue()
+# visualizer to studio
+proxy_queue_send = asyncio.Queue()
+
+
+async def hello(loop):
+    uri = "ws://localhost:8765"
+    # loop = asyncio.get_event_loop()
+
+    logger.warning(f"output!!!!!!! connected!!! {id(loop)}")
+
+    async def read_from_browser(ws):
+        while 1:
+            val = await proxy_queue.get()
+            await ws.send(val)
+
+    async def read_from_visualizer(ws):
+        while 1:
+            greeting = await ws.recv()
+            proxy_queue_send.put_nowait(greeting)
+
+    async with websockets.connect(uri) as websocket:
+        f1 = loop.create_task(read_from_browser(websocket))
+        f2 = loop.create_task(read_from_visualizer(websocket))
+        await asyncio.wait([f1, f2])
+
+# logger.warning(f"{id(asyncio.get_event_loop())}")
+# # asyncio.get_event_loop().run_until_complete(hello())
+# new_evt_loop = asyncio.new_event_loop()
+# new_evt_loop.run_until_complete(hello())
+# asyncio_serve = asyncio.get_event_loop().run_forever
+# ws_proxy_th = threading.Thread(target=asyncio_serve, args=(new_evt_loop,))
+# ws_proxy_th.setDaemon(True)
+# ws_proxy_th.start()
+
 
 def register_websocket_handlers(app: Flask):
 
@@ -164,6 +209,14 @@ def register_websocket_handlers(app: Flask):
         while True:
             data = ws.receive()
             ws_handlers.handle_in_chain(json.loads(data))
+
+    @sock.route("/api/visualizer-ws")
+    def proxy(ws):
+        proxied_ws.add(ws)
+
+        while True:
+            data = ws.receive()
+            proxy_queue.put_nowait(data)
 
 
 def send_pty_output(term_id: str, content: str):
