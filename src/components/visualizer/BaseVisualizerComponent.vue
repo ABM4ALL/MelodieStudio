@@ -79,7 +79,7 @@ export default defineComponent({
       return
     },
     connect() {
-      this.$ws = new WebSocket(`ws://${this.currentWSHost}`);
+      this.$ws = new WebSocket(`ws://${this.currentWSHost}/echo`);
       this.$ws.onopen = () => {
         console.log("websocket ready!");
 
