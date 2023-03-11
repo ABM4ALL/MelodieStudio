@@ -20,7 +20,8 @@ from .routes import (
     charts,
     pty_mgr,
     files_blueprint,
-    visualizer_mgr
+    visualizer_mgr,
+    lowcode
 )
 from .utils.config_manager import init_config_manager, get_workdir, set_workdir, get_config_manager
 from .hotupdate import start_watch_fs, create_runner
@@ -41,6 +42,7 @@ app.register_blueprint(tools, url_prefix="/api/tools")
 app.register_blueprint(pty_mgr, url_prefix="/api/pty")
 app.register_blueprint(files_blueprint, url_prefix="/api/files")
 app.register_blueprint(visualizer_mgr, url_prefix="/api/visualizer")
+app.register_blueprint(lowcode, url_prefix="/api/lowcode")
 logger = logging.getLogger(__name__)
 
 
@@ -108,6 +110,7 @@ def studio_main(config: Optional[Config] = None):
 
     th.setDaemon(True)
     th.start()
+    time.sleep(100000) # TODO:delete this row!
     try:
         show_window()
     except BaseException:

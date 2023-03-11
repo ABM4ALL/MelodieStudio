@@ -40,7 +40,7 @@
             <el-button @click="onLoadParams(paramSetName)" type="primary">Load</el-button>
         </div>
     </el-dialog>
-    <el-dialog v-model="actionWithParamsConfigShow" :append-to-body="true" width="30vw">
+    <el-dialog v-model="actionWithParamsConfigShow" :append-to-body="true" width="30vw" :title="actionParamDialogTitle">
         <dynamic-form ref="dynamicForm" :show-modified-warning="false"></dynamic-form>
         <template #footer>
             <el-button @click="actionWithParamsConfigShow = false">Cancel</el-button>
@@ -59,6 +59,7 @@ import { OperationEvaluator } from "@/service/operation_evaluator/opeval"
 const emits = defineEmits(["save-params", "load-params", "save-database", "export-database"])
 const loadParamSetDialogShow = ref(false)
 const actionWithParamsConfigShow = ref(false)
+const actionParamDialogTitle = ref('')
 const dynamicForm = ref(null)
 const currentAction = ref<{ action: null | Action, key: string }>({ action: null, key: "" })
 const props = defineProps({
@@ -110,6 +111,7 @@ const onActionClick = async (key: string, action: Action) => {
         emitAction(key, action)
     } else {
         actionWithParamsConfigShow.value = true
+        actionParamDialogTitle.value = `Parameters of "${action.text}"`
         await nextTick();
         currentAction.value = { key, action }
         console.log(dynamicForm.value);

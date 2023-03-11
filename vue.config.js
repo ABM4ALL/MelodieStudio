@@ -62,11 +62,11 @@ module.exports = {
         },
     },
     configureWebpack: (env) => {
-        console.log(env.production, env.independent,process.env.VUE_APP_SOURCEMAP_ON);
+        console.log(env.production, env.independent, process.env.VUE_APP_SOURCEMAP_ON);
         const analyzerPlugin = env.analyzer_on ? [new BundleAnalyzerPlugin()] : []
-        const cdnPlugin = env.independent == null ? plugins : []
+        const cdnPlugin = process.env.VUE_APP_INDEPENDENT == "TRUE" ? plugins : []
         return {
-            devtool: process.env.VUE_APP_SOURCEMAP_ON=="TRUE" ? "inline-source-map" : undefined,
+            devtool: process.env.VUE_APP_SOURCEMAP_ON == "TRUE" ? "inline-source-map" : undefined,
             resolve: {
                 alias: {
                     "@": path.resolve("src")

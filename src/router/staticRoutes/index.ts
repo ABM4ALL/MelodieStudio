@@ -65,6 +65,14 @@ export const staticRoutes = [
     meta: {
       icon: 'el-icon-s-home'
     }
+  },  {
+    path: '/state-diagram',
+    name: 'StateDiagram',
+    component: () => import('@/components/flowchart/Flowchart.vue'),
+    children: [],
+    meta: {
+      icon: 'el-icon-s-home'
+    }
   }, 
   // {
   //   path: '/blockly-canvas',

@@ -12,6 +12,11 @@
 - Echarts server-side configurable items
 - Configure connections to different types of databases by connection string, and get data by sqlalchemy.
 
+## Version 0.6.0
+- Feature: Added form configurations on units;
+- Feature: Added visualizer address switching mechanics;
+- Enhancement: optimized package size of webpage. 
+
 ## Version 0.5.0
 - Feature: Fixed network and grid visualization;
 - Feature: Dynamic actions from Melodie visualizer to webpage in order to implement customized actions, eg. export table to `.xlsx` file from database.

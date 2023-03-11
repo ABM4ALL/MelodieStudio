@@ -73,6 +73,7 @@ declare module '@vue/runtime-core' {
     FileTreeButton: typeof import('./src/components/editor/filetree-utils/FileTreeButton.vue')['default']
     FileTreeButtons: typeof import('./src/components/editor/filetree-utils/FileTreeButtons.vue')['default']
     FloatLabel: typeof import('./src/components/editor/FloatLabel.vue')['default']
+    Flowchart: typeof import('./src/components/flowchart/Flowchart.vue')['default']
     GridComponent: typeof import('./src/components/visualizer/GridComponent.vue')['default']
     GridSplitter: typeof import('./src/components/visualizer/GridSplitter.vue')['default']
     GridVisualizer: typeof import('./src/components/visualizer/GridVisualizer.vue')['default']
@@ -103,5 +104,6 @@ declare module '@vue/runtime-core' {
     Tooltips: typeof import('./src/components/editor/tooltip-utils/Tooltips.vue')['default']
     VariableComponent: typeof import('./src/components/visual_programming/programming_blocks/VariableComponent.vue')['default']
     VisualProgramming: typeof import('./src/components/visual_programming/VisualProgramming.vue')['default']
+    VueNode: typeof import('./src/components/flowchart/VueNode.vue')['default']
   }
 }
