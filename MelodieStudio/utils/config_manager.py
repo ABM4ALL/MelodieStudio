@@ -3,10 +3,13 @@
 # @Author: Zhanyi Hou
 # @Email: 1295752786@qq.com
 # @File: configure_manager.py
+import logging
 import os
 from typing import Optional
 
 from ..services.json_config import JSONManager
+
+logger = logging.getLogger(__name__)
 
 COMPULSORY_CONFIGS_DIR = os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "compulsory_configs"
@@ -56,6 +59,8 @@ class ConfigureCategory:
         config, err = JSONManager.from_file(self._file, dict)
         if err is not None:
             raise Exception(err)
+        
+        need_to_write = False
 
         for k, v in self.__dict__.items():
             if k.startswith("_"):
@@ -63,9 +68,13 @@ class ConfigureCategory:
             if k in config:
                 self.__dict__[k] = config[k]
             else:
-                raise AttributeError(
+                logger.warning(
                     f"Configure file {self._file} does not define '{k}'"
                 )
+                need_to_write = True
+
+        if need_to_write:
+            self.save()
 
     def to_dict(self):
         """
@@ -123,9 +132,22 @@ class ConfigureManager:
                 f"Config folder '{conf_folder}' is a file, not a folder"
             )
         self._conf_folder = conf_folder
+
+        # The folder to store logs
+        self._log_folder = os.path.join(self._conf_folder, "logs")
+
+        if not os.path.exists(self._log_folder):
+            os.makedirs(self._log_folder)
+
         self.basic_config: BasicConfig = BasicConfig(
             os.path.join(conf_folder, "basic_config.json"), False
         )
+
+    def get_gateway_log_file(self)->str:
+        return os.path.join(self._log_folder, "gateway.log")
+
+    def get_studio_log_file(self)->str:
+        return os.path.join(self._log_folder, "studio.log")
 
     def chart_style_config_file(self):
         return os.path.join(self._conf_folder, "chart_options.json")

@@ -45,8 +45,14 @@ export default defineComponent({
       visualizerData: {},
       actions: [] as Action[],
       unMounted: false,
-      currentWSHost: "127.0.0.1:8765"
+      currentWSHost: "127.0.0.1:8765",
+      wsHeartbeatTimer: -1
     };
+  },
+  beforeUnmount() {
+    if (this.wsHeartbeatTimer !== -1) {
+      window.clearInterval(this.wsHeartbeatTimer)
+    }
   },
   methods: {
 
@@ -78,21 +84,27 @@ export default defineComponent({
     onStep() {
       return
     },
+
     connect() {
-      this.$ws = new WebSocket(`ws://${this.currentWSHost}/echo`);
+      this.$ws = new WebSocket(`ws://${window.location.host}/visualizer/echo`);
       this.$ws.onopen = () => {
-        console.log("websocket ready!");
 
         this.sendCommand(COMMANDS.GET_PARAMS, { name: "" });
         this.sendCommand(COMMANDS.INIT_OPTIONS, {});
         this.sendCommand(COMMANDS.CURRENT_DATA, {});
         this.connected = true;
+        this.wsHeartbeatTimer = window.setInterval(() => {
+          if (this.$ws && this.$ws.OPEN) {
+            this.$ws.send(JSON.stringify({ cmd: COMMANDS.HEARTBEAT, data: "" }))
+          }
+        }, 15000)
       };
       this.$ws.onclose = () => {
         this.connected = false;
         this.reconnect();
       };
       this.$ws.onmessage = (wsStatus: MessageEvent) => {
+
         const data: VisData = JSON.parse(wsStatus.data);
         if (data.type === "params") {
           this.updateParams(data.data as ParamsData);

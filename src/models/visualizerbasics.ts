@@ -33,7 +33,7 @@ export enum COMMANDS {
     // LOAD_PARAMS = 8,
     SAVE_DATA = 8,
     DOWNLOAD_DATA = 9,
-    // GENERAL_COMMAND = 10
+    HEARTBEAT=100
 }
 
 export type StatusType = number;
@@ -98,7 +98,7 @@ export interface FileModel {
 export type VisualizeViewInitialOption = GridVisComponentViewInitialOptions | NetworkVisComponentViewInitialOptions
 
 export interface VisData {
-    type: string;
+    type: "initOption" | "initPlotSeries" | "notification" | "params" | "data" | "actions" | "file";
     period: number;
     data: VisualizerData | ParamsData | SeriesConfig | NotificationModel | FileModel | Action[];
     modelState: ModelStateType;
@@ -112,6 +112,8 @@ export interface CommandParams {
 export interface Action {
     key: string
     text: string,
+    menu: string
+    type: "default" | "parameterized-window"
     operation: OperationTypes
     fetch_custom_args: boolean
 }

@@ -17,18 +17,21 @@
 }
 </style>
 <template>
-    <!-- <div> -->
-    <el-popover trigger="click" width="160">
+    <el-popover trigger="click" width="160" v-for="(menu, menuName) in menuRoots" :key="menuName">
         <template #reference>
-            <el-button>Scenario...</el-button>
+            <el-button>{{ menuName }}</el-button>
         </template>
         <div class="popover-buttonlist">
-            <el-button @click="onSaveParams">Save</el-button>
-            <el-button @click="loadParamSetDialogShow = true">Load</el-button>
 
-            <el-button @click="onActionClick(action.key, action)" v-for="action of actions" :key="action.key">{{
-                action.text
-            }}</el-button>
+            <template v-for="(menuItem, menuName) of menu" :key="menuName">
+
+                <parameterized-chart-window :ws-host="wsHost" :action="menuItem.action!"
+                    v-if="menuItem.action != null && menuItem.action.type == 'parameterized-window'"></parameterized-chart-window>
+                <el-button @click="menuItem.callback" v-else>{{
+                    menuItem.text
+                }}</el-button>
+            </template>
+
         </div>
     </el-popover>
 
@@ -49,13 +52,15 @@
     </el-dialog>
 </template>
 <script setup lang="ts">
-import { defineEmits, defineProps, PropType, ref, nextTick } from "vue"
+import { defineEmits, defineProps, PropType, ref, nextTick, computed } from "vue"
 import { ElMessageBox, ElNotification } from "element-plus";
 import { Action } from "@/models/visualizerbasics";
 import axios from "axios";
 import { downloadFile } from "@/utils/file";
 import DynamicForm from "../dynamicform/DynamicForm.vue";
 import { OperationEvaluator } from "@/service/operation_evaluator/opeval"
+import { Base64 } from 'js-base64';
+import ParameterizedChartWindow from "./ParameterizedChartWindow.vue";
 const emits = defineEmits(["save-params", "load-params", "save-database", "export-database"])
 const loadParamSetDialogShow = ref(false)
 const actionWithParamsConfigShow = ref(false)
@@ -67,6 +72,36 @@ const props = defineProps({
     actions: Array as PropType<Action[]>,
     wsHost: String
     // type:
+})
+
+type Menus = { [key: string]: { [key: string]: { text: string, callback: () => void, action: Action | null } } }
+const defaultMenus: Menus = {
+    "Scenarios":
+    {
+
+        "Load": { text: "Load", callback: () => { loadParamSetDialogShow.value = true }, action: null },
+        "Save": { text: "Save", callback: () => { onSaveParams() }, action: null }
+    }
+}
+const menuRoots = computed((): Menus => {
+
+    if (props.actions == null) {
+        return defaultMenus
+    }
+    const menus: Menus = { "Scenarios": defaultMenus['Scenarios'] }
+
+    for (const action of props.actions) {
+        const menuName = action.menu || "Actions"
+        if (menus[menuName] == null) {
+            menus[menuName] = {} //as { [key: string]: () => void }
+        }
+        menus[menuName][action.key] = {
+            text: action.text,
+            callback: () => { onActionClick(action.key, action) },
+            action
+        }
+    }
+    return menus
 })
 // 页面加载的时候，需要一并加载。
 // Send: request to change params-set
@@ -115,7 +150,7 @@ const onActionClick = async (key: string, action: Action) => {
         await nextTick();
         currentAction.value = { key, action }
         console.log(dynamicForm.value);
-        const url = `http://${props.wsHost}/action-params/` + key;
+        const url = `/visualizer/action-params/` + key;
 
         newAxios.get(encodeURI(url)).then((resp) => {
             console.log('resp', resp.data);
@@ -140,8 +175,8 @@ const triggerActionWithCustomArgs = () => {
 }
 
 const emitAction = (key: string, action: Action, args?: any[]) => {
-    const argsSection = args ? "?args=" + JSON.stringify(args) : ""
-    const url = `http://${props.wsHost}/action/` + key + argsSection
+    const argsSection = args ? "?args=" + Base64.encode(JSON.stringify(args)) : ""
+    const url = `/visualizer/action/` + key + argsSection
 
     newAxios.get(encodeURI(url), { responseType: 'blob' }).then((resp) => {
         try {
@@ -151,6 +186,7 @@ const emitAction = (key: string, action: Action, args?: any[]) => {
             console.error(err)
         }
     }).catch((err) => {
+        console.error(err)
         const reader = new FileReader();
         reader.onload = function (event) {
             const content = reader.result;//内容就在这里

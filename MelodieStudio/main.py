@@ -1,6 +1,9 @@
 import argparse
+from contextlib import closing
 import logging
 import os
+import socket
+import sys
 import threading
 import time
 
@@ -10,6 +13,8 @@ from threading import current_thread
 from flask import Flask, redirect, g as app_ctx, current_app, request
 
 from MelodieInfra import Config
+
+from MelodieStudio.gateway.gateway import start_gateway_thread
 
 from ._config import set_studio_config
 from .routes import (
@@ -26,6 +31,9 @@ from .routes import (
 from .utils.config_manager import init_config_manager, get_workdir, set_workdir, get_config_manager
 from .hotupdate import start_watch_fs, create_runner
 from .window import show_window
+
+
+
 args_parser = argparse.ArgumentParser(description="Melodie Studio")
 args_parser.add_argument(
     "--workdir", help="The workdir where MelodieStudio serve")
@@ -43,7 +51,13 @@ app.register_blueprint(pty_mgr, url_prefix="/api/pty")
 app.register_blueprint(files_blueprint, url_prefix="/api/files")
 app.register_blueprint(visualizer_mgr, url_prefix="/api/visualizer")
 app.register_blueprint(lowcode, url_prefix="/api/lowcode")
-logger = logging.getLogger(__name__)
+
+
+app.logger.setLevel(logging.ERROR)
+
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
+
+logger = logging.getLogger("studio-server-main")
 
 
 @app.before_request
@@ -61,7 +75,7 @@ def logging_after(response):
     else:
         time_in_ms = 'unknown'
     # Log the time taken for the endpoint
-    current_app.logger.info(
+    logger.info(
         "%s ms %s %s %s %s", time_in_ms, request.method, request.path, dict(
             request.args), current_thread()
     )
@@ -72,6 +86,15 @@ def logging_after(response):
 def handle_root():
     return redirect(f"http://{request.host}/index.html", code=301)
 
+def find_free_port():
+    """
+    Find an unused port for studio server.
+
+    """
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(('', 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
 
 def studio_main(config: Optional[Config] = None):
     """
@@ -96,6 +119,11 @@ def studio_main(config: Optional[Config] = None):
         conf_folder = os.path.join(config.project_root, ".melodie", "studio")
     init_config_manager(conf_folder)
     conf_manager = get_config_manager()
+
+    studio_logfile = open(conf_manager.get_studio_log_file(), 'w', encoding='utf8', errors="ignore")
+
+    logging.basicConfig(stream=studio_logfile, level=logging.INFO)
+
     if config is not None:
         if os.path.exists(config.visualizer_entry):
             create_runner(config)
@@ -106,15 +134,25 @@ def studio_main(config: Optional[Config] = None):
         start_watch_fs(get_workdir(), create_runner)
     register_websocket_handlers(app)
 
-    th = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=conf_manager.basic_config.PORT))
+    studio_port = find_free_port()
+    gateway_thread = start_gateway_thread(
+        conf_manager.basic_config.PORT, studio_port=studio_port)
+    th = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=studio_port))
 
+    logger.info(f"""\n
+Melodie Studio is running on: 
+- Gateway:          {conf_manager.basic_config.PORT}
+- Studio Service:   {studio_port}
+- Visualizer:       {conf_manager.basic_config.CURRENT_VISUALIZER_HOST}
+
+If MelodieStudio cannot connect to the visualizer, please check if the visualizer host in webpage is corresponding to the visualizer configuration.
+""")
     th.setDaemon(True)
     th.start()
-    time.sleep(100000) # TODO:delete this row!
-    try:
-        show_window()
-    except BaseException:
-        import traceback
-        traceback.print_exc()
-        while 1:
-            time.sleep(1)
+    # try:
+    #     show_window()
+    # except BaseException:
+    #     import traceback
+    #     traceback.print_exc()
+    while 1:
+        time.sleep(1)

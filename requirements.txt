@@ -17,3 +17,5 @@ jedi
 flask_sock
 astroid
 psutil
+brotli
+websocket-client

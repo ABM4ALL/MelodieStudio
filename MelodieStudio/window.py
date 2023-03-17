@@ -1,7 +1,6 @@
 
 import os
 import sys
-import logging
 from typing import Tuple
 
 from MelodieStudio.utils.config_manager import get_config_manager
@@ -45,6 +44,7 @@ def show_window():
     def on_window_close():
         print("window close!")
         root.destroy()
+        
     import tkinter as tk
     root = tk.Tk()
     root.title('MelodieStudio')

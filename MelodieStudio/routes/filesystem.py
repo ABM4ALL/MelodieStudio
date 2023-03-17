@@ -173,7 +173,6 @@ def get_file_by_path():
         
         stripped_path = request.path[len(file_server_baseurl):]
         file_abs_path = os.path.join(wd, stripped_path)
-        print('wd', wd, stripped_path, file_abs_path)
         if not (os.path.isfile(file_abs_path) and os.path.exists(file_abs_path)):
             return Response.error(
                 f"Filename {file_abs_path} invalid. It may not exist or not a file."

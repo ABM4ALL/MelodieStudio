@@ -59,6 +59,11 @@ module.exports = {
                 target: 'http://127.0.0.1:8089/',
                 changeOrigin: true
             },
+            '/visualizer/':{
+                target: 'http://127.0.0.1:8089',
+                changeOrigin: true,
+                ws: true,
+            }
         },
     },
     configureWebpack: (env) => {
