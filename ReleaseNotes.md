@@ -12,6 +12,13 @@
 - Echarts server-side configurable items
 - Configure connections to different types of databases by connection string, and get data by sqlalchemy.
 
+## Version 0.7.0
+- Feature: Used a gateway forwarding the visualizer and studio.
+- Bugfix: Fixed cdn configurations for offline environments.
+
+## Version 0.6.1
+- Bugfix: If settings not compatible, MelodieStudio will fill up the missing items with default ones and write to the configuration file.
+
 ## Version 0.6.0
 - Feature: Added form configurations on units;
 - Feature: Added visualizer address switching mechanics;
