@@ -58,7 +58,7 @@ app.logger.setLevel(logging.ERROR)
 logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
 logger = logging.getLogger("studio-server-main")
-
+logger.setLevel(logging.INFO)
 
 @app.before_request
 def logging_before():
@@ -138,15 +138,18 @@ def studio_main(config: Optional[Config] = None):
     gateway_thread = start_gateway_thread(
         conf_manager.basic_config.PORT, studio_port=studio_port)
     th = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=studio_port))
-
-    logger.info(f"""\n
+    info = f"""
 Melodie Studio is running on: 
 - Gateway:          {conf_manager.basic_config.PORT}
 - Studio Service:   {studio_port}
 - Visualizer:       {conf_manager.basic_config.CURRENT_VISUALIZER_HOST}
 
+Please visit this url http://localhost:{conf_manager.basic_config.PORT} to open the visualizer.
+
 If MelodieStudio cannot connect to the visualizer, please check if the visualizer host in webpage is corresponding to the visualizer configuration.
-""")
+"""
+    logger.info(info)
+    print(info, file=sys.stderr)
     th.setDaemon(True)
     th.start()
     # try:
