@@ -45,7 +45,7 @@ with open('README.md', encoding='utf8', errors='replace') as f:
 
 setuptools.setup(
     name="MelodieStudio",
-    version="0.7.0",
+    version="0.7.0.dev1",
     description="A web-based toolbox for Melodie ABM package.",
     long_description=long_description,
     long_description_content_type="text/markdown",

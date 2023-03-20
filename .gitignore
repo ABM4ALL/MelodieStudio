@@ -3,6 +3,7 @@ node_modules
 /dist
 *.pyc
 build
+*.log
 webdist
 *.egginfo
 # local env files
