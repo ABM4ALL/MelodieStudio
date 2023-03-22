@@ -100,6 +100,7 @@ declare module '@vue/runtime-core' {
     TableViewer: typeof import('./src/components/tableviewer/TableViewer.vue')['default']
     TerminalTabs: typeof import('./src/components/terminal/TerminalTabs.vue')['default']
     TerminalView: typeof import('./src/components/terminal/TerminalView.vue')['default']
+    Test: typeof import('./src/components/flowchart/Test.vue')['default']
     ThreejsViewer: typeof import('./src/components/network/ThreejsViewer.vue')['default']
     Toolbar: typeof import('./src/components/visualizer/Toolbar.vue')['default']
     ToolButton: typeof import('./src/components/basic/ToolButton.vue')['default']

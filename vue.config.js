@@ -59,7 +59,7 @@ module.exports = {
                 target: 'http://127.0.0.1:8089/',
                 changeOrigin: true
             },
-            '/visualizer/':{
+            '/visualizer/': {
                 target: 'http://127.0.0.1:8089',
                 changeOrigin: true,
                 ws: true,
@@ -69,7 +69,8 @@ module.exports = {
     configureWebpack: (env) => {
         console.log(env.production, env.independent, process.env.VUE_APP_SOURCEMAP_ON);
         const analyzerPlugin = env.analyzer_on ? [new BundleAnalyzerPlugin()] : []
-        const cdnPlugin = process.env.VUE_APP_INDEPENDENT == "TRUE" ? plugins : []
+        const cdnPlugin = process.env.VUE_APP_INDEPENDENT == "TRUE" ? [] : plugins
+        console.log("cdnplugin:", cdnPlugin)
         return {
             devtool: process.env.VUE_APP_SOURCEMAP_ON == "TRUE" ? "inline-source-map" : undefined,
             resolve: {

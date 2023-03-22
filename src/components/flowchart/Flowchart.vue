@@ -1,6 +1,8 @@
 <template>
     <el-button @click="exportGraph">export</el-button>
+    <test></test>
     <div id="flowchart" style="height: 800px;width: 600px;"></div>
+    
 </template>
 
 <script setup lang="ts">
@@ -13,6 +15,7 @@ import '@logicflow/extension/lib/style/index.css'
 import UserTask from "./UserTask";
 import UserNode from "./UserNode";
 import CustomEdge from "./Edge"
+import Test from "./Test"
 LogicFlow.use(DndPanel);
 LogicFlow.use(SelectionSelect);
 
