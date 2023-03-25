@@ -1,4 +1,4 @@
-import { HtmlNode, HtmlNodeModel } from "@logicflow/core";
+import { GraphModel, HtmlNode, HtmlNodeModel, NodeConfig, NodeData } from "@logicflow/core";
 import { createApp, ref, h, VNode, App } from "vue";
 import VueNode from "./VueNode.vue";
 
@@ -6,18 +6,24 @@ class VueHtmlNode extends HtmlNode {
   isMounted: boolean
   r: VNode
   app: App
-  constructor(props) {
+  constructor(props: { model: VueHtmlNodeModel }) {
     super(props);
     this.isMounted = false;
     this.r = h(VueNode, {
-      properties: props.model.getProperties(),
-      text: props.model.inputData,
+      properties: props.model.getProperties() as { t: number, style: any },
+      text: props.model.inputData as any,
+      onValueChange: (i) => {
+        console.log('value', i)
+        props.model.inputBlockValue = i
+        props.model.properties['data'] = i
+      },
       onBtnClick: (i) => {
         this.r.component!.props.text = String(
           Number(this.r.component!.props.text) + Number(i)
         );
         console.log('text', props.model)
         props.model.inputData = this.r.component!.props.text
+
       }
     });
     this.app = createApp({
@@ -40,24 +46,18 @@ class VueHtmlNode extends HtmlNode {
 }
 
 class VueHtmlNodeModel extends HtmlNodeModel {
+  constructor(data: NodeConfig, model: GraphModel) {
+    super(data, model)
+    console.log('data', data, model)
+    console.log(this.inputData, this.properties)
+  }
+
   setAttributes() {
     this.width = 300;
     this.height = 100;
     this.text.editable = false;
     this.inputData = this.text.value;
-    // this.anchorsOffset = [
-    //   [this.width / 2, 0],
-    //   [0, this.height / 2],
-    //   [-this.width / 2, 0],
-    //   [0, -this.height / 2],
-    // ]
   }
-  // getOutlineStyle() {
-  //   const style = super.getOutlineStyle();
-  //   style.stroke = "none";
-  //   style.hover!.stroke = "none";
-  //   return style;
-  // }
   getDefaultAnchor() {
     const { width, height, x, y, id } = this;
     return [
@@ -79,9 +79,9 @@ class VueHtmlNodeModel extends HtmlNodeModel {
   }
   getData() {
     const data = super.getData();
-    data.text = this.inputData
+    data.inputData = this.inputData
+    data.inputBlockValue = this.inputBlockValue
     console.log(data)
-    // data.text!.value = this.inputData;
     return data;
   }
 }

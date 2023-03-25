@@ -44,8 +44,9 @@ const data = {
       "type": "UserNode",
       "x": 220,
       "y": 260,
-      "properties": {},
-      "text": ""
+      "properties": {"aaaa":"bbbb"},
+      "text": "",
+      "inputData": "-----------"
     },
     {
       "id": "23248262-b675-4737-a419-baa08210984b",
