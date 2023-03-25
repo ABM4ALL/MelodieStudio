@@ -1,8 +1,5 @@
 <script lang="ts">
-import {
-  InitialParams,
-  ParamsData,
-} from "@/components/dynamicform/models";
+import { InitialParams, ParamsData } from "@/components/dynamicform/models";
 import Vue, { defineComponent } from "vue";
 import {
   CommandParams,
@@ -23,8 +20,9 @@ import {
 import { GridItem } from "@/models/agents";
 import { ElNotification } from "element-plus";
 import { downloadFileByBase64 } from "@/utils/file";
-import { Action } from "@/models/visualizerbasics"
+import { Action } from "@/models/visualizerbasics";
 import request from "@/request";
+import { getCurrentOS } from "../terminal/terminal_utils";
 export default defineComponent({
   data() {
     return {
@@ -46,20 +44,19 @@ export default defineComponent({
       actions: [] as Action[],
       unMounted: false,
       currentWSHost: "127.0.0.1:8765",
-      wsHeartbeatTimer: -1
+      wsHeartbeatTimer: -1,
     };
   },
   beforeUnmount() {
     if (this.wsHeartbeatTimer !== -1) {
-      window.clearInterval(this.wsHeartbeatTimer)
+      window.clearInterval(this.wsHeartbeatTimer);
     }
   },
   methods: {
-
     updateParams(params: ParamsData) {
       this.interactiveParams = params;
-      (this.$refs['dynamic-form'] as any).setupModels(params.paramModels);
-      (this.$refs['dynamic-form'] as any).setupValues(params.initialParams);
+      (this.$refs["dynamic-form"] as any).setupModels(params.paramModels);
+      (this.$refs["dynamic-form"] as any).setupValues(params.initialParams);
 
       this.$nextTick(() => {
         this.paramsModified = false;
@@ -82,26 +79,29 @@ export default defineComponent({
       }
     },
     onStep() {
-      return
+      return;
     },
 
     connect() {
-      this.$ws = new WebSocket(`ws://${window.location.host}/visualizer/echo`);
+      // this.$ws = new WebSocket(`ws://${window.location.host}/visualizer/echo`);
+      this.$ws = new WebSocket(`ws://${this.currentWSHost}/visualizer/echo`);
       this.$ws.onopen = () => {
-
+        console.log("websocket opened!", this.$ws.binaryType);
         this.sendCommand(COMMANDS.GET_PARAMS, { name: "" });
         this.sendCommand(COMMANDS.INIT_OPTIONS, {});
         this.sendCommand(COMMANDS.CURRENT_DATA, {});
         if (this.wsHeartbeatTimer !== -1) {
-          window.clearInterval(this.wsHeartbeatTimer)
-          this.wsHeartbeatTimer = -1
+          window.clearInterval(this.wsHeartbeatTimer);
+          this.wsHeartbeatTimer = -1;
         }
         this.wsHeartbeatTimer = window.setInterval(() => {
           if (this.$ws && this.$ws.OPEN) {
-            console.log("HEARTBEAT sent!", this.$ws.binaryType)
-            this.$ws.send(JSON.stringify({ cmd: COMMANDS.HEARTBEAT, data: "HEARTBEAT" }))
+            console.log("HEARTBEAT sent!", this.$ws.binaryType);
+            this.$ws.send(
+              JSON.stringify({ cmd: COMMANDS.HEARTBEAT, data: "HEARTBEAT" })
+            );
           }
-        }, 5000)
+        }, 5000);
       };
       this.$ws.onclose = () => {
         this.connected = false;
@@ -114,31 +114,30 @@ export default defineComponent({
           this.updateParams(data.data as ParamsData);
           return;
         } else if (data.type == "notification") {
-          const notification = data.data as NotificationModel
-          ElNotification({ ...notification })
-          return
-        } else if (data.type == 'actions') {
-          this.actions = data.data as Action[]
-          return
+          const notification = data.data as NotificationModel;
+          ElNotification({ ...notification });
+          return;
+        } else if (data.type == "actions") {
+          this.actions = data.data as Action[];
+          return;
         } else if (data.type == "file") {
-          const f = data.data as FileModel
-          downloadFileByBase64(f.name, f.content)
+          const f = data.data as FileModel;
+          downloadFileByBase64(f.name, f.content);
         } else if (data.type === "initOption") {
           const visualizerIDs: VisualizeViewInitialOption[] = [];
           for (let i in data.data) {
-            const initData: VisualizeViewInitialOption = data.data[i]
+            const initData: VisualizeViewInitialOption = data.data[i];
             visualizerIDs.push(initData);
-            this.visualizerData[initData.name] = (initData as any).graph
+            this.visualizerData[initData.name] = (initData as any).graph;
           }
           this.visualizers = visualizerIDs;
           return;
         } else if (data.type === "initPlotSeries") {
           this.seriesConfig = (data.data as any).charts as SeriesConfig;
         } else {
-
           this.currentStep = data.period;
           if (this.currentStep > 0) {
-            this.onStep()
+            this.onStep();
           }
 
           // If status is OK, show data;
@@ -203,9 +202,9 @@ export default defineComponent({
 
     reset() {
       this.sendCommand(COMMANDS.RESET, {
-        params: (this.$refs['dynamic-form'] as any).getValues(),
+        params: (this.$refs["dynamic-form"] as any).getValues(),
       });
-      (this.$refs['dynamic-form'] as any).setUnmodified()
+      (this.$refs["dynamic-form"] as any).setUnmodified();
       this.paramsModified = false;
       this.visualizationState = this.STATES.STEP;
       this.sendCommand(COMMANDS.CURRENT_DATA, {});
