@@ -8,9 +8,7 @@
                         <span class="form-item-label">{{ label }}</span>
                     </template>
                     <div class="form-item-help">
-                        <span v-if="componentModel.description">Description: {{
-                            componentModel.description.replaceAll("\n", "<br />")
-                        }}</span>
+                        <span style="white-space: pre-wrap;" v-if="componentModel.description" v-html="'Description:'+componentModel.description.replaceAll('\n', '<br>')"></span>
                         <span v-if="isNumericValue">Range: {{ numericValueRange }}</span>
                         <span v-if="componentModel.readonly">Readonly</span>
                         <el-button @click="resetToOriginal">Reset to: {{ originalValue }}
@@ -25,8 +23,8 @@
                 <el-option v-for="item in props.componentModel.selections" :key="item.value" :label="item.label"
                     :value="item.value" />
             </el-select>
-            <el-input v-else class="form-item-input" :model-value="valueShown"
-                @update:model-value="onValueChange($event)" :disabled="componentModel.readonly">
+            <el-input v-else class="form-item-input" :model-value="valueShown" @update:model-value="onValueChange($event)"
+                :disabled="componentModel.readonly">
                 <template #suffix v-if="props.componentModel.type == 'float' && props.componentModel.percentage">
                     %
                 </template>
@@ -37,7 +35,6 @@
         </div>
 
     </div>
-
 </template>
 <script lang="ts" setup>
 import { eliminateFloatRoundoffError } from "@/utils/utils"
@@ -66,6 +63,7 @@ const emits = defineEmits(['update:model-value'])
 const valueShown = ref('')
 let timeout: number | null = null
 const onValueChange = (evt: any) => {
+    console.log(valueShown.value, evt)
     valueShown.value = evt
     if (timeout == null) {
         timeout = window.setTimeout(() => {
@@ -123,6 +121,11 @@ const updateShownValue = () => {
         valueShown.value = ''
         return
     }
+    if (props.componentModel.type == "selection") {
+        valueShown.value = props.modelValue
+        return
+    }
+
     if (props.componentModel.type == 'float') {
         const value = props.componentModel.percentage ? props.modelValue * 100 : props.modelValue
         const s = `${value}`

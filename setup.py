@@ -45,13 +45,13 @@ with open('README.md', encoding='utf8', errors='replace') as f:
 
 setuptools.setup(
     name="MelodieStudio",
-    version="0.7.0.dev1",
+    version="0.7.0",
     description="A web-based toolbox for Melodie ABM package.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    # url='https://github.com/SongminYu/Melodie',
-    author="ABM4ALL",
-    author_email="songmin.yu@isi.fraunhofer.de",
+    url='https://github.com/ABM4ALL/MelodieStudio',
+    author="Songmin Yu, Zhanyi Hou",
+    author_email="abm4all@outlook.com",
     license="BSD 3",
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -63,9 +63,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
-    project_urls={
-        "Documentation": "https://Melodie.readthedocs.io/en/latest/index.html",
-    },
     packages=setuptools.find_namespace_packages(
         include=["MelodieStudio", "MelodieStudio.*"]
     ),

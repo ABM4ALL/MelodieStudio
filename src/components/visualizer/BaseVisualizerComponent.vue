@@ -92,19 +92,23 @@ export default defineComponent({
         this.sendCommand(COMMANDS.GET_PARAMS, { name: "" });
         this.sendCommand(COMMANDS.INIT_OPTIONS, {});
         this.sendCommand(COMMANDS.CURRENT_DATA, {});
-        this.connected = true;
+        if (this.wsHeartbeatTimer !== -1) {
+          window.clearInterval(this.wsHeartbeatTimer)
+          this.wsHeartbeatTimer = -1
+        }
         this.wsHeartbeatTimer = window.setInterval(() => {
           if (this.$ws && this.$ws.OPEN) {
-            this.$ws.send(JSON.stringify({ cmd: COMMANDS.HEARTBEAT, data: "" }))
+            console.log("HEARTBEAT sent!", this.$ws.binaryType)
+            this.$ws.send(JSON.stringify({ cmd: COMMANDS.HEARTBEAT, data: "HEARTBEAT" }))
           }
-        }, 15000)
+        }, 5000)
       };
       this.$ws.onclose = () => {
         this.connected = false;
         this.reconnect();
       };
       this.$ws.onmessage = (wsStatus: MessageEvent) => {
-
+        this.connected = true;
         const data: VisData = JSON.parse(wsStatus.data);
         if (data.type === "params") {
           this.updateParams(data.data as ParamsData);

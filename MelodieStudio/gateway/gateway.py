@@ -19,6 +19,7 @@ import brotli
 import http.client
 import html
 import queue
+import datetime
 from urllib.parse import urlparse, urlsplit, parse_qsl
 from base64 import b64encode
 from hashlib import sha1
@@ -35,7 +36,7 @@ from MelodieStudio.utils.config_manager import get_config_manager
 
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.WARNING)
 trunc = 125
 #trunc = 0
 
@@ -560,8 +561,6 @@ class WsHttpProxy(HttpProxy):
             if length > 0:
                 self.connection.send(message.encode())
         except socket.error as e:
-            import traceback
-            traceback.print_exc()
             self.log_message(f"connection: {self.connection}")
             # websocket content error, time-out or disconnect.
             self.log_message(
@@ -700,8 +699,12 @@ class WSProxy(WsHttpProxy):
         self.log_message('%s', f"Connecting to remote websocket {remote_url}")
         self._remote_websocket = websocket.WebSocket(
             sslopt={"cert_reqs": ssl.CERT_NONE})
-        self._remote_websocket.connect(remote_url)
-
+        try:
+            self._remote_websocket.connect(remote_url)
+        except ConnectionRefusedError as e:
+            self.log_message("connection refused error at on_message: %s", e)
+            print(f"[WARNING {datetime.datetime.now()}]: Gateway cannot connect to the visualizer, please check if the visualizer was started!", file=sys.stderr)
+            return
         def forward_to_client(proxy_obj):
             # Send responses to client
             self.log_message(

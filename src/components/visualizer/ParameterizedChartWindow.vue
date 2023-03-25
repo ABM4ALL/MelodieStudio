@@ -41,8 +41,8 @@ const showWindow = async () => {
     await nextTick()
     newAxios.get(encodeURI(url)).then((resp) => {
         console.log('resp', resp.data);
-        (dynamicForm.value as any).setupModels(resp.data.data);
-        (dynamicForm.value as any).setupValues(resp.data.data);
+        (dynamicForm.value as any).setupModels(resp.data.data.model);
+        (dynamicForm.value as any).setupValues(resp.data.data.values);
     }).catch((err) => {
         ElNotification.error(`Fetching action parameters for action ${props.action.key} error.`)
         console.error(err)
@@ -51,6 +51,7 @@ const showWindow = async () => {
 
 const draw = async () => {
     const args: { name: string, value: any }[] = (dynamicForm.value as any).getValues()
+    console.log(args)
     const argsSection = args ? "?args=" + Base64.encode(JSON.stringify(args)) : ""
     const url = `/visualizer/action/` + props.action.key + argsSection
 
