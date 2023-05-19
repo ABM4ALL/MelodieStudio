@@ -150,7 +150,7 @@ const onActionClick = async (key: string, action: Action) => {
         await nextTick();
         currentAction.value = { key, action }
         console.log(dynamicForm.value);
-        const url = `/visualizer/action-params/` + key;
+        const url = "http://" + props.wsHost + `/visualizer/action-params/` + key;
 
         newAxios.get(encodeURI(url)).then((resp) => {
             console.log('resp', resp.data);
@@ -176,7 +176,7 @@ const triggerActionWithCustomArgs = () => {
 
 const emitAction = (key: string, action: Action, args?: any[]) => {
     const argsSection = args ? "?args=" + Base64.encode(JSON.stringify(args)) : ""
-    const url = `/visualizer/action/` + key + argsSection
+    const url = "http://" + props.wsHost + `/visualizer/action/` + key + argsSection
 
     newAxios.get(encodeURI(url), { responseType: 'blob' }).then((resp) => {
         try {

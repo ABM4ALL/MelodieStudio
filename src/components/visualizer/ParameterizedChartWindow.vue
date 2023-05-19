@@ -36,7 +36,7 @@ const chartNum = ref(1)
 const newAxios = axios.create()
 const showWindow = async () => {
 
-    const url = `/visualizer/action-params/` + props.action.key;
+    const url = "http://" + props.wsHost + `/visualizer/action-params/` + props.action.key;
     showAgentsTimeSeriesView.value = true
     await nextTick()
     newAxios.get(encodeURI(url)).then((resp) => {
@@ -53,7 +53,7 @@ const draw = async () => {
     const args: { name: string, value: any }[] = (dynamicForm.value as any).getValues()
     console.log(args)
     const argsSection = args ? "?args=" + Base64.encode(JSON.stringify(args)) : ""
-    const url = `/visualizer/action/` + props.action.key + argsSection
+    const url = "http://" + props.wsHost + `/visualizer/action/` + props.action.key + argsSection
 
     newAxios.get(encodeURI(url)).then((resp) => {
         try {

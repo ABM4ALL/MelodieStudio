@@ -134,14 +134,13 @@ def studio_main(config: Optional[Config] = None):
         start_watch_fs(get_workdir(), create_runner)
     register_websocket_handlers(app)
 
-    studio_port = find_free_port()
-    gateway_thread = start_gateway_thread(
-        conf_manager.basic_config.PORT, studio_port=studio_port)
-    th = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=studio_port))
+    # studio_port = find_free_port()
+    # gateway_thread = start_gateway_thread(
+    #     conf_manager.basic_config.PORT, studio_port=studio_port)
+    th = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=conf_manager.basic_config.PORT))
     info = f"""
 Melodie Studio is running on: 
-- Gateway:          {conf_manager.basic_config.PORT}
-- Studio Service:   {studio_port}
+- Studio Service:   {conf_manager.basic_config.PORT}
 - Visualizer:       {conf_manager.basic_config.CURRENT_VISUALIZER_HOST}
 
 Please visit this url http://localhost:{conf_manager.basic_config.PORT} to open the visualizer.
