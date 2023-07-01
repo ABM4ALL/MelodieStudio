@@ -28,6 +28,8 @@ class UserTaskView extends RectNode {
       ]
     );
   }
+
+
   getShape() {
     const { model } = this.props;
     const { x, y, width, height, radius } = model;
@@ -88,6 +90,36 @@ class UserTaskModel extends RectNodeModel {
     style.stroke = "red";
     style.hover.stroke = "red";
     return style;
+  }
+  getData() {
+    const data = super.getData();
+    data.anchors = {
+      input: [],
+      output: []
+    }
+    console.log(data)
+    return data;
+  }
+
+  getDefaultAnchor() {
+
+    const { width, height, x, y, id } = this;
+    return [
+      {
+        x: x - width / 2,
+        y,
+        type: 'left',
+        edgeAddable: false, // 控制锚点是否可以从此锚点手动创建连线。默认为true。
+        id: `${id}_0`
+      },
+      {
+        x: x + width / 2,
+        y,
+        type: 'right',
+        id: `${id}_1`
+      },
+    ]
+
   }
 }
 

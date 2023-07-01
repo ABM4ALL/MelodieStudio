@@ -37,6 +37,7 @@ const props = defineProps({
       width: number;
       height: number;
     }>,
+    required: true
   },
   role: {
     type: String as PropType<"agent" | "spot">,

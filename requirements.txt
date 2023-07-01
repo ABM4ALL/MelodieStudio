@@ -19,3 +19,4 @@ astroid
 psutil
 brotli
 websocket-client
+pywinpty

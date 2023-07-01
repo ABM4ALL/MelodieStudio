@@ -1,5 +1,5 @@
 export type PyTypes = 'str' | 'int' | 'float' | 'bool' | 'selection' | "array"
-
+export type FormComponentTypes = "auto" | "panel"
 export interface ParamValue {
     name: string;
     type: PyTypes;
@@ -15,7 +15,7 @@ export interface ParamType {
     name: string;
     type: PyTypes;
     label: string;
-    component: string;
+    component?: FormComponentTypes;
     readonly: boolean;
     description: string
 }
@@ -42,6 +42,7 @@ export interface SelectionParamType extends ParamType {
 export interface ArrayParamsType extends ParamType {
     type: "array",
     children: Array<BasicParamTypes>
+    component: FormComponentTypes
 }
 export type BasicParamTypes = FloatParamType | IntParamType | SelectionParamType | ArrayParamsType
 

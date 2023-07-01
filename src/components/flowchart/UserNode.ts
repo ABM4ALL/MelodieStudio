@@ -40,9 +40,6 @@ class VueHtmlNode extends HtmlNode {
       this.r.component!.props.properties = this.props.model.getProperties();
     }
   }
-  // getText() {
-  //   return null;
-  // }
 }
 
 class VueHtmlNodeModel extends HtmlNodeModel {

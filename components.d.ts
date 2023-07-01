@@ -19,6 +19,7 @@ declare module '@vue/runtime-core' {
     CandleStickChart: typeof import('./src/components/dynamicChart/CandleStickChart.vue')['default']
     ChartConfig: typeof import('./src/components/dynamicChart/ChartConfig.vue')['default']
     ChartList: typeof import('./src/components/dynamicChart/ChartList.vue')['default']
+    CodeAnalysis: typeof import('./src/components/codeAnalysis/CodeAnalysis.vue')['default']
     CodeEditor: typeof import('./src/components/editor/CodeEditor.vue')['default']
     CommonComponent: typeof import('./src/components/visual_programming/programming_blocks/CommonComponent.vue')['default']
     CythonEditor2: typeof import('./src/components/editor/CythonEditor2.vue')['default']

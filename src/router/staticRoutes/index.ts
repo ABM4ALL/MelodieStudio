@@ -26,10 +26,9 @@ export const staticRoutes = [
       icon: 'home-filled',
       title: "Melody Studio"
     },
-    // redirect: "/studio-main"
-    redirect: "/full-page-visualizer"
-  },
-
+    redirect: "/codeAnalysis"
+    // redirect: "/full-page-visualizer"
+  }, 
   {
     path: '/home',
     name: 'Home',
@@ -39,6 +38,15 @@ export const staticRoutes = [
       icon: 'home-filled',
       title: "Melody Studio"
     },
+  },
+  {
+    path: '/codeAnalysis',
+    name: 'CodeAnalysis',
+    component: () => import('@/components/codeAnalysis/CodeAnalysis.vue'),
+    children: [],
+    meta: {
+      icon: 'el-icon-s-home'
+    }
   },
   {
     path: '/visualizer',
@@ -57,7 +65,9 @@ export const staticRoutes = [
     meta: {
       icon: 'el-icon-s-home'
     }
-  }, {
+  }, 
+  
+  {
     path: '/visual-programming',
     name: 'VisualProgramming',
     component: () => import('@/components/visual_programming/VisualProgramming.vue'),

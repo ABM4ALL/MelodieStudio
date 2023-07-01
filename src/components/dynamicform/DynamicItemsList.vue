@@ -60,7 +60,7 @@
 <script lang="ts" setup>
 import { deepCopy } from "@/utils/utils";
 import { defineProps, PropType, defineEmits, ref, onBeforeMount, watch, computed, defineExpose } from "vue"
-import { ArrayParamsType, ArrayParamsValue, ParamsType, ParamValue } from "./models"
+import { ArrayParamsType, ArrayParamsValue, FormComponentTypes, ParamsType, ParamValue } from "./models"
 import DynamicFormItem from "./DynamicFormItem.vue";
 const props = defineProps({
     paramsModel: {
@@ -72,7 +72,7 @@ const props = defineProps({
         required: true
     },
     type: {
-        type: String as PropType<'auto' | 'panel'>
+        type: String as PropType<FormComponentTypes>
     },
     depth: {
         type: Number,
@@ -80,7 +80,7 @@ const props = defineProps({
     }
 })
 
-const itemRefs = [];
+const itemRefs: HTMLDivElement[] = [];
 const setItemRef = (el: HTMLDivElement) => {
     itemRefs.push(el)
 }
@@ -112,15 +112,6 @@ const originalValue: { value: ParamValue } = { value: {} as ParamValue }
 const resetParams = () => {
     console.log('reset params!')
     emits('update-value', originalValue.value)
-    // for (const item of itemRefs) {
-    //     if (item == null) {
-    //         continue
-    //     }
-    //     const f = (item as any).resetToOriginal
-    //     if (f != null) {
-    //         f()
-    //     }
-    // }
 }
 onBeforeMount(() => {
     if (props.paramsModel.children.length > 0) {
@@ -145,7 +136,6 @@ defineExpose({
     margin-top: 0px;
     margin-bottom: 0px;
     min-width: var(--label-width);
-    /* max-width: var(--label-width); */
     flex-grow: 1;
 }
 </style>
