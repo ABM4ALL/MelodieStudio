@@ -3,21 +3,16 @@
 <template>
   <div>
     <el-dialog v-model="dialogVisible">
-      <!-- <el-button @click="onSelectDirectory">Select Directory</el-button> -->
       <el-button @click="gotoParent_">ToParentDir</el-button>
-      <el-button @click="select">Select</el-button>
+      <el-button @click="select" v-if="selectMode == 'directory'">Select</el-button>
       <p>{{ currentDirectory }}</p>
       <div>
-        <div v-for="(value, index) in fsItemsList" :key="index">
+        <div v-for="(value, index) in fsItemsList" :key="index" @click="itemClicked(value)">
           <el-icon>
             <Folder v-if="value.type == 'directory'" />
             <Document v-else />
           </el-icon>
-          <a
-            v-if="value.type == 'directory'"
-            @click="gotoSubDir_(value.name)"
-            >{{ value.name }}</a
-          >
+          <a v-if="value.type == 'directory'" @click="gotoSubDir_(value.name)">{{ value.name }}</a>
           <a v-else>{{ value.name }}</a>
         </div>
       </div>
@@ -30,16 +25,23 @@ import { Folder, Document } from "@element-plus/icons-vue";
 </script>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import { getFSItems, gotoSubDir, gotoParentDir } from "@/api/fs";
+import { FileSystemItem } from "@/models/fs"
 
 export default defineComponent({
-  emits: ["select-directory"],
+  emits: ["select-directory", "select-file"],
+  props: {
+    selectMode: {
+      type: String as PropType<"directory" | "file">,
+      default: () => "directory"
+    }
+  },
   data() {
     return {
       dialogVisible: false,
       currentDirectory: "",
-      fsItemsList: [],
+      fsItemsList: [] as FileSystemItem[],
     };
   },
   mounted() {
@@ -55,24 +57,30 @@ export default defineComponent({
       }
     },
     async getFSItems_() {
-      const resp = await getFSItems(this.currentDirectory);
-      const fsItems = resp.data;
+      const fsItems = await getFSItems(this.currentDirectory);
       this.currentDirectory = fsItems.currentDirectory;
       this.fsItemsList = fsItems.fsItemsList;
     },
 
     async gotoSubDir_(subdirName: string) {
-      const resp = await gotoSubDir(this.currentDirectory, subdirName);
-      const fsItems = resp.data;
+      const fsItems = await gotoSubDir(this.currentDirectory, subdirName);
       this.currentDirectory = fsItems.currentDirectory;
       this.fsItemsList = fsItems.fsItemsList;
     },
 
     async gotoParent_() {
-      const resp = await gotoParentDir(this.currentDirectory);
-      const fsItems = resp.data;
+      console.log(this.currentDirectory)
+      const fsItems = await gotoParentDir(this.currentDirectory);
       this.currentDirectory = fsItems.currentDirectory;
       this.fsItemsList = fsItems.fsItemsList;
+    },
+
+    itemClicked(item: FileSystemItem) {
+      if ((this.selectMode == "file") && (item.type == "file")) {
+        this.$emit("select-file", item.absPath)
+        this.dialogVisible = false;
+        return
+      }
     },
 
     select() {
@@ -83,5 +91,4 @@ export default defineComponent({
 });
 </script>
 
-<style>
-</style>
+<style></style>

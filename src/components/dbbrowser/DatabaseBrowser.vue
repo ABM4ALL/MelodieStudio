@@ -1,5 +1,7 @@
 <template>
   <div style="height: 100%">
+    {{ sqliteFile }}
+    <directory-selector @select-file="sqliteFile=$event" select-mode="file"></directory-selector>
     <el-row>
       <el-col :span="16">
         <el-input v-model="queryForm.sql" placeholder="Please input" @change="onSQLChange" />
@@ -46,13 +48,16 @@ import { getTableNames, query } from "@/api/db";
 import { defineComponent } from "@vue/runtime-core";
 import { ElMessage } from "element-plus";
 import { QueriedData } from "@/models/data_mani";
+import DirectorySelector from "@/components/projectcreator/DirectorySelector.vue";
 import parser from "js-sql-parser";
 export default defineComponent({
   props: {
     sqlitePath: String,
   },
+  components: { DirectorySelector },
   data() {
     return {
+      sqliteFile: this.sqlitePath,
       queryForm: {
         sql: "select * from scenarios LIMIT 100;",
         autoLimit: true,
@@ -107,6 +112,9 @@ export default defineComponent({
     handleScroll(evt) {
       return;
     },
+    selectSQLiteFile() {
+      return
+    },
     onSQLChange() {
       let ast: any = {};
       try {
@@ -127,7 +135,7 @@ export default defineComponent({
     },
     async queryTable() {
       const data: QueriedData = await query({
-        connectionString: `sqlite:///${this.sqlitePath}` as string,
+        connectionString: `sqlite:///${this.sqliteFile}` as string,
         sql: this.queryForm.sql as string,
       });
       this.columns = data.schema.fields;
@@ -136,7 +144,7 @@ export default defineComponent({
     },
     async getAllTableNames() {
       const tableNames = await getTableNames({
-        connectionString: `sqlite:///${this.sqlitePath}` as string,
+        connectionString: `sqlite:///${this.sqliteFile}` as string,
       });
       this.tableNames = tableNames;
     },
@@ -154,7 +162,7 @@ export default defineComponent({
   overflow-y: auto;
 }
 
-.table-name-item{
+.table-name-item {
   margin-top: 6px;
 }
 

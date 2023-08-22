@@ -28,7 +28,7 @@ export const staticRoutes = [
     },
     redirect: "/codeAnalysis"
     // redirect: "/full-page-visualizer"
-  }, 
+  },
   {
     path: '/home',
     name: 'Home',
@@ -65,8 +65,8 @@ export const staticRoutes = [
     meta: {
       icon: 'el-icon-s-home'
     }
-  }, 
-  
+  },
+
   {
     path: '/visual-programming',
     name: 'VisualProgramming',
@@ -75,7 +75,7 @@ export const staticRoutes = [
     meta: {
       icon: 'el-icon-s-home'
     }
-  },  {
+  }, {
     path: '/state-diagram',
     name: 'StateDiagram',
     component: () => import('@/components/flowchart/Flowchart.vue'),
@@ -83,7 +83,7 @@ export const staticRoutes = [
     meta: {
       icon: 'el-icon-s-home'
     }
-  }, 
+  },
   // {
   //   path: '/blockly-canvas',
   //   name: 'BlocklyCanvas',
@@ -114,6 +114,16 @@ export const staticRoutes = [
         path: 'dbBrowser',
         name: 'DB Browser',
         component: Database,
+        children: [],
+        meta: {
+          icon: 'coin',
+          keepAlive: true
+        }
+      },
+      {
+        path: 'safetyInfoDB',
+        name: 'Safety Info DB',
+        component: () => import('@/components/safety-info-db/SafetyInfoDB.vue'),
         children: [],
         meta: {
           icon: 'coin',
