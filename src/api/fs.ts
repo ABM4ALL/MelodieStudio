@@ -1,14 +1,15 @@
 import request from "@/request";
-export const getFSItems = async (directory: string): Promise<any> => {
-    return request.get("/api/fs/getFSItems", { directory: directory });
+import { FileSystemItem, FSResponseData } from "@/models/fs"
+export const getFSItems = async (directory: string): Promise<FSResponseData> => {
+    return (await request.get("/api/fs/getFSItems", { directory: directory })).data;
 };
 
-export const gotoSubDir = async (directory: string, subdir: string): Promise<any> => {
-    return request.get("/api/fs/gotoSubDir", { directory: directory, subdir: subdir });
+export const gotoSubDir = async (directory: string, subdir: string): Promise<FSResponseData> => {
+    return (await request.get("/api/fs/gotoSubDir", { directory: directory, subdir: subdir })).data;
 };
 
-export const gotoParentDir = async (directory: string): Promise<any> => {
-    return request.get("/api/fs/gotoParentDir", { directory: directory });
+export const gotoParentDir = async (directory: string): Promise<FSResponseData> => {
+    return (await request.get("/api/fs/gotoParentDir", { directory: directory })).data;
 };
 
 export const getFSItemsRecursive = async (directory: string): Promise<any> => {

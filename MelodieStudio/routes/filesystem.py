@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 file_system = Blueprint("fs", __name__)
 
 
-def get_all_file_items(directory: str, one_layer=False):
+def get_all_file_items(directory: str, one_layer=True):
     items = []
     for root, dirs, files in os.walk(directory):
         if not os.path.samefile(root, directory):
@@ -53,7 +53,8 @@ def get_all_file_items(directory: str, one_layer=False):
 def all_fs_items():
     directory: str = request.args["directory"]
     if directory == "":
-        directory = os.path.join(os.path.expanduser("~"), "Desktop")
+        # directory = os.path.join(os.path.expanduser("~"), "Desktop")
+        directory = os.getcwd()
     if os.path.exists(directory):
         return Response.ok(
             {
