@@ -1,4 +1,5 @@
-export type PyTypes = 'str' | 'int' | 'float' | 'bool' | 'selection' | "array"
+export type BasicDataTypes = 'str' | 'int' | 'float' | 'bool'
+export type PyTypes = BasicDataTypes | 'selection' | "array"
 export type FormComponentTypes = "auto" | "panel"
 export interface ParamValue {
     name: string;
@@ -16,8 +17,8 @@ export interface ParamType {
     type: PyTypes;
     label: string;
     component?: FormComponentTypes;
-    readonly: boolean;
-    description: string
+    readonly?: boolean;
+    description?: string
 }
 
 export interface IntParamType extends ParamType {
@@ -33,6 +34,16 @@ export interface FloatParamType extends ParamType {
     step: number;
     percentage: boolean
 }
+
+export interface StringParamType extends ParamType {
+    type: "str"
+    pattern?: string
+}
+
+export interface BoolParamType extends ParamType {
+    type: "bool"
+}
+
 
 export interface SelectionParamType extends ParamType {
     type: "selection";

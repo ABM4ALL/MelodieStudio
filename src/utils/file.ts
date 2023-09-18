@@ -104,18 +104,46 @@ function dataURLtoBlob(dataurl, name) {//name:文件名
   return new Blob([u8arr], { type: mime });
 }
 
-function downloadSomeFile(url: string, name: string) {
+export function downloadSomeFile(url: string, name: string) {
   const a = document.createElement("a")//创建a标签触发点击下载
-  a.setAttribute("href", url)//附上
-  a.setAttribute("download", name)
-  a.setAttribute("target", "_blank")
-  let clickEvent = document.createEvent("MouseEvents");
-  clickEvent.initEvent("click", true, true);
-  a.dispatchEvent(clickEvent);
+  // a.setAttribute("href", url)//附上
+  // a.setAttribute("download", name)
+  // a.setAttribute("target", "_blank")
+  console.log("name", name)
+  a.href = url
+
+  a.download = name
+  a.click()
+  // let clickEvent = document.createEvent("MouseEvents");
+  // a.addEventListener("click", null)
+  // clickEvent.initEvent("click", true, true);
+  // a.dispatchEvent(clickEvent);
 }
 //主函数
 export function downloadFileByBase64(name: string, base64: string) {
   const myBlob = dataURLtoBlob(base64, name)
   const myUrl = URL.createObjectURL(myBlob)
   downloadSomeFile(myUrl, name)
+}
+
+export function downloadFileNew(url: string, filename: string) {
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.responseType = 'blob';
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      const blob = new Blob([xhr.response], { type: 'application/octet-stream' });
+
+      // 创建一个下载链接
+      const downloadLink = document.createElement('a');
+      downloadLink.href = window.URL.createObjectURL(blob);
+      downloadLink.download = filename;
+
+      // 模拟点击下载链接
+      downloadLink.click();
+    }
+  };
+
+  xhr.send();
 }

@@ -26,8 +26,8 @@ export const staticRoutes = [
       icon: 'home-filled',
       title: "Melody Studio"
     },
-    redirect: "/codeAnalysis"
-    // redirect: "/full-page-visualizer"
+    // redirect: "/codeAnalysis"
+    redirect: "/full-page-visualizer"
   },
   {
     path: '/home',
@@ -66,7 +66,16 @@ export const staticRoutes = [
       icon: 'el-icon-s-home'
     }
   },
-
+  {
+    path: '/db-browser',
+    name: 'DBBrowser',
+    component: () => import('@/components/web-db-browser/DBBrowser.vue'),
+    children: [],
+    meta: {
+      icon: 'coin',
+      keepAlive: true
+    }
+  },
   {
     path: '/visual-programming',
     name: 'VisualProgramming',
@@ -84,24 +93,6 @@ export const staticRoutes = [
       icon: 'el-icon-s-home'
     }
   },
-  // {
-  //   path: '/blockly-canvas',
-  //   name: 'BlocklyCanvas',
-  //   component: () => import('@/components/blockly/BlocklyCanvas.vue'),
-  //   children: [],
-  //   meta: {
-  //     icon: 'el-icon-s-home'
-  //   }
-  // },
-  // {
-  //   path: '/chartList',
-  //   name: 'ChartListView',
-  //   component: ChartListView,
-  //   children: [],
-  //   meta: {
-  //     icon: 'el-icon-s-home'
-  //   }
-  // },
   {
     path: '/tools',
     name: 'Tools',
@@ -114,16 +105,6 @@ export const staticRoutes = [
         path: 'dbBrowser',
         name: 'DB Browser',
         component: Database,
-        children: [],
-        meta: {
-          icon: 'coin',
-          keepAlive: true
-        }
-      },
-      {
-        path: 'safetyInfoDB',
-        name: 'Safety Info DB',
-        component: () => import('@/components/safety-info-db/SafetyInfoDB.vue'),
         children: [],
         meta: {
           icon: 'coin',
